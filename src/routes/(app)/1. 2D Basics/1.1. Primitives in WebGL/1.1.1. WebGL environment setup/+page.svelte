@@ -2,6 +2,7 @@
     import { onMount } from 'svelte';
     import { WebGLUtils } from '$lib/utils.js';
     import CodeBlock from '$lib/components/CodeBlock.svelte';
+    import { theme } from "$lib/stores";
 
     let canvas, gl;
     let vertices = [];

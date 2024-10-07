@@ -26,10 +26,7 @@
         setTimeout(() => {
             const block = document.querySelector('pre code');
             if (block) {
-                // If the code is already escaped (contains HTML entities), unescape it first
-                const processedCode = current_code.includes('&lt;') 
-                    ? unescapeHtml(current_code)
-                    : current_code;
+                const processedCode = current_code.includes('&lt;') ? unescapeHtml(current_code) : current_code;
                     
                 block.dataset.highlighted = '';
                 block.textContent = processedCode;
@@ -39,9 +36,7 @@
     }
 
     function copyToClipboard() {
-        const textToCopy = current_code.includes('&lt;')
-            ? unescapeHtml(current_code)
-            : current_code;
+        const textToCopy = current_code.includes('&lt;') ? unescapeHtml(current_code) : current_code;
             
         navigator.clipboard.writeText(textToCopy).then(() => {
             button_text = 'Copied!';
@@ -59,16 +54,12 @@
     }
 </script>
 
-<div class="relative my-8 w-full">
+<div class="relative my-8 w-full" style="min-width: 768px;">
     <div class="button-container absolute flex flex-row justify-between p-4 w-full rounded-l-lg">
         <div class="flex flex-row justify-start">
             {#if code_snippets.length > 1}
                 {#each code_snippets as code_snippet, i}
-                    <button 
-                        class="me-2 text-sm px-4 py-4 rounded-lg w-auto" 
-                        class:selected={i === current_snippet_index}
-                        on:click={() => selectSnippet(i)}
-                    > 
+                    <button class="me-2 text-sm px-4 py-4 rounded-lg w-auto" class:selected={i === current_snippet_index} on:click={() => selectSnippet(i)}> 
                         {code_snippet.name} 
                     </button>
                 {/each}
@@ -77,18 +68,12 @@
             {/if}
         </div>
 
-        <button 
-            on:click={copyToClipboard} 
-            class="me-2 text-sm px-4 py-4 rounded-lg w-auto"
-        >
+        <button on:click={copyToClipboard} class="text-sm px-4 py-4 rounded-lg w-auto">
             {button_text}
         </button>
     </div>
 
-    <pre 
-        class="language-{current_language} m-0 {classes}" 
-        style={style}
-    >
+    <pre class="language-{current_language} m-0 {classes}" style={style}>
         <code class="language-{current_language}">
             {current_code}
         </code>
@@ -104,8 +89,7 @@
         background-color: #282c34; 
         overflow-x: auto;
         width: 100%;
-        padding: 4rem 1rem 1rem 1rem;
-        border-radius: 0.5rem;
+        padding: 2rem 1rem 1rem 1rem;
     } 
 
     code { 

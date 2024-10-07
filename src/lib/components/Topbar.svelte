@@ -1,10 +1,9 @@
 <script>
     import { onMount } from "svelte";
     import { page } from "$app/stores";
+    import { theme } from "$lib/stores";
 
-    // const singlseDigitPattern = /^\d\.\s/;
-    // const doubleDigitPattern = /^\d\.\d\.\s/;
-    // const tripleDigitPattern = /^\d\.\d\.\d\.\s/;
+    import ThemeToggle from "$lib/components/ThemeToggle.svelte";
 
     let title, subtitle, url, parent_path;
 
@@ -69,8 +68,10 @@
     </div>
 
     <a href="/home">
-        <img src="/favicon.png" alt="logo" class="w-12 h-12 top-4 right-4" />
+        <img src="/favicon-{$theme}.png" alt="logo" class="w-12 h-12 top-4 right-4" />
     </a>
+
+    <!-- <ThemeToggle /> -->
 </div>
 
 <style>

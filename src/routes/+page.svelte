@@ -1,5 +1,6 @@
 <script>
     import Button from "$lib/components/Button.svelte";
+    import { theme } from "$lib/stores";
 </script>
 
 <div class="flex flex-col justify-center items-center h-screen">
@@ -9,7 +10,7 @@
 
         <div class="flex flex-row justify-center items-center me-9">
             <p class="text-8xl text-bold">Computer</p>
-            <img src="/favicon.png" alt="icon" class="w-16 h-16 mx-4">
+            <img src="/favicon-{ $theme }.png" alt="icon" class="w-16 h-16 mx-4">
             <p class="text-8xl text-bold">Graphics</p>
         </div>
     </div>

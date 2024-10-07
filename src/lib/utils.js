@@ -1,6 +1,6 @@
 const WebGLUtils = function() {
     var setupWebGL = function(canvas, opt_attribs) {
-        if (typeof window === 'undefined') return null; // Prevent SSR issues
+        if (typeof window === 'undefined') return null;
 
         function showLink(str) {
             var container = canvas.parentNode;
@@ -22,7 +22,7 @@ const WebGLUtils = function() {
     };
 
     var create3DContext = function(canvas, opt_attribs) {
-        if (typeof window === 'undefined') return null; // Prevent SSR issues
+        if (typeof window === 'undefined') return null;
 
         var names = ["webgl", "experimental-webgl", "webkit-3d", "moz-webgl"];
         var context = null;
@@ -43,7 +43,6 @@ const WebGLUtils = function() {
     };
 }();
 
-// Only define requestAnimFrame on the client side
 if (typeof window !== 'undefined') {
     window.requestAnimFrame = (function() {
         return window.requestAnimationFrame ||

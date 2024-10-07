@@ -967,8 +967,7 @@ function inverse(m)
    if(m.length == 4) return inverse4(m);
 }
 
-function normalMatrix(m, flag)
-{
+function normalMatrix(m, flag) {
     var a = mat4();
     a = inverse(transpose(m));
     if (flag != true) 
@@ -979,5 +978,3 @@ function normalMatrix(m, flag)
         return b;
     }
 }
-
-export { flatten, vec2 };
