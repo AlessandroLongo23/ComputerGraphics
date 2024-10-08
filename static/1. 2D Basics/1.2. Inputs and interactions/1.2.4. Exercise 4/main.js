@@ -23,10 +23,11 @@ window.onload = function init() {
     mode = 'points';
     side = 20;
     count = 0;
-    max_points = 100;
+    max_points = 1000;
+    n_triangles = 32;
     
     // points
-    colorsArray = []
+    colors_array = []
     vertices = [];
 
     vBuffer = gl.createBuffer();
@@ -44,45 +45,78 @@ window.onload = function init() {
             switch(document.getElementById("pointscolor").selectedIndex) {
                 case 0:
                     for (var i = 0; i < 6; i++)
-                        colorsArray.push(vec4(0.0, 0.0, 0.0, 1.0));
+                        colors_array.push(vec4(0.0, 0.0, 0.0, 1.0));
                     break;
                 case 1:
                     for (var i = 0; i < 6; i++)
-                        colorsArray.push(vec4(1.0, 1.0, 1.0, 1.0));
+                        colors_array.push(vec4(1.0, 1.0, 1.0, 1.0));
                     break;
             }
         } else if (mode == 'triangles') {
             count++;
             if (count == 3) {
-                var first_vertex_color = colorsArray[colorsArray.length - 6];
-                var second_vertex_color = colorsArray[colorsArray.length - 3];
-                colorsArray = colorsArray.slice(0, colorsArray.length - 12);
-                colorsArray.push(first_vertex_color);
-                colorsArray.push(second_vertex_color);
+                var first_vertex_color = colors_array[colors_array.length - 6];
+                var second_vertex_color = colors_array[colors_array.length - 3];
+                colors_array = colors_array.slice(0, colors_array.length - 12);
+                colors_array.push(first_vertex_color);
+                colors_array.push(second_vertex_color);
                 switch(document.getElementById("pointscolor").selectedIndex) {
                     case 0:
-                        colorsArray.push(vec4(0.0, 0.0, 0.0, 1.0)); 
+                        colors_array.push(vec4(0.0, 0.0, 0.0, 1.0)); 
                         break;
                     case 1:
-                        colorsArray.push(vec4(1.0, 1.0, 1.0, 1.0));
+                        colors_array.push(vec4(1.0, 1.0, 1.0, 1.0));
                         break;
                 }
             } else {
                 switch(document.getElementById("pointscolor").selectedIndex) {
                     case 0:
                         for (var i = 0; i < 6; i++)
-                            colorsArray.push(vec4(0.0, 0.0, 0.0, 1.0));
+                            colors_array.push(vec4(0.0, 0.0, 0.0, 1.0));
                         break;
                     case 1:
                         for (var i = 0; i < 6; i++)
-                            colorsArray.push(vec4(1.0, 1.0, 1.0, 1.0));
+                            colors_array.push(vec4(1.0, 1.0, 1.0, 1.0));
+                        break;
+                }
+            }
+        } else if (mode == 'circles') {
+            count++;
+            if (count == 2) {
+                var center_color = colors_array[colors_array.length - 1];
+                switch(document.getElementById("pointscolor").selectedIndex) {
+                    case 0:
+                        for (let i = 0; i < n_triangles; i++) {
+                            colors_array.push(vec4(0.0, 0.0, 0.0, 1.0));
+                            colors_array.push(vec4(0.0, 0.0, 0.0, 1.0));
+                            colors_array.push(center_color);
+                        }
+                        break;
+                    case 1:
+                        for (let i = 0; i < n_triangles; i++) {
+                            colors_array.push(vec4(1.0, 1.0, 1.0, 1.0));
+                            colors_array.push(vec4(1.0, 1.0, 1.0, 1.0));
+                            colors_array.push(center_color);
+                        }
+                        break;
+                }
+            } else {
+                switch(document.getElementById("pointscolor").selectedIndex) {
+                    case 0:
+                        for (var i = 0; i < 6; i++)
+                            colors_array.push(vec4(0.0, 0.0, 0.0, 1.0));
+                        break;
+                    case 1:
+                        for (var i = 0; i < 6; i++)
+                            colors_array.push(vec4(1.0, 1.0, 1.0, 1.0));
                         break;
                 }
             }
         }
+
         cBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, flatten(colorsArray), gl.STATIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER, flatten(colors_array), gl.STATIC_DRAW);
         vColor = gl.getAttribLocation(program, "vColor");
         gl.vertexAttribPointer(vColor, 4, gl.FLOAT, false, 0, 0);
         gl.enableVertexAttribArray(vColor);
@@ -132,6 +166,38 @@ window.onload = function init() {
                     vec2(t[0] + side / canvas.width, t[1] + side / canvas.height),
                 ]
             }
+        } else if (mode == 'circles') {
+            if (count == 2) {
+                var center = vec2(
+                    (vertices[vertices.length - 1][0] + vertices[vertices.length - 3][0]) / 2, 
+                    (vertices[vertices.length - 1][1] + vertices[vertices.length - 3][1]) / 2
+                );
+                var rad = Math.sqrt(Math.pow(center[0] - t[0], 2) + Math.pow(center[1] - t[1], 2));
+
+                var new_vertices = [];
+                for (let angle = 0; angle < Math.PI * 2; angle += Math.PI * 2 / n_triangles) {
+                    new_vertices.push(vec2(
+                        center[0] + rad * Math.cos(angle),
+                        center[1] + rad * Math.sin(angle)
+                    ));
+                    new_vertices.push(vec2(
+                        center[0] + rad * Math.cos(angle + Math.PI * 2 / n_triangles),
+                        center[1] + rad * Math.sin(angle + Math.PI * 2 / n_triangles)
+                    ));
+                    new_vertices.push(center);
+                }
+                count = 0;
+            } else {
+                var new_vertices = [
+                    vec2(t[0] - side / canvas.width, t[1] - side / canvas.height),
+                    vec2(t[0] - side / canvas.width, t[1] + side / canvas.height),
+                    vec2(t[0] + side / canvas.width, t[1] + side / canvas.height),
+    
+                    vec2(t[0] - side / canvas.width, t[1] - side / canvas.height),
+                    vec2(t[0] + side / canvas.width, t[1] - side / canvas.height),
+                    vec2(t[0] + side / canvas.width, t[1] + side / canvas.height),
+                ]
+            }
         }
         
         for (var i = 0; i < new_vertices.length; i++)
@@ -157,10 +223,10 @@ document.getElementById("clear").addEventListener("click", function() {
             break;
     }
 
-    colorsArray = [];
+    colors_array = [];
     cBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, flatten(colorsArray), gl.STATIC_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER, flatten(colors_array), gl.STATIC_DRAW);
     vColor = gl.getAttribLocation(program, "vColor");
     gl.vertexAttribPointer(vColor, 4, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(vColor);
@@ -179,3 +245,8 @@ document.getElementById("points_mode").addEventListener("click", function() {
 document.getElementById("triangles_mode").addEventListener("click", function() {
     mode = 'triangles';
 });
+
+document.getElementById("circles_mode").addEventListener("click", function() {
+    mode = 'circles';
+});
+

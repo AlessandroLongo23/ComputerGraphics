@@ -51,12 +51,12 @@ const menuItems = [
     { 
         icon: 'Box', 
         label: '3D Rendering', 
-        href: '/2. 3D rendering', 
+        href: '/2. 3D Rendering', 
         children: [
             {   
                 icon: 'Box',
                 label: 'Lighting and shading',
-                href: '/2. 3D rendering/2.1. Lighting and shading',
+                href: '/2. 3D Rendering/2.1. Lighting and shading',
             }
         ] 
     },

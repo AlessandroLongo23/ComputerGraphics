@@ -1,10 +1,3 @@
-function render() {
-    gl.clear(gl.COLOR_BUFFER_BIT);
-
-    gl.drawArrays(gl.POINTS, 0, index);
-    window.requestAnimFrame(render, canvas);
-}
-
 window.onload = function init() {
     canvas = document.getElementById("gl-canvas");
 
@@ -19,14 +12,14 @@ window.onload = function init() {
     gl.useProgram(program);
 
     // points
-    colorsArray = []
+    colors_array = []
     vertices = [];
     index = vertices.length;
 
-    var maxPoints = 100;
+    var max_points = 100;
     vBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, sizeof['vec2'] * maxPoints, gl.STATIC_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER, sizeof['vec2'] * max_points, gl.STATIC_DRAW);
     gl.bufferSubData(gl.ARRAY_BUFFER, 0, flatten(vertices));
     var vPosition = gl.getAttribLocation(program, "vPosition");
     gl.vertexAttribPointer(vPosition, 2, gl.FLOAT, false, 0, 0);
@@ -37,16 +30,16 @@ window.onload = function init() {
         // colors
         switch(document.getElementById("pointscolor").selectedIndex) {
             case 0:
-                colorsArray.push(vec4(0.0, 0.0, 0.0, 1.0));
+                colors_array.push(vec4(0.0, 0.0, 0.0, 1.0));
                 break;
             case 1:
-                colorsArray.push(vec4(1.0, 1.0, 1.0, 1.0));
+                colors_array.push(vec4(1.0, 1.0, 1.0, 1.0));
                 break;
         }
 
         cBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, flatten(colorsArray), gl.STATIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER, flatten(colors_array), gl.STATIC_DRAW);
         vColor = gl.getAttribLocation(program, "vColor");
         gl.vertexAttribPointer(vColor, 4, gl.FLOAT, false, 0, 0);
         gl.enableVertexAttribArray(vColor);
@@ -55,7 +48,7 @@ window.onload = function init() {
         var t = vec2(-1 + 2 * (event.clientX - canvas.getBoundingClientRect().x) / canvas.width, -1 + 2 * (canvas.height - (event.clientY - canvas.getBoundingClientRect().y)) / canvas.height);
         var data = new Float32Array(t);
         
-        if (index < maxPoints) {
+        if (index < max_points) {
             gl.bufferSubData(gl.ARRAY_BUFFER, sizeof['vec2'] * index, data);
             index++;
         } else {
@@ -64,6 +57,12 @@ window.onload = function init() {
     });
 
     render();
+}
+
+function render() {
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.drawArrays(gl.POINTS, 0, index);
+    window.requestAnimFrame(render, canvas);
 }
 
 document.getElementById("clear").addEventListener("click", function() {
@@ -79,10 +78,10 @@ document.getElementById("clear").addEventListener("click", function() {
             break;
     }
 
-    colorsArray = [];
+    colors_array = [];
     cBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, flatten(colorsArray), gl.STATIC_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER, flatten(colors_array), gl.STATIC_DRAW);
     vColor = gl.getAttribLocation(program, "vColor");
     gl.vertexAttribPointer(vColor, 4, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(vColor);

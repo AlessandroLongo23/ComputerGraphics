@@ -22,7 +22,7 @@ window.onload = function init() {
     gl.enableVertexAttribArray(vPosition);
 
     // colors
-    colorsArray = [ 
+    colors_array = [ 
         vec4(1.0, 0.0, 0.0, 1.0), 
         vec4(0.0, 1.0, 0.0, 1.0), 
         vec4(0.0, 0.0, 1.0, 1.0) 
@@ -30,7 +30,7 @@ window.onload = function init() {
 
     var cBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, flatten(colorsArray), gl.STATIC_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER, flatten(colors_array), gl.STATIC_DRAW);
 
     var vColor = gl.getAttribLocation(program, "vColor");
     gl.vertexAttribPointer(vColor, 4, gl.FLOAT, false, 0, 0);

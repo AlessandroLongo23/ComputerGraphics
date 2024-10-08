@@ -1,12 +1,16 @@
 <script>
     import Section from "$lib/components/Section.svelte";
-    import { page } from "$app/stores";
+
+    let sections = [
+        '1.3.1. Exercise 1',
+        '1.3.2. Exercise 2',
+    ]
 </script>
 
-<div>
-    <Section title="Exercise 1" href="{ $page.url.pathname }/1.3.1. Exercise 1" style=""></Section>
-    <Section title="Exercise 2" href="{ $page.url.pathname }/1.3.2. Exercise 2" style=""></Section>
-    <Section title="Exercise 3" href="{ $page.url.pathname }/1.3.3. Exercise 3" style=""></Section>
+<div class="flex flex-row justify-evenly items-center w-3/4 m-auto">
+    {#each sections as section}
+        <Section title={section}></Section> 
+    {/each}
 </div>
 
 <style>

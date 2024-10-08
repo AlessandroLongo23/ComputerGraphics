@@ -1,12 +1,17 @@
 <script>
     import Section from "$lib/components/Section.svelte";
-    import { page } from "$app/stores";
+
+    let sections = [
+        '1.1. Primitives in WebGL',
+        '1.2. Inputs and interactions',
+        '1.3. Model, view and projection'
+    ]
 </script>
 
-<div>
-    <Section title="1.1. Primitives in WebGL" href="{ $page.url.pathname }/1.1. Primitives in WebGL" style=""></Section>
-    <Section title="1.2. Inputs and interactions" href="{ $page.url.pathname }/1.2. Inputs and interactions" style=""></Section>
-    <Section title="1.3. Model, view and projections" href="{ $page.url.pathname }/1.3. Model, view and projections" style=""></Section>
+<div class="flex flex-row justify-evenly items-center w-3/4 m-auto">
+    {#each sections as section}
+        <Section title={section}></Section> 
+    {/each}
 </div>
 
 <style>

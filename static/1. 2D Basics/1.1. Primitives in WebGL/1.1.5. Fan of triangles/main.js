@@ -11,8 +11,8 @@ window.onload = function init() {
 
     acc = vec2(0.0, -9.81);
     vel = vec2(5, 0.0);
-    off = vec2(-0.4, 0.3);
-    offLoc = gl.getUniformLocation(program, "off");
+    pos = vec2(-0.4, 0.3);
+    posLoc = gl.getUniformLocation(program, "pos");
 
     gl.useProgram(program);
     
@@ -49,35 +49,35 @@ function render() {
     deltatime = (t2 - t1) * 0.001;
     t1 = t2;
 
-    off = add(off, mult(vel, deltatime));
-    if (Math.abs(off[1] + 0.5) > 0.015 || Math.abs(vel[1]) > 0.015)
+    pos = add(pos, mult(vel, deltatime));
+    if (Math.abs(pos[1] + 0.5) > 0.015 || Math.abs(vel[1]) > 0.015)
         vel = add(vel, mult(acc, deltatime));
     else { 
-        off[1] = -0.5;
+        pos[1] = -0.5;
         vel[1] = 0.0;
         vel[0] = vel[0] * rad_friction;
     }
 
     vel = mult(vel, air_friction);
 
-    if (off[1] < -0.5 && vel[1] < 0.0) {
+    if (pos[1] < -0.5 && vel[1] < 0.0) {
         vel[0] = vel[0] * rad_friction;
         vel[1] = -vel[1] * damp[1];
-    } else if (off[1] > 0.5 && vel[1] > 0.0) {
+    } else if (pos[1] > 0.5 && vel[1] > 0.0) {
         vel[0] = vel[0] * rad_friction;
         vel[1] = -vel[1] * damp[1];
     }
 
-    if (off[0] > 0.5 || off[0] < -0.5) {
-        if (off[0] > 0.5)
-            off[0] = 1.0 - off[0];
+    if (pos[0] > 0.5 || pos[0] < -0.5) {
+        if (pos[0] > 0.5)
+            pos[0] = 1.0 - pos[0];
         else
-            off[0] = -1.0 - off[0];
+            pos[0] = -1.0 - pos[0];
 
         vel[0] = -vel[0] * damp[0];
     }
 
-    gl.uniform2f(offLoc, off[0], off[1]);
+    gl.uniform2f(posLoc, pos[0], pos[1]);
 
     gl.drawArrays(gl.TRIANGLE_FAN, 0, vertices.length);
 

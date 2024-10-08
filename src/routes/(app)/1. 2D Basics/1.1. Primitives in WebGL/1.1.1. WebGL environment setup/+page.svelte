@@ -1,8 +1,9 @@
 <script>
     import { onMount } from 'svelte';
-    import { WebGLUtils } from '$lib/utils.js';
+    import { page } from '$app/stores'
     import CodeBlock from '$lib/components/CodeBlock.svelte';
-    import { theme } from "$lib/stores";
+    
+    import { WebGLUtils } from '$lib/utils.js';
 
     let canvas, gl;
     let vertices = [];
@@ -11,12 +12,22 @@
         {
             name: 'main.js',
             language: 'JavaScript',
-            path: '1.1.1. Exercise 1/main.js'
+            path: $page.url.pathname + '/main.js'
         },
         {
             name: 'index.html',
             language: 'HTML',
-            path: '1.1.1. Exercise 1/index.html'
+            path: $page.url.pathname + '/index.html'
+        },
+        {
+            name: 'vshader.glsl',
+            language: 'GLSL',
+            path: $page.url.pathname + '/vshader.glsl'
+        },
+        {
+            name: 'fshader.glsl',
+            language: 'GLSL',
+            path: $page.url.pathname + '/fshader.glsl'
         }
     ];
     let isLoading = true;

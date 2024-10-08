@@ -8,7 +8,7 @@
 
     export let code_snippets;
     let current_snippet_index = 0;
-    let button_text = 'Copy Code';
+    let button_icon = 'copy';
     $: current_code = code_snippets[current_snippet_index].code;
     $: current_language = code_snippets[current_snippet_index].language;
 
@@ -39,10 +39,10 @@
         const textToCopy = current_code.includes('&lt;') ? unescapeHtml(current_code) : current_code;
             
         navigator.clipboard.writeText(textToCopy).then(() => {
-            button_text = 'Copied!';
+            button_icon = 'check';
             setTimeout(() => {
-                button_text = 'Copy Code';
-            }, 1000);
+                button_icon = 'copy';
+            }, 2000);
         }).catch(err => {
             console.error('Could not copy text: ', err);
         });
@@ -54,12 +54,12 @@
     }
 </script>
 
-<div class="relative my-8 w-full" style="min-width: 768px;">
+<div class="relative my-8 w-full" style="max-width: 512px;">
     <div class="button-container absolute flex flex-row justify-between p-4 w-full rounded-l-lg">
         <div class="flex flex-row justify-start">
             {#if code_snippets.length > 1}
                 {#each code_snippets as code_snippet, i}
-                    <button class="me-2 text-sm px-4 py-4 rounded-lg w-auto" class:selected={i === current_snippet_index} on:click={() => selectSnippet(i)}> 
+                    <button class="flex me-2 text-sm h-8 transition-colors duration-200 items-center text-white px-4 py-4 rounded-lg w-auto" class:selected={i === current_snippet_index} on:click={() => selectSnippet(i)}> 
                         {code_snippet.name} 
                     </button>
                 {/each}
@@ -68,8 +68,8 @@
             {/if}
         </div>
 
-        <button on:click={copyToClipboard} class="text-sm px-4 py-4 rounded-lg w-auto">
-            {button_text}
+        <button on:click={copyToClipboard} class="flex items-center transition-colors duration-200 text-sm h-8 text-white px-4 py-2 rounded-lg w-auto {button_icon == 'check' ? 'copied' : ''}">
+            <i class="fa fa-{button_icon} ? 'copy' : 'check'}"></i>
         </button>
     </div>
 
@@ -97,24 +97,15 @@
         white-space: pre;
     }
 
-    button { 
+    button {
         background: rgba(51, 51, 51, 0.8);
-        color: white; 
-        border: none; 
-        cursor: pointer; 
-        transition: background-color 0.2s;
-        backdrop-filter: blur(4px);
-        height: 2rem;
-        width: auto;
-        display: flex;
-        align-items: center;
-    } 
+    }
 
     button:hover { 
         background-color: rgba(68, 68, 68, 0.9);
     } 
 
-    button.selected { 
-        background-color: rgba(0, 122, 204, 0.8);
+    button.selected, .copied { 
+        background-color: rgba(0, 122, 204, 0.8) !important;
     }  
 </style>

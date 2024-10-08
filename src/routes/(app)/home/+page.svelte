@@ -1,12 +1,18 @@
 <script>
     import Section from "$lib/components/Section.svelte";
+
+    let sections = [
+        '1. 2D Basics',
+        '2. 3D Rendering',
+        '3. Advanced rendering',
+        '4. Advanced techniques'
+    ]
 </script>
 
-<div>
-    <Section title="1. 2D Basics" href="/1. 2D Basics" style=""></Section> 
-    <Section title="2. 3D Rendering" href="/2. 3D rendering" style=""></Section>
-    <Section title="3. Advanced Rendering" href="/3. Advanced Rendering" style=""></Section> 
-    <Section title="4. Advanced techniques" href="/4. Advanced techniques" style=""></Section>
+<div class="flex flex-row justify-evenly items-center w-3/4 m-auto">
+    {#each sections as section}
+        <Section title={section}></Section> 
+    {/each}
 </div>
 
 <style>

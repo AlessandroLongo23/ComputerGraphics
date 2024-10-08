@@ -1,33 +1,36 @@
 <script>
     import { onMount } from 'svelte';
+    import { page } from '$app/stores'
+    import CodeBlock from '$lib/components/CodeBlock.svelte';
+    
     import { WebGLUtils } from '$lib/utils.js';
     import { vec2, flatten } from '$lib/Libraries/MV.js';
-    import CodeBlock from '$lib/components/CodeBlock.svelte';
 
     let canvas, gl, program;
     let vertices = [];
     let vertexShaderSource, fragmentShaderSource;
     let code_snippets = [];
+
     let code_snippets_info = [
         {
             name: 'main.js',
             language: 'JavaScript',
-            path: '1.1.2. Exercise 2/main.js'
+            path: $page.url.pathname + '/main.js'
         },
         {
             name: 'index.html',
             language: 'HTML',
-            path: '1.1.2. Exercise 2/index.html'
+            path: $page.url.pathname + '/index.html'
         },
         {
             name: 'vshader.glsl',
             language: 'GLSL',
-            path: '1.1.2. Exercise 2/vshader.glsl'
+            path: $page.url.pathname + '/vshader.glsl'
         },
         {
             name: 'fshader.glsl',
             language: 'GLSL',
-            path: '1.1.2. Exercise 2/fshader.glsl'
+            path: $page.url.pathname + '/fshader.glsl'
         }
     ];
     let isLoading = true;
@@ -68,12 +71,16 @@
             gl.clearColor(0.3921, 0.5843, 0.9294, 1.0);
 
             try {
-                vertexShaderSource = await fetchShader('/1. 2D Basics/1.1. Primitives in WebGL/1.1.2. Exercise 2/vshader.glsl');
-                fragmentShaderSource = await fetchShader('/1. 2D Basics/1.1. Primitives in WebGL/1.1.2. Exercise 2/fshader.glsl');
+                vertexShaderSource = await fetchShader($page.url.pathname + '/vshader.glsl');
+                fragmentShaderSource = await fetchShader($page.url.pathname + '/fshader.glsl');
                 
                 initShaders();
 
-                vertices = [ vec2(0.0, 0.0), vec2(1.0, 0.0), vec2(1.0, 1.0) ];
+                vertices = [ 
+                    vec2(0.0, 0.0), 
+                    vec2(1.0, 0.0), 
+                    vec2(1.0, 1.0) 
+                ];
                 var vBuffer = gl.createBuffer();
                 gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
                 gl.bufferData(gl.ARRAY_BUFFER, flatten(vertices), gl.STATIC_DRAW);

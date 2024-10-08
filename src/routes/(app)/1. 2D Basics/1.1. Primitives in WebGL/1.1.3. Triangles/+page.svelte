@@ -1,34 +1,36 @@
 <script>
     import { onMount } from 'svelte';
+    import { page } from '$app/stores'
+    import CodeBlock from '$lib/components/CodeBlock.svelte';
+    
     import { WebGLUtils } from '$lib/utils.js';
     import { vec2, vec4, flatten } from '$lib/Libraries/MV.js';
-    import CodeBlock from '$lib/components/CodeBlock.svelte';
 
     let canvas, gl, program;
     let vertices = [];
-    let colorsArray = [];
+    let colors_array = [];
     let vertexShaderSource, fragmentShaderSource;
     let code_snippets = [];
     let code_snippets_info = [
         {
             name: 'main.js',
             language: 'JavaScript',
-            path: '1.1.3. Exercise 3/main.js'
+            path: $page.url.pathname + '/main.js'
         },
         {
             name: 'index.html',
             language: 'HTML',
-            path: '1.1.3. Exercise 3/index.html'
+            path: $page.url.pathname + '/index.html'
         },
         {
             name: 'vshader.glsl',
             language: 'GLSL',
-            path: '1.1.3. Exercise 3/vshader.glsl'
+            path: $page.url.pathname + '/vshader.glsl'
         },
         {
             name: 'fshader.glsl',
             language: 'GLSL',
-            path: '1.1.3. Exercise 3/fshader.glsl'
+            path: $page.url.pathname + '/fshader.glsl'
         }
     ];
     let isLoading = true;
@@ -69,9 +71,9 @@
             gl.clearColor(0.3921, 0.5843, 0.9294, 1.0);
 
             try {
-                vertexShaderSource = await fetchShader('/1. 2D Basics/1.1. Primitives in WebGL/1.1.3. Exercise 3/vshader.glsl');
-                fragmentShaderSource = await fetchShader('/1. 2D Basics/1.1. Primitives in WebGL/1.1.3. Exercise 3/fshader.glsl');
-                
+                vertexShaderSource = await fetchShader($page.url.pathname + '/vshader.glsl');
+                fragmentShaderSource = await fetchShader($page.url.pathname + '/fshader.glsl');
+                                
                 initShaders();
 
                 // vertices
@@ -86,7 +88,7 @@
                 gl.enableVertexAttribArray(vPosition);
 
                 // colors
-                colorsArray = [ 
+                colors_array = [ 
                     vec4(1.0, 0.0, 0.0, 1.0), 
                     vec4(0.0, 1.0, 0.0, 1.0), 
                     vec4(0.0, 0.0, 1.0, 1.0) 
@@ -94,7 +96,7 @@
 
                 var cBuffer = gl.createBuffer();
                 gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
-                gl.bufferData(gl.ARRAY_BUFFER, flatten(colorsArray), gl.STATIC_DRAW);
+                gl.bufferData(gl.ARRAY_BUFFER, flatten(colors_array), gl.STATIC_DRAW);
 
                 var vColor = gl.getAttribLocation(program, "vColor");
                 gl.vertexAttribPointer(vColor, 4, gl.FLOAT, false, 0, 0);
