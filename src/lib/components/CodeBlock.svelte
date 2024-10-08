@@ -74,7 +74,7 @@
     </div>
 
     <pre class="language-{current_language} m-0 {classes}" style={style}>
-        <code class="language-{current_language}">
+        <code class="language-{current_language}">n
             {current_code}
         </code>
     </pre>

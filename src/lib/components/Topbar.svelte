@@ -1,9 +1,6 @@
 <script>
     import { onMount } from "svelte";
     import { page } from "$app/stores";
-    import { theme } from "$lib/stores";
-
-    import ThemeToggle from "$lib/components/ThemeToggle.svelte";
 
     let title, subtitle, url, parent_path;
 
@@ -51,27 +48,29 @@
     }
 </script>
 
-<div class="flex flex-row justify-evenly items-center faded-border mx-16 mb-8 py-4">
+<div class="flex flex-row justify-center items-center faded-border mx-16 mb-8 py-4">
     <a href="{parent_path}">
         {#if url != "/home"}
-            <i class="fa-solid fa-arrow-left text-2xl ms-6 m-auto text-black"></i>
+            <i class="fa-solid fa-arrow-left text-2xl mx-6 m-auto text-black"></i>
         {:else}
             <i class="px-6 m-auto text-black"></i>
         {/if}
     </a>
 
-    <div class="flex flex-col justify-center items-center {subtitle ? '' : 'my-4'} w-1/3">
+    <div class="flex flex-col justify-center items-center {subtitle ? '' : 'my-4'} mx-16">
         {#if subtitle}
             <p class="text-xl mb-1">{subtitle}</p>
         {/if}
         <p class="text-4xl font-bold">{title}</p>
     </div>
 
-    <a href="/home">
-        <img src="/favicon-{$theme}.png" alt="logo" class="w-12 h-12 top-4 right-4" />
+    <a href="{parent_path}">
+        {#if url != "/home"}
+            <i class="fa-solid fa-arrow-right text-2xl mx-6 m-auto text-black"></i>
+        {:else}
+            <i class="px-6 m-auto text-black"></i>
+        {/if}
     </a>
-
-    <!-- <ThemeToggle /> -->
 </div>
 
 <style>

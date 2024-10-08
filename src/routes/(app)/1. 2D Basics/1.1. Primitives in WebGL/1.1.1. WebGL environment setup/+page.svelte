@@ -81,7 +81,7 @@
         <p>Loading code snippets...</p>
     {/if} -->
 
-<div class="flex flex-row justify-evenly items-center m-auto">
+    <div class="flex flex-row justify-evenly items-center m-auto">
         {#if !isLoading}
             <CodeBlock code_snippets={code_snippets} classes="rounded-none rounded-l-lg" style="min-width: 512px; height: 512px;" />
         {:else}

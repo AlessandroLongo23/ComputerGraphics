@@ -1,0 +1,1 @@
+document.getElementById('title').innerHTML = 'Week 3 - Exercise 1';

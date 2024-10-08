@@ -980,4 +980,4 @@ function normalMatrix(m, flag)
     }
 }
 
-export { flatten, vec2 };
+export { vec2, vec4, flatten };

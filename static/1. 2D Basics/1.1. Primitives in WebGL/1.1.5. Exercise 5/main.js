@@ -26,13 +26,13 @@ window.onload = function init() {
     // vertices
     num = 100;
     rad = 0.5;
-    pointsArray = [vec2(0, 0)];
+    vertices = [vec2(0, 0)];
     for (var angle = 0; angle <= Math.PI * 2; angle += Math.PI * 2 / num)
-        pointsArray.push(vec2(rad * Math.cos(angle), rad * Math.sin(angle)));
+        vertices.push(vec2(rad * Math.cos(angle), rad * Math.sin(angle)));
 
     var vBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, flatten(pointsArray), gl.STATIC_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER, flatten(vertices), gl.STATIC_DRAW);
 
     var vPosition = gl.getAttribLocation(program, "vPosition");
     gl.vertexAttribPointer(vPosition, 2, gl.FLOAT, false, 0, 0);
@@ -79,7 +79,7 @@ function render() {
 
     gl.uniform2f(offLoc, off[0], off[1]);
 
-    gl.drawArrays(gl.TRIANGLE_FAN, 0, pointsArray.length);
+    gl.drawArrays(gl.TRIANGLE_FAN, 0, vertices.length);
 
     requestAnimFrame(render);
 }
