@@ -1,101 +1,9 @@
-var vertices, vBuffer, normalsArray, vertexColors, numTimesToSubdivide;
+var vertices, vBuffer, vertex_colors, num_subdivisions;
+var light_color_loc, light_color;
+var shininess;
+var camera_pos;
 var v0, v1, v2, v3;
 var theta_y = 30;
-
-window.onload = function init() {
-    // setting up the canvas, WebGL, and the shaders
-    setup_environment();
-
-    // colors
-    vertexColors = [];
-
-    var cBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, flatten(vertexColors), gl.STATIC_DRAW);
-
-    var vColor = gl.getAttribLocation(program, "vColor");
-    gl.vertexAttribPointer(vColor, 4, gl.FLOAT, false, 0, 0);
-    gl.enableVertexAttribArray(vColor);
-
-    // vertices
-    vertices = [];
-    v0 = vec4(0.0, 0.0, -1.0, 1); 
-    v1 = vec4(0.0, 0.942809, 0.333333, 1);
-    v2 = vec4(-0.816497, -0.471405, 0.333333, 1);
-    v3 = vec4(0.816497, -0.471405, 0.333333, 1);
-    numTimesToSubdivide = 0;
-    
-    build_polyhedron();
-
-    modelViewMatrixLoc = gl.getUniformLocation(program, "modelViewMatrix");
-    projectionMatrixLoc = gl.getUniformLocation(program, "projectionMatrix");
-
-    render();
-};
-
-document.getElementById("increment-subdivision-level").addEventListener("click", function() {
-    if (numTimesToSubdivide > 6)
-        alert("Maximum subdivision level reached!");
-    else
-        numTimesToSubdivide++;
-
-    build_polyhedron();
-});
-
-document.getElementById("decrement-subdivision-level").addEventListener("click", function() {
-    if (numTimesToSubdivide == 0)
-        alert("subdivision level is already 0!");
-    else
-        numTimesToSubdivide--;
-
-    build_polyhedron();
-});
-
-function build_polyhedron() {
-    vertices = [];
-    normals = [];
-
-    tetrahedron(v0, v1, v2, v3, numTimesToSubdivide);
-
-    // Bind the vertex buffer
-    vBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, flatten(vertices), gl.STATIC_DRAW);
-
-    var vPosition = gl.getAttribLocation(program, "vPosition");
-    gl.vertexAttribPointer(vPosition, 4, gl.FLOAT, false, 0, 0);
-    gl.enableVertexAttribArray(vPosition);
-
-    // Bind the normal buffer
-    var nBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, nBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, flatten(normals), gl.STATIC_DRAW);
-
-    var vNormal = gl.getAttribLocation(program, "vNormal");
-    gl.vertexAttribPointer(vNormal, 3, gl.FLOAT, false, 0, 0);
-    gl.enableVertexAttribArray(vNormal);
-}
-
-function render() {
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
-    var modelViewMatrix = mat4();
-    var projectionMatrix = perspective(45, canvas.width / canvas.height, 0.1, 10.0);
-
-    theta_y += 0.1;
-    modelViewMatrix = mult(modelViewMatrix, translate(0.0, 0.0, -3.0));
-    modelViewMatrix = mult(modelViewMatrix, rotateY(theta_y));
-
-    var normalMatrix = normalMatrix3x3(modelViewMatrix);
-
-    // Pass matrices to the shader
-    gl.uniformMatrix4fv(projectionMatrixLoc, false, flatten(projectionMatrix));
-    gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
-    gl.uniformMatrix3fv(normalMatrixLoc, false, flatten(normalMatrix));
-
-    gl.drawArrays(gl.TRIANGLES, 0, vertices.length);
-    requestAnimFrame(render);
-}
 
 function setup_environment() {
     canvas = document.getElementById("gl-canvas");
@@ -110,15 +18,135 @@ function setup_environment() {
     program = initShaders(gl, "vshader.glsl", "fshader.glsl");
     gl.useProgram(program);
 
-    // Set the light direction
-    var lightDirection = vec3(0.0, 0.0, -1.0);
-    var lightDirectionLoc = gl.getUniformLocation(program, "lightDirection");
-    gl.uniform3fv(lightDirectionLoc, flatten(lightDirection));
+    // Light direction
+    var light_direction = vec3(0.0, 0.0, 1.0);
+    var light_direction_loc = gl.getUniformLocation(program, "light_dir");
+    gl.uniform3fv(light_direction_loc, flatten(light_direction));
 
     // Uniform locations for the matrices
-    modelViewMatrixLoc = gl.getUniformLocation(program, "modelViewMatrix");
-    projectionMatrixLoc = gl.getUniformLocation(program, "projectionMatrix");
-    normalMatrixLoc = gl.getUniformLocation(program, "normalMatrix");
+    camera_pos_loc = gl.getUniformLocation(program, "camera_pos");
+    view_matrix_loc = gl.getUniformLocation(program, "view_matrix");
+    model_matrix_loc = gl.getUniformLocation(program, "model_matrix")
+    projection_matrix_loc = gl.getUniformLocation(program, "projection_matrix");
+
+    // Uniform locations for the material parameters
+    shininess_loc = gl.getUniformLocation(program, "s");
+    diffuse_material_loc = gl.getUniformLocation(program, "k_d");
+    diffuse_intensity_loc = gl.getUniformLocation(program, "L_s");
+    specular_material_loc = gl.getUniformLocation(program, "k_s");
+    specular_intensity_loc = gl.getUniformLocation(program, "L_s");
+    ambient_material_loc = gl.getUniformLocation(program, "k_a");
+    ambient_intensity_loc = gl.getUniformLocation(program, "L_a");
+}
+
+window.onload = function init() {
+    setup_environment();
+
+    // colors
+    vertex_colors = [];
+
+    var cBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, flatten(vertex_colors), gl.STATIC_DRAW);
+
+    light_color_loc = gl.getUniformLocation(program, "light_color");
+    gl.vertexAttribPointer(light_color_loc, 4, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(light_color_loc);
+
+    // vertices
+    vertices = [];
+    v0 = vec4(0.0, 0.0, -1.0, 1); 
+    v1 = vec4(0.0, 0.942809, 0.333333, 1);
+    v2 = vec4(-0.816497, -0.471405, 0.333333, 1);
+    v3 = vec4(0.816497, -0.471405, 0.333333, 1);
+    num_subdivisions = 0;
+    
+    build_polyhedron();
+
+    render();
+};
+
+function render() {
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+    get_sliders_values();
+
+    dist = 3.0;
+    theta_y += .01;
+    camera_pos = vec3(dist * Math.cos(theta_y), 0.0, dist * Math.sin(theta_y));
+    var view_matrix = lookAt(
+        camera_pos,
+        vec3(0.0, 0.0, 0.0), 
+        vec3(0.0, 1.0, 0.0)
+    );
+
+    var model_matrix = translate(vec3(0.0)); 
+    var projection_matrix = perspective(45, canvas.width / canvas.height, 0.1, 10.0);
+
+    // model_view_matrix = mult(model_view_matrix, translate(0.0, 0.0, -3.0));
+    // model_view_matrix = mult(model_view_matrix, rotateY(theta_y));
+
+    light_color = vec3(1.0, 0.0, 0.0);
+
+    gl.uniform3fv(light_color_loc, flatten(light_color));
+    gl.uniform3fv(camera_pos_loc, flatten(camera_pos));
+    gl.uniformMatrix4fv(view_matrix_loc, false, flatten(view_matrix));
+    gl.uniformMatrix4fv(model_matrix_loc, false, flatten(model_matrix));
+    gl.uniformMatrix4fv(projection_matrix_loc, false, flatten(projection_matrix));
+
+    gl.uniform1f(shininess_loc, shininess);
+    gl.uniform1f(diffuse_material_loc, diffuse_material);
+    gl.uniform1f(diffuse_intensity_loc, diffuse_intensity);
+    gl.uniform1f(specular_material_loc, specular_material);
+    gl.uniform1f(specular_intensity_loc, specular_intensity);
+    gl.uniform1f(ambient_material_loc, ambient_material);
+    gl.uniform1f(ambient_intensity_loc, ambient_intensity);
+
+    gl.drawArrays(gl.TRIANGLES, 0, vertices.length);
+    requestAnimFrame(render);
+}
+
+document.getElementById("increment-subdivision-level").addEventListener("click", function() {
+    if (num_subdivisions > 6)
+        alert("Maximum subdivision level reached!");
+    else
+        num_subdivisions++;
+
+    build_polyhedron();
+});
+
+document.getElementById("decrement-subdivision-level").addEventListener("click", function() {
+    if (num_subdivisions == 0)
+        alert("subdivision level is already 0!");
+    else
+        num_subdivisions--;
+
+    build_polyhedron();
+});
+
+function get_sliders_values() {
+    shininess = Math.pow(10, document.getElementById("s").value);
+    diffuse_material = document.getElementById("k_d").value;
+    diffuse_intensity = document.getElementById("L_d").value;
+    specular_material = document.getElementById("k_s").value;
+    specular_intensity = document.getElementById("L_s").value;
+    ambient_material = document.getElementById("k_a").value;
+    ambient_intensity = document.getElementById("L_a").value;
+}
+
+function build_polyhedron() {
+    vertices = [];
+
+    tetrahedron(v0, v1, v2, v3, num_subdivisions);
+
+    // Bind the vertex buffer
+    vBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, flatten(vertices), gl.STATIC_DRAW);
+
+    var vPosition = gl.getAttribLocation(program, "vPosition");
+    gl.vertexAttribPointer(vPosition, 4, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(vPosition);
 }
 
 function tetrahedron(a, b, c, d, n) {
@@ -145,24 +173,7 @@ function divideTriangle(a, b, c, count) {
 }
 
 function triangle(a, b, c) {
-    // Calculate and push vertex positions and corresponding normals (unit vectors)
-    normals.push(normalize(vec3(a[0], a[1], a[2])));
     vertices.push(a);
-
-    normals.push(normalize(vec3(b[0], b[1], b[2])));
     vertices.push(b);
-
-    normals.push(normalize(vec3(c[0], c[1], c[2])));
     vertices.push(c);
-}
-
-function normalMatrix3x3(modelViewMatrix) {
-    var upper3x3 = mat3(
-        modelViewMatrix[0][0], modelViewMatrix[0][1], modelViewMatrix[0][2],
-        modelViewMatrix[1][0], modelViewMatrix[1][1], modelViewMatrix[1][2],
-        modelViewMatrix[2][0], modelViewMatrix[2][1], modelViewMatrix[2][2]
-    );
-    
-    var invMat = inverse(upper3x3);
-    return transpose(invMat);
 }

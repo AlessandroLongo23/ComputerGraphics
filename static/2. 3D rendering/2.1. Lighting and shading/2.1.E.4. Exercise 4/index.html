@@ -30,25 +30,34 @@
                     <button id="decrement-subdivision-level">Decrement Subdivision Level</button>
                 </div>
 
-                <div class="column">
+                <div class="row">
                     <div class="column">
-                        <label for="shininess">Shininess</label>
-                        <input type="range" id="shininess" min="0" max="100" value="50" onchange="updateShininess()">
+                        <label for="s">Shininess</label>
+                        <input id="s" type="range" id="shininess" min="0" max="3" value="1" step="0.05">
                     </div>
 
                     <div class="column">
-                        <label for="diffuse">Diffuse</label>
-                        <input type="range" id="diffuse" min="0" max="100" value="50" onchange="updateDiffuse()">
+                        <label for="k_d">Diffusion coefficient</label>
+                        <input id="k_d" type="range" id="diffuse" min="0" max="1" value="0.5" step="0.05">
+
+                        <label for="L_d">Diffusion intensity</label>
+                        <input id="L_d" type="color" id="diffuse" min="0" max="1" value="0.5" step="0.05">
                     </div>
 
                     <div class="column">
-                        <label for="specular">Specular</label>
-                        <input type="range" id="specular" min="0" max="100" value="50" onchange="updateSpecular()">
+                        <label for="k_s">Specular coefficient</label>
+                        <input id="k_s" type="range" id="specular" min="0" max="1" value="0.5" step="0.05">
+
+                        <label for="L_s">Specular intensity</label>
+                        <input id="L_s" type="color" id="specular" min="0" max="1" value="0.5" step="0.05">
                     </div>
 
                     <div class="column">
-                        <label for="ambient">Ambient</label>
-                        <input type="range" id="ambient" min="0" max="100" value="50" onchange="updateAmbient()">
+                        <label for="k_a">Ambient coeffcient</label>
+                        <input id="k_a" type="range" id="ambient" min="0" max="1" value="0.5" step="0.05">
+
+                        <label for="L_a">Ambient coeffcient</label>
+                        <input id="L_a" type="color" id="ambient" min="0" max="1" value="0.5" step="0.05">
                     </div>
                 </div>
             </div>

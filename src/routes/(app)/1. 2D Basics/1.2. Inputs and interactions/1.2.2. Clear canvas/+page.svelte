@@ -2,9 +2,14 @@
     import { onMount } from 'svelte';
     import { page } from '$app/stores'
     import CodeBlock from '$lib/components/CodeBlock.svelte';
+    import Toggle from '$lib/components/Toggle.svelte';
+    import Canvas from '$lib/components/Canvas.svelte';
+    import { Code, Play, Columns2 } from 'lucide-svelte';
 
     import { WebGLUtils } from '$lib/utils.js';
-    import { vec2, flatten, sizeof } from '$lib/Libraries/MV.js';
+    import { vec2, vec4, flatten, sizeof } from '$lib/Libraries/MV.js';
+
+    let view_index = 0;
 
     let code_snippets = [];
     let code_snippets_info = [
@@ -29,6 +34,7 @@
             path: $page.url.pathname + '/fshader.glsl'
         }
     ];
+
     let isLoading = true;
 
     async function fetchShader(url) {
@@ -58,6 +64,9 @@
 
     let canvas, gl, program;
     let vertices = [];
+    let colors_array = [];
+    let cBuffer, vColor;
+
     let index;
 
     onMount(async () => {
@@ -77,30 +86,40 @@
 
                 initShaders();
 
-                vertices = [ 
-                    vec2(0.0, 0.0), 
-                    vec2(1.0, 0.0), 
-                    vec2(1.0, 1.0)
-                ];
+                // points
+                colors_array = []
+                vertices = [];
                 index = vertices.length;
 
                 var max_points = 100;
                 var vBuffer = gl.createBuffer();
                 gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
                 gl.bufferData(gl.ARRAY_BUFFER, sizeof['vec2'] * max_points, gl.STATIC_DRAW);
-                
                 gl.bufferSubData(gl.ARRAY_BUFFER, 0, flatten(vertices));
-
+                
                 var vPosition = gl.getAttribLocation(program, "vPosition");
                 gl.vertexAttribPointer(vPosition, 2, gl.FLOAT, false, 0, 0);
                 gl.enableVertexAttribArray(vPosition);
 
                 canvas.addEventListener("click", function(event) {
+                    switch(document.getElementById("pointscolor").selectedIndex) {
+                        case 0:
+                            colors_array.push(vec4(0.0, 0.0, 0.0, 1.0));
+                            break;
+                        case 1:
+                            colors_array.push(vec4(1.0, 1.0, 1.0, 1.0));
+                            break;
+                    }
+
+                    cBuffer = gl.createBuffer();
+                    gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
+                    gl.bufferData(gl.ARRAY_BUFFER, flatten(colors_array), gl.STATIC_DRAW);
+                    vColor = gl.getAttribLocation(program, "vColor");
+                    gl.vertexAttribPointer(vColor, 4, gl.FLOAT, false, 0, 0);
+                    gl.enableVertexAttribArray(vColor);
+
                     gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
-                    var t = vec2(
-                        -1 + 2 * (event.clientX - canvas.getBoundingClientRect().x) / canvas.width, 
-                        -1 + 2 * (canvas.height - (event.clientY - canvas.getBoundingClientRect().y)) / canvas.height
-                    );
+                    var t = vec2(-1 + 2 * (event.clientX - canvas.getBoundingClientRect().x) / canvas.width, -1 + 2 * (canvas.height - (event.clientY - canvas.getBoundingClientRect().y)) / canvas.height);
                     var data = new Float32Array(t);
                     
                     if (index < max_points) {
@@ -115,6 +134,32 @@
             } catch (error) {
                 console.error(error);
             }
+
+            document.getElementById("clear").addEventListener("click", function() {
+                switch(document.getElementById("mymenu").selectedIndex) {
+                    case 0:
+                        gl.clearColor(0.3921, 0.5843, 0.9294, 1.0);
+                        break;
+                    case 1:
+                        gl.clearColor(87 / 255, 218 / 255, 122 / 255, 1);
+                        break;
+                    case 2:
+                        gl.clearColor(218 / 255, 98 / 255, 87 / 255, 1.0);
+                        break;
+                }
+
+                colors_array = [];
+                cBuffer = gl.createBuffer();
+                gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
+                gl.bufferData(gl.ARRAY_BUFFER, flatten(colors_array), gl.STATIC_DRAW);
+                vColor = gl.getAttribLocation(program, "vColor");
+                gl.vertexAttribPointer(vColor, 4, gl.FLOAT, false, 0, 0);
+                gl.enableVertexAttribArray(vColor);
+
+                gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
+                gl.bufferSubData(gl.ARRAY_BUFFER, 0, new Float32Array(vertices));
+                index = 0;
+            });
 
             await fetchCodeSnippets();
             isLoading = false;
@@ -157,20 +202,45 @@
         </ul>
     </div>
 
-    <!-- {#if !isLoading}
-        <CodeBlock code_snippets={code_snippets} classes="w-full rounded-lg" style="" />
-    {:else}
-        <p>Loading code snippets...</p>
-    {/if} -->
+    <div class="mx-auto my-4">
+        <Toggle icons={[Code, Play, Columns2]} bind:selected={view_index} />
+    </div>
 
-    <div class="flex flex-row justify-center items-center m-auto">
-        {#if !isLoading}
-            <CodeBlock code_snippets={code_snippets} classes="rounded-none rounded-l-lg" style="min-width: 512px; height: 512px;" />
-        {:else}
-            <p>Loading code snippets...</p>
-        {/if}
+    <div class="flex flex-row justify-center items-center w-4/5 m-auto">
+        <div class="{view_index !== 1 ? 'visible' : 'hidden'} w-full">
+            {#if !isLoading}
+                <CodeBlock code_snippets={code_snippets} classes="rounded-{view_index === 2 ? 'l-' : ''}lg" style="{view_index === 0 ? 'min-' : ''}width: 512px; height: 512px;" />
+            {:else}
+                <p>Loading code snippets...</p>
+            {/if}
+        </div>
 
-        <canvas bind:this={canvas} id="gl-canvas" width="512" height="512" class="rounded-r-lg"></canvas>
+        <Canvas bind:canvas={canvas} view_index={view_index}>
+            <div slot='input/output'>
+                <div class="absolute left-0 top-0 flex flex-row justify-evenly items-center gap-4 w-full p-4 bg-gray-900/25">    
+                    <button id="clear" class="flex w-32 h-8 items-center justify-center px-auto py-4 transition-colors duration-200 text-sm bg-white hover:bg-gray-300 text-black rounded-lg">Clear canvas</button>
+                    
+                    <div class="flex flex-row justify-between gap-4">
+                        <div class="flex flex-col w-32 bg-white rounded-lg p-1">
+                            <label for="mymenu" class="flex text-sm h-8 items-center justify-center text-black rounded-lg">Background</label>
+                            <select id="mymenu" class="flex text-sm h-8 bg-gray-300 text-black ps-4 rounded-lg">
+                                <option class="bg-white" value="0" selected>Blue</option>
+                                <option class="bg-white" value="1">Green</option>
+                                <option class="bg-white" value="2">Red</option>
+                            </select>
+                        </div>
+                        
+                        <div class="flex flex-col w-32 bg-white rounded-lg p-1">
+                            <label for="pointscolor" class="flex text-sm h-8 items-center justify-center text-black rounded-lg">Point color</label>
+                            <select id="pointscolor" class="flex text-sm h-8 bg-gray-300 text-black ps-4 rounded-lg">
+                                <option class="bg-white" value="0" selected>Black</option>
+                                <option class="bg-white" value="1">White</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </Canvas>
     </div>
 </div>
 

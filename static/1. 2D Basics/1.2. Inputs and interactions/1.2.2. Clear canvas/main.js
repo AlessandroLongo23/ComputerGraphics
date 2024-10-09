@@ -45,7 +45,10 @@ window.onload = function init() {
         gl.enableVertexAttribArray(vColor);
 
         gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
-        var t = vec2(-1 + 2 * (event.clientX - canvas.getBoundingClientRect().x) / canvas.width, -1 + 2 * (canvas.height - (event.clientY - canvas.getBoundingClientRect().y)) / canvas.height);
+        var t = vec2(
+            -1 + 2 * (event.clientX - canvas.getBoundingClientRect().x) / canvas.width, 
+            -1 + 2 * (canvas.height - (event.clientY - canvas.getBoundingClientRect().y)) / canvas.height
+        );
         var data = new Float32Array(t);
         
         if (index < max_points) {

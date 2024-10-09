@@ -1,8 +1,10 @@
 <script>
-    import { ChevronLeft, ChevronDown, Menu, Spline, Box, Boxes, Orbit, GripVertical } from 'lucide-svelte';
+    import { ChevronDown, Menu, GripVertical, X } from 'lucide-svelte';
     import { theme } from "$lib/stores";
+    import { page } from '$app/stores';
+    import { content_tree } from '$lib/data';
     
-    let isCollapsed = false;
+    let isCollapsed = true;
     let sidebarWidth = 350;
     let isDragging = false;
     
@@ -10,16 +12,15 @@
         isCollapsed = !isCollapsed;
     }
 
-    function startResize(event) {
+    function startResize() {
         isDragging = true;
         document.addEventListener('mousemove', handleMouseMove);
         document.addEventListener('mouseup', stopResize);
     }
 
     function handleMouseMove(event) {
-        if (isDragging) {
+        if (isDragging)
             sidebarWidth = Math.max(280, Math.min(400, event.clientX));
-        }
     }
 
     function stopResize() {
@@ -28,95 +29,43 @@
         document.removeEventListener('mouseup', stopResize);
     }
 
-    const menuItems = [
-        { 
-            icon: Spline, 
-            label: '2D Basics',
-            href: '/1. 2D Basics',
-            children: [
-                {
-                    icon: Spline,
-                    label: 'Primitives in WebGL',
-                    href: '/1. 2D Basics/1.1. Primitives in WebGL',
-                    children: [
-                        {
-                            icon: Spline,
-                            label: 'WebGL environment setup',
-                            href: '/1. 2D Basics/1.1. Primitives in WebGL/1.1.1. WebGL environment setup',
-                        },
-                        {
-                            icon: Spline,
-                            label: 'Shaders and buffers',
-                            href: '/1. 2D Basics/1.1. Primitives in WebGL/1.1.2. Shaders and buffers',
-                        },
-                        {
-                            icon: Spline,
-                            label: 'Triangles',
-                            href: '/1. 2D Basics/1.1. Primitives in WebGL/1.1.3. Triangles',
-                        },
-                        {
-                            icon: Spline,
-                            label: 'Rotating square',
-                            href: '/1. 2D Basics/1.1. Primitives in WebGL/1.1.4. Rotating square',
-                        },
-                        {
-                            icon: Spline,
-                            label: 'Fan of triangles',
-                            href: '/1. 2D Basics/1.1. Primitives in WebGL/1.1.5. Fan of triangles',
-                        }
-                    ]
-                },
-                {
-                    icon: Spline,
-                    label: 'Inputs and interactions',
-                    href: '/1. 2D Basics/1.2. Inputs and interactions',
-                    children: [
-                        {
-                            icon: Spline,
-                            label: 'Exercise 1',
-                            href: '/1. 2D Basics/1.2. Inputs and interactions/1.2.1. Exercise 1'
-                        },
-                        {
-                            icon: Spline,
-                            label: 'Exercise 2',
-                            href: '/1. 2D Basics/1.2. Inputs and interactions/1.2.2. Exercise 2'
-                        },
-                        {
-                            icon: Spline,
-                            label: 'Exercise 3',
-                            href: '/1. 2D Basics/1.2. Inputs and interactions/1.2.3. Exercise 3'
-                        },
-                        {
-                            icon: Spline,
-                            label: 'Exercise 4',
-                            href: '/1. 2D Basics/1.2. Inputs and interactions/1.2.4. Exercise 4'
-                        }
-                    ]
-                },
-                {
-                    icon: Spline,
-                    label: 'Model, view and projection',
-                    href: '/1. 2D Basics/1.3. Model, view and projections',
+    function isRouteActive(href) {
+        return $page.url.pathname === href;
+    }
+
+    function isParentRouteActive(item) {
+        if (isRouteActive(item.href)) 
+            return true;
+        
+        if (item.children) {
+            return item.children.some(child => {
+                if (isRouteActive(child.href)) return true;
+                if (child.children) {
+                    return child.children.some(grandchild => isRouteActive(grandchild.href));
                 }
-            ]
-        },
-        { 
-            icon: Box, 
-            label: '3D Rendering', 
-            href: '/2. 3D Rendering', 
-            children: [
-                {   
-                    icon: Box,
-                    label: 'Lighting and shading',
-                    href: '/2. 3D Rendering/2.1. Lighting and shading',
-                }
-            ] 
-        },
-        { icon: Boxes, label: 'Advanced rendering', href: '/3. Advanced rendering', children: [] },
-        { icon: Orbit, label: 'Advanced techniques', href: '/4. Advanced techniques', children: [] },
-    ];
-    
+                return false;
+            });
+        }
+        return false;
+    }
+
     let expandedItems = new Set();
+
+    $: if ($page) {
+        content_tree.children.forEach(item => {
+            if (isParentRouteActive(item)) {
+                expandedItems.add(item.href);
+                if (item.children) {
+                    item.children.forEach(child => {
+                        if (isParentRouteActive(child)) {
+                            expandedItems.add(child.href);
+                        }
+                    });
+                }
+            }
+        });
+    }
+
     function toggleExpanded(href) {
         if (expandedItems.has(href))
             expandedItems.delete(href);
@@ -143,22 +92,27 @@
                    overflow-y-auto"
             style="width: {sidebarWidth}px"
         >
-            <div class="flex flex-row justify-between items-center p-4 mb-6">
-                <a href="/home" class="relative">
-                    <img src="/images/favicon-{ $theme }.png" alt="logo" class="w-12 h-12"/>
+            <div class="flex flex-row justify-between items-center p-6 mb-6">
+                <a href="/home" class="relative w-12 h-12 me-4">
+                    <img src="/images/favicon-{ $theme }.png" alt="logo"/>
                 </a>
-
-                <button on:click={toggleSidebar} class="p-2 rounded-lg { $theme == 'light' ? 'hover:bg-gray-300' : 'hover:bg-gray-700' } transition-colors" aria-label="Collapse sidebar">
-                    <ChevronLeft size={20} />
-                </button>
+                
+                <div class="flex items-center">
+                    <button on:click={toggleSidebar} class="p-2 rounded-lg { $theme == 'light' ? 'hover:bg-gray-300' : 'hover:bg-gray-700' } transition-colors" aria-label="Collapse sidebar">
+                        <X size={20} />
+                    </button>
+                </div>
             </div>
             
             <nav class="flex flex-col gap-1 pe-4">
-                {#each menuItems as item}
+                {#each content_tree.children as item}
                     {@const hasChildren = item.children && item.children.length > 0}
                     <div class="flex flex-col">
-                        <div class="flex items-center gap-4 p-2 ms-4 rounded-lg { $theme == 'light' ?  'hover:bg-gray-300' : ' hover:bg-gray-700'} transition-colors">
-                            <a href={item.href} class="flex items-center gap-4 flex-1 hover:no-underline { $theme == 'light' ? 'text-black ' : 'text-white '}">
+                        <div class="flex items-center gap-4 p-2 ms-4 rounded-lg { $theme == 'light' ? 
+                            isRouteActive(item.href) ? 'bg-gray-300' : 'hover:bg-gray-300' : 
+                            isRouteActive(item.href) ? 'bg-gray-700' : 'hover:bg-gray-700'} transition-colors">
+                            <a href={item.href} class="flex items-center gap-4 flex-1 hover:no-underline { $theme == 'light' ? 'text-black' : 'text-white'}
+                               {isRouteActive(item.href) ? 'font-semibold' : ''}">
                                 <svelte:component this={item.icon} size={20}/>
                                 <span class="flex-1 truncate">{item.label}</span>
                             </a>
@@ -175,8 +129,11 @@
                                 {#each item.children as child}
                                     {@const hasGrandchildren = child.children && child.children.length > 0}
                                     <div class="flex flex-col">
-                                        <div class="flex items-center gap-4 p-2 ms-4 rounded-lg transition-colors { $theme == 'light' ?  'hover:bg-gray-300' : ' hover:bg-gray-700'}">
-                                            <a href={child.href} class="flex items-center gap-4 flex-1 hover:no-underline { $theme == 'light' ? 'text-black ' : 'text-white '}">
+                                        <div class="flex items-center gap-4 p-2 ms-4 rounded-lg transition-colors { $theme == 'light' ? 
+                                            isRouteActive(child.href) ? 'bg-gray-300' : 'hover:bg-gray-300' : 
+                                            isRouteActive(child.href) ? 'bg-gray-700' : 'hover:bg-gray-700'}">
+                                            <a href={child.href} class="flex items-center gap-4 flex-1 hover:no-underline { $theme == 'light' ? 'text-black' : 'text-white'}
+                                               {isRouteActive(child.href) ? 'font-semibold' : ''}">
                                                 <svelte:component this={child.icon} size={20}/>
                                                 <span class="flex-1 truncate">{child.label}</span>
                                             </a>
@@ -191,7 +148,12 @@
                                         {#if hasGrandchildren && expandedItems.has(child.href)}
                                             <div class="pl-2 border-l-2 ml-4 {$theme == 'light' ? 'border-gray-300' : 'border-gray-700'}">
                                                 {#each child.children as grandchild}
-                                                    <a href={grandchild.href} class="flex items-center gap-4 p-2 ms-4 rounded-lg hover:no-underline transition-colors { $theme == 'light' ? 'text-black hover:bg-gray-300' : 'text-white hover:bg-gray-700'}">
+                                                    <a href={grandchild.href} 
+                                                       class="flex items-center gap-4 p-2 ms-4 rounded-lg hover:no-underline transition-colors 
+                                                              { $theme == 'light' ? 
+                                                                isRouteActive(grandchild.href) ? 'bg-gray-300 font-semibold' : 'hover:bg-gray-300' : 
+                                                                isRouteActive(grandchild.href) ? 'bg-gray-700 font-semibold' : 'hover:bg-gray-700'}
+                                                              { $theme == 'light' ? 'text-black' : 'text-white'}">
                                                         <svelte:component this={grandchild.icon} size={20}/>
                                                         <span class="flex-1 truncate">{grandchild.label}</span>
                                                     </a>
@@ -217,7 +179,7 @@
         </aside>
     </div>
 
-    <div class="flex-1" style="margin-left: {!isCollapsed ? sidebarWidth : 0}px">
+    <div class="flex-1">
         <button 
             on:click={toggleSidebar} 
             class="fixed top-4 left-4 z-10 p-2 rounded-lg { $theme == 'light' ? 'hover:bg-gray-300' : 'hover:bg-gray-700' } transition-colors" 

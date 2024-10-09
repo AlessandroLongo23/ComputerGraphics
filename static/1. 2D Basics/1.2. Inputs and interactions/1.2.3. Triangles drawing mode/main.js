@@ -2,7 +2,6 @@ var vertices;
 
 function render() {
     gl.clear(gl.COLOR_BUFFER_BIT);
-
     gl.drawArrays(gl.TRIANGLES, 0, vertices.length);
     window.requestAnimFrame(render, canvas);
 }
@@ -80,6 +79,7 @@ window.onload = function init() {
                 }
             }
         }
+        
         cBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
         gl.bufferData(gl.ARRAY_BUFFER, flatten(colors_array), gl.STATIC_DRAW);

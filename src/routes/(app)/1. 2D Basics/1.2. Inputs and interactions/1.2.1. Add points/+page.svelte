@@ -2,9 +2,14 @@
     import { onMount } from 'svelte';
     import { page } from '$app/stores'
     import CodeBlock from '$lib/components/CodeBlock.svelte';
+    import Toggle from '$lib/components/Toggle.svelte';
+    import Canvas from '$lib/components/Canvas.svelte';
+    import { Code, Play, Columns2 } from 'lucide-svelte';
 
     import { WebGLUtils } from '$lib/utils.js';
-    import { vec2, add, mult, flatten } from '$lib/Libraries/MV.js';
+    import { vec2, flatten, sizeof } from '$lib/Libraries/MV.js';
+
+    let view_index = 0;
 
     let code_snippets = [];
     let code_snippets_info = [
@@ -58,7 +63,7 @@
 
     let canvas, gl, program;
     let vertices = [];
-    let acc, vel, pos, posLoc, date, delta_time, t1, t2, damp, air_friction, rad_friction, num, rad;
+    let index;
 
     onMount(async () => {
         if (typeof window !== 'undefined') {
@@ -77,34 +82,39 @@
 
                 initShaders();
 
-                acc = vec2(0.0, -9.81);
-                vel = vec2(5, 0.0);
-                pos = vec2(-0.4, 0.3);
-                posLoc = gl.getUniformLocation(program, "pos");
+                vertices = [ 
+                    vec2(0.0, 0.0), 
+                    vec2(1.0, 0.0), 
+                    vec2(1.0, 1.0)
+                ];
+                index = vertices.length;
 
-                gl.useProgram(program);
-                
-                date = new Date;
-                delta_time = 0.0;
-                t1 = date.getTime();
-                damp = vec2(0.75, 0.5);
-                air_friction = 0.99;
-                rad_friction = 0.90;
-
-                // vertices
-                num = 100;
-                rad = 0.5;
-                vertices = [vec2(0, 0)];
-                for (var angle = 0; angle <= Math.PI * 2; angle += Math.PI * 2 / num)
-                    vertices.push(vec2(rad * Math.cos(angle), rad * Math.sin(angle)));
-
+                var max_points = 100;
                 var vBuffer = gl.createBuffer();
                 gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
-                gl.bufferData(gl.ARRAY_BUFFER, flatten(vertices), gl.STATIC_DRAW);
+                gl.bufferData(gl.ARRAY_BUFFER, sizeof['vec2'] * max_points, gl.STATIC_DRAW);
+                
+                gl.bufferSubData(gl.ARRAY_BUFFER, 0, flatten(vertices));
 
                 var vPosition = gl.getAttribLocation(program, "vPosition");
                 gl.vertexAttribPointer(vPosition, 2, gl.FLOAT, false, 0, 0);
                 gl.enableVertexAttribArray(vPosition);
+
+                canvas.addEventListener("click", function(event) {
+                    gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
+                    var t = vec2(
+                        -1 + 2 * (event.clientX - canvas.getBoundingClientRect().x) / canvas.width, 
+                        -1 + 2 * (canvas.height - (event.clientY - canvas.getBoundingClientRect().y)) / canvas.height
+                    );
+                    var data = new Float32Array(t);
+                    
+                    if (index < max_points) {
+                        gl.bufferSubData(gl.ARRAY_BUFFER, sizeof['vec2'] * index, data);
+                        index++;
+                    } else {
+                        console.log("Max points reached!");
+                    }
+                });
 
                 render();
             } catch (error) {
@@ -118,45 +128,8 @@
 
     function render() {
         gl.clear(gl.COLOR_BUFFER_BIT);
-
-        date = new Date;
-        t2 = date.getTime();
-        delta_time = (t2 - t1) * 0.001;
-        t1 = t2;
-
-        pos = add(pos, mult(vel, delta_time));
-        if (Math.abs(pos[1] + 0.5) > 0.015 || Math.abs(vel[1]) > 0.015)
-            vel = add(vel, mult(acc, delta_time));
-        else { 
-            pos[1] = -0.5;
-            vel[1] = 0.0;
-            vel[0] = vel[0] * rad_friction;
-        }
-
-        vel = mult(vel, air_friction);
-
-        if (pos[1] < -0.5 && vel[1] < 0.0) {
-            vel[0] = vel[0] * rad_friction;
-            vel[1] = -vel[1] * damp[1];
-        } else if (pos[1] > 0.5 && vel[1] > 0.0) {
-            vel[0] = vel[0] * rad_friction;
-            vel[1] = -vel[1] * damp[1];
-        }
-
-        if (pos[0] > 0.5 || pos[0] < -0.5) {
-            if (pos[0] > 0.5)
-                pos[0] = 1.0 - pos[0];
-            else
-                pos[0] = -1.0 - pos[0];
-
-            vel[0] = -vel[0] * damp[0];
-        }
-
-        gl.uniform2f(posLoc, pos[0], pos[1]);
-
-        gl.drawArrays(gl.TRIANGLE_FAN, 0, vertices.length);
-
-        requestAnimFrame(render);
+        gl.drawArrays(gl.POINTS, 0, index);
+        window.requestAnimFrame(render, canvas);
     }
 
     async function fetchCodeSnippets() {
@@ -183,25 +156,26 @@
 <div class="flex flex-col justify-center items-start w-4/5 text-xl m-auto">
     <div class="w-3/5 m-auto">
         <ul>
-            <li>Create and draw a circle using the triangle fan drawing mode. [Angel 2.4.2] [The triangle fan drawing mode is not available in WebGPU. If using WebGPU, use the triangle-strip drawing mode to draw a circle.]</li>
-            <li>Make the circle bounce up and down over time.</li>
+            <li>Start from your solution to Part 2 of Worksheet 1: A web application that clears the canvas and then draws three points. [Angel 2.8]</li>
+            <li>Attach an event handler to the mouse click event and draw points on the canvas where the mouse was clicked. [Angel 3.7]</li>
+            <li>Points are offset from the tip of the mouse cursor. This is not as desired. Get the bounding rectangle of the canvas in the client area using event.target.getBoundingClientRect() and correct the mouse position using the left and top coordinates of this rectangle.</li>
         </ul>
     </div>
 
-    <!-- {#if !isLoading}
-        <CodeBlock code_snippets={code_snippets} classes="w-full rounded-lg" style="" />
-    {:else}
-        <p>Loading code snippets...</p>
-    {/if} -->
+    <div class="mx-auto my-4">
+        <Toggle icons={[Code, Play, Columns2]} bind:selected={view_index}/>
+    </div>
 
-    <div class="flex flex-row justify-center items-center m-auto">
-        {#if !isLoading}
-            <CodeBlock code_snippets={code_snippets} classes="rounded-none rounded-l-lg" style="min-width: 512px; height: 512px;" />
-        {:else}
-            <p>Loading code snippets...</p>
-        {/if}
+    <div class="flex flex-row justify-center items-center w-4/5 m-auto">
+        <div class="{view_index !== 1 ? 'visible' : 'hidden'} w-full">
+            {#if !isLoading}
+                <CodeBlock code_snippets={code_snippets} classes="rounded-{view_index === 2 ? 'l-' : ''}lg" style="{view_index === 0 ? 'min-' : ''}width: 512px; height: 512px;" />
+            {:else}
+                <p>Loading code snippets...</p>
+            {/if}
+        </div>
 
-        <canvas bind:this={canvas} id="gl-canvas" width="512" height="512" class="rounded-r-lg"></canvas>
+        <Canvas bind:canvas={canvas} view_index={view_index}/>
     </div>
 </div>
 

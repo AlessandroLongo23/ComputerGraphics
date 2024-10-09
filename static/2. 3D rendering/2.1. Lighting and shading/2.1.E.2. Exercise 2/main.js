@@ -76,7 +76,7 @@ function build_polyhedron() {
 
 
 function render() {
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    gl.clear(gl.COLOR_BUFFER_BIT);
 
     var ctm = mat4();
     var projectionMatrix = perspective(45, canvas.width / canvas.height, .001, 10.0);

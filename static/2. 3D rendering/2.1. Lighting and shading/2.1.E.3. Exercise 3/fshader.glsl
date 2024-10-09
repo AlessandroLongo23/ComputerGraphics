@@ -1,8 +1,7 @@
 precision mediump float;
 
-varying vec4 vertexColor;  // Interpolated color from vertex shader
+varying vec4 vertexColor;
 
 void main() {
-    // Set the color for this fragment
     gl_FragColor = vertexColor;
 }

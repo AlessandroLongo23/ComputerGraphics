@@ -54,8 +54,8 @@
     }
 </script>
 
-<div class="relative my-8 w-full" style="max-width: 512px;">
-    <div class="button-container absolute flex flex-row justify-between p-4 w-full rounded-l-lg">
+<div class="relative w-full">
+    <div class="button-container absolute flex flex-row w-full justify-between p-4 rounded-lg">
         <div class="flex flex-row justify-start">
             {#if code_snippets.length > 1}
                 {#each code_snippets as code_snippet, i}
@@ -74,7 +74,7 @@
     </div>
 
     <pre class="language-{current_language} m-0 {classes}" style={style}>
-        <code class="language-{current_language}">n
+        <code class="language-{current_language}">
             {current_code}
         </code>
     </pre>
@@ -88,7 +88,6 @@
     pre { 
         background-color: #282c34; 
         overflow-x: auto;
-        width: 100%;
         padding: 2rem 1rem 1rem 1rem;
     } 
 

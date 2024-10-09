@@ -81,7 +81,7 @@ window.onload = function init() {
 }
 
 function render() {
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    gl.clear(gl.COLOR_BUFFER_BIT);
     rot[0] += 0.025;
     rot[1] += 0.010;
     rot[2] -= 0.250;

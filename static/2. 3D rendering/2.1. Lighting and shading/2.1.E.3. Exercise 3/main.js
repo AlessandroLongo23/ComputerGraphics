@@ -1,4 +1,4 @@
-var vertices, vBuffer, normalsArray, vertexColors, numTimesToSubdivide;
+var vertices, vBuffer, vertexColors, numTimesToSubdivide;
 var v0, v1, v2, v3;
 var theta_y = 30;
 
@@ -53,7 +53,6 @@ document.getElementById("decrement-subdivision-level").addEventListener("click",
 
 function build_polyhedron() {
     vertices = [];
-    normals = [];
 
     tetrahedron(v0, v1, v2, v3, numTimesToSubdivide);
 
@@ -65,15 +64,6 @@ function build_polyhedron() {
     var vPosition = gl.getAttribLocation(program, "vPosition");
     gl.vertexAttribPointer(vPosition, 4, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(vPosition);
-
-    // Bind the normal buffer
-    var nBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, nBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, flatten(normals), gl.STATIC_DRAW);
-
-    var vNormal = gl.getAttribLocation(program, "vNormal");
-    gl.vertexAttribPointer(vNormal, 3, gl.FLOAT, false, 0, 0);
-    gl.enableVertexAttribArray(vNormal);
 }
 
 function render() {
@@ -82,16 +72,13 @@ function render() {
     var modelViewMatrix = mat4();
     var projectionMatrix = perspective(45, canvas.width / canvas.height, 0.1, 10.0);
 
-    theta_y += 0.025;
+    theta_y += 0.5;
     modelViewMatrix = mult(modelViewMatrix, translate(0.0, 0.0, -3.0));
     modelViewMatrix = mult(modelViewMatrix, rotateY(theta_y));
-
-    var normalMatrix = normalMatrix3x3(modelViewMatrix);
 
     // Pass matrices to the shader
     gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
     gl.uniformMatrix4fv(projectionMatrixLoc, false, flatten(projectionMatrix));
-    gl.uniformMatrix3fv(normalMatrixLoc, false, flatten(normalMatrix));
 
     gl.drawArrays(gl.TRIANGLES, 0, vertices.length);
     requestAnimFrame(render);
@@ -118,7 +105,6 @@ function setup_environment() {
     // Uniform locations for the matrices
     modelViewMatrixLoc = gl.getUniformLocation(program, "modelViewMatrix");
     projectionMatrixLoc = gl.getUniformLocation(program, "projectionMatrix");
-    normalMatrixLoc = gl.getUniformLocation(program, "normalMatrix");
 }
 
 function tetrahedron(a, b, c, d, n) {
@@ -145,24 +131,7 @@ function divideTriangle(a, b, c, count) {
 }
 
 function triangle(a, b, c) {
-    // Calculate and push vertex positions and corresponding normals (unit vectors)
-    normals.push(normalize(vec3(a[0], a[1], a[2])));
     vertices.push(a);
-
-    normals.push(normalize(vec3(b[0], b[1], b[2])));
     vertices.push(b);
-
-    normals.push(normalize(vec3(c[0], c[1], c[2])));
     vertices.push(c);
-}
-
-function normalMatrix3x3(modelViewMatrix) {
-    var upper3x3 = mat3(
-        modelViewMatrix[0][0], modelViewMatrix[0][1], modelViewMatrix[0][2],
-        modelViewMatrix[1][0], modelViewMatrix[1][1], modelViewMatrix[1][2],
-        modelViewMatrix[2][0], modelViewMatrix[2][1], modelViewMatrix[2][2]
-    );
-    
-    var invMat = inverse(upper3x3);
-    return transpose(invMat);
 }

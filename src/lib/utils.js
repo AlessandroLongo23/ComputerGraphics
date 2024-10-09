@@ -50,7 +50,7 @@ if (typeof window !== 'undefined') {
             window.mozRequestAnimationFrame ||
             window.oRequestAnimationFrame ||
             window.msRequestAnimationFrame ||
-            function(callback, element) {
+            function(callback, _) {
                 window.setTimeout(callback, 1000 / 60);
             };
     })();

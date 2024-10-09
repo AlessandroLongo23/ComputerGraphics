@@ -1,12 +1,5 @@
 var vertices;
 
-function render() {
-    gl.clear(gl.COLOR_BUFFER_BIT);
-
-    gl.drawArrays(gl.TRIANGLES, 0, vertices.length);
-    window.requestAnimFrame(render, canvas);
-}
-
 window.onload = function init() {
     canvas = document.getElementById("gl-canvas");
 
@@ -208,6 +201,12 @@ window.onload = function init() {
     });
 
     render();
+}
+
+function render() {
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.drawArrays(gl.TRIANGLES, 0, vertices.length);
+    window.requestAnimFrame(render, canvas);
 }
 
 document.getElementById("clear").addEventListener("click", function() {
