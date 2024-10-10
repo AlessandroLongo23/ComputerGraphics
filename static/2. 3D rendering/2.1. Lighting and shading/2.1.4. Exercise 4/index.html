@@ -2,9 +2,11 @@
     <head>
         <title>2.1. Lighting and shading - Exercise 4</title>
 
-        <script type="text/javascript" src="../../../lib/webgl-utils.js"></script>
-        <script type="text/javascript" src="../../../lib/initShaders2.js"></script>
-        <script type="text/javascript" src="../../../lib/MV.js"></script>
+        <script type="text/javascript" src="../../../../Libraries/webgl-utils.js"></script>
+        <script type="text/javascript" src="../../../../Libraries/initShaders2.js"></script>
+        <script type="text/javascript" src="../../../../Libraries/MV.js"></script>
+
+        <link rel="stylesheet" href="../../../../style.css">
     </head>
 
     <body>
@@ -30,34 +32,25 @@
                     <button id="decrement-subdivision-level">Decrement Subdivision Level</button>
                 </div>
 
-                <div class="row">
+                <div class="column">
                     <div class="column">
-                        <label for="s">Shininess</label>
-                        <input id="s" type="range" id="shininess" min="0" max="3" value="1" step="0.05">
+                        <label for="shininess">Shininess</label>
+                        <input type="range" id="shininess" min="0" max="100" value="50" onchange="updateShininess()">
                     </div>
 
                     <div class="column">
-                        <label for="k_d">Diffusion coefficient</label>
-                        <input id="k_d" type="range" id="diffuse" min="0" max="1" value="0.5" step="0.05">
-
-                        <label for="L_d">Diffusion intensity</label>
-                        <input id="L_d" type="color" id="diffuse" min="0" max="1" value="0.5" step="0.05">
+                        <label for="diffuse">Diffuse</label>
+                        <input type="range" id="diffuse" min="0" max="100" value="50" onchange="updateDiffuse()">
                     </div>
 
                     <div class="column">
-                        <label for="k_s">Specular coefficient</label>
-                        <input id="k_s" type="range" id="specular" min="0" max="1" value="0.5" step="0.05">
-
-                        <label for="L_s">Specular intensity</label>
-                        <input id="L_s" type="color" id="specular" min="0" max="1" value="0.5" step="0.05">
+                        <label for="specular">Specular</label>
+                        <input type="range" id="specular" min="0" max="100" value="50" onchange="updateSpecular()">
                     </div>
 
                     <div class="column">
-                        <label for="k_a">Ambient coeffcient</label>
-                        <input id="k_a" type="range" id="ambient" min="0" max="1" value="0.5" step="0.05">
-
-                        <label for="L_a">Ambient coeffcient</label>
-                        <input id="L_a" type="color" id="ambient" min="0" max="1" value="0.5" step="0.05">
+                        <label for="ambient">Ambient</label>
+                        <input type="range" id="ambient" min="0" max="100" value="50" onchange="updateAmbient()">
                     </div>
                 </div>
             </div>

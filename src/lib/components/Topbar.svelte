@@ -35,7 +35,7 @@
             subtitle = 'Chapter ' + parts[0] + '.' + parts[1] + '.';
             title = parts[2].trim();
         } else if (count === 3) {
-            subtitle = 'Paragraph ' + parts[0] + '.' + parts[1] + '.' + parts[2] + '.';
+            subtitle = 'Exercise ' + parts[0] + '.' + parts[1] + '.' + parts[2] + '.';
             title = parts[3].trim();
         }
     }
@@ -50,6 +50,9 @@
 
         let item = content_sequence.find(item => item.label == url.split("/").slice(-1)[0].replaceAll("%20", " "))
         let index = content_sequence.indexOf(item);
+        if (index + off < 0 || index + off >= content_sequence.length)
+            return undefined;
+
         return content_sequence[index + off].href;
     }
 </script>

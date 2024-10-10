@@ -6,7 +6,7 @@
 
 <div class="{ theme }">
     <LeftSidebar>
-        <Topbar title="Computer Graphics" />
+        <Topbar/>
         <slot />
     </LeftSidebar>
 </div>

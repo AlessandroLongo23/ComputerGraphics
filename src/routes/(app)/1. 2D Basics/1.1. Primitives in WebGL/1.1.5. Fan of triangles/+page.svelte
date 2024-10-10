@@ -1,85 +1,31 @@
 <script>
     import { onMount } from 'svelte';
     import { page } from '$app/stores'
-    import CodeBlock from '$lib/components/CodeBlock.svelte';
+    import { WebGLUtils, fetchCodeSnippets, initShaders } from '$lib/utils.js';
+    import { RotateCw } from 'lucide-svelte';
+    import * as mv from '$lib/Libraries/MV.js';
+    import Result from '$lib/components/Result.svelte';
 
-    import { WebGLUtils } from '$lib/utils.js';
-    import { vec2, add, mult, flatten } from '$lib/Libraries/MV.js';
-
-    let code_snippets = [];
-    let code_snippets_info = [
-        {
-            name: 'main.js',
-            language: 'JavaScript',
-            path: $page.url.pathname + '/main.js'
-        },
-        {
-            name: 'index.html',
-            language: 'HTML',
-            path: $page.url.pathname + '/index.html'
-        },
-        {
-            name: 'vshader.glsl',
-            language: 'GLSL',
-            path: $page.url.pathname + '/vshader.glsl'
-        },
-        {
-            name: 'fshader.glsl',
-            language: 'GLSL',
-            path: $page.url.pathname + '/fshader.glsl'
-        }
-    ];
-    let isLoading = true;
-
-    async function fetchShader(url) {
-        const response = await fetch(url);
-        if (!response.ok)
-            throw new Error(`Failed to fetch shader: ${url}`);
-
-        return await response.text();
-    }
-
-    let vertexShaderSource, fragmentShaderSource;
-    function initShaders() {
-        const vertexShader = gl.createShader(gl.VERTEX_SHADER);
-        gl.shaderSource(vertexShader, vertexShaderSource);
-        gl.compileShader(vertexShader);
-
-        const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
-        gl.shaderSource(fragmentShader, fragmentShaderSource);
-        gl.compileShader(fragmentShader);
-
-        program = gl.createProgram();
-        gl.attachShader(program, vertexShader);
-        gl.attachShader(program, fragmentShader);
-        gl.linkProgram(program);
-        gl.useProgram(program);
-    }
-
+    let view_index = 1;
+    let loading = true;
     let canvas, gl, program;
+    let code_snippets = [];
+
     let vertices = [];
     let acc, vel, pos, posLoc, date, delta_time, t1, t2, damp, air_friction, rad_friction, num, rad;
 
     onMount(async () => {
         if (typeof window !== 'undefined') {
             gl = WebGLUtils.setupWebGL(canvas);
-            if (!gl) {
-                alert("WebGL isn’t available");
-                return;
-            }
-        
             gl.viewport(0, 0, canvas.width, canvas.height);
             gl.clearColor(0.3921, 0.5843, 0.9294, 1.0);
 
             try {
-                vertexShaderSource = await fetchShader($page.url.pathname + '/vshader.glsl');
-                fragmentShaderSource = await fetchShader($page.url.pathname + '/fshader.glsl');
+                [gl, program] = await initShaders(gl, program, $page.url.pathname + '/vshader.glsl', $page.url.pathname + '/fshader.glsl');
 
-                initShaders();
-
-                acc = vec2(0.0, -9.81);
-                vel = vec2(5, 0.0);
-                pos = vec2(-0.4, 0.3);
+                acc = mv.vec2(0.0, -9.81);
+                vel = mv.vec2(5, 0.0);
+                pos = mv.vec2(-0.4, 0.3);
                 posLoc = gl.getUniformLocation(program, "pos");
 
                 gl.useProgram(program);
@@ -87,20 +33,20 @@
                 date = new Date;
                 delta_time = 0.0;
                 t1 = date.getTime();
-                damp = vec2(0.75, 0.5);
+                damp = mv.vec2(0.75, 0.5);
                 air_friction = 0.99;
                 rad_friction = 0.90;
 
                 // vertices
                 num = 100;
                 rad = 0.5;
-                vertices = [vec2(0, 0)];
+                vertices = [mv.vec2(0, 0)];
                 for (var angle = 0; angle <= Math.PI * 2; angle += Math.PI * 2 / num)
-                    vertices.push(vec2(rad * Math.cos(angle), rad * Math.sin(angle)));
+                    vertices.push(mv.vec2(rad * Math.cos(angle), rad * Math.sin(angle)));
 
                 var vBuffer = gl.createBuffer();
                 gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
-                gl.bufferData(gl.ARRAY_BUFFER, flatten(vertices), gl.STATIC_DRAW);
+                gl.bufferData(gl.ARRAY_BUFFER, mv.flatten(vertices), gl.STATIC_DRAW);
 
                 var vPosition = gl.getAttribLocation(program, "vPosition");
                 gl.vertexAttribPointer(vPosition, 2, gl.FLOAT, false, 0, 0);
@@ -111,8 +57,8 @@
                 console.error(error);
             }
 
-            await fetchCodeSnippets();
-            isLoading = false;
+            code_snippets = await fetchCodeSnippets($page.url.pathname);
+            loading = false;
         }
     });
 
@@ -124,16 +70,16 @@
         delta_time = (t2 - t1) * 0.001;
         t1 = t2;
 
-        pos = add(pos, mult(vel, delta_time));
+        pos = mv.add(pos, mv.mult(vel, delta_time));
         if (Math.abs(pos[1] + 0.5) > 0.015 || Math.abs(vel[1]) > 0.015)
-            vel = add(vel, mult(acc, delta_time));
+            vel = mv.add(vel, mv.mult(acc, delta_time));
         else { 
             pos[1] = -0.5;
             vel[1] = 0.0;
             vel[0] = vel[0] * rad_friction;
         }
 
-        vel = mult(vel, air_friction);
+        vel = mv.mult(vel, air_friction);
 
         if (pos[1] < -0.5 && vel[1] < 0.0) {
             vel[0] = vel[0] * rad_friction;
@@ -153,30 +99,15 @@
         }
 
         gl.uniform2f(posLoc, pos[0], pos[1]);
-
         gl.drawArrays(gl.TRIANGLE_FAN, 0, vertices.length);
-
         requestAnimFrame(render);
     }
 
-    async function fetchCodeSnippets() {
-        try {
-            for (let info of code_snippets_info) {
-                const response = await fetch(info.path); 
-                if (!response.ok)
-                    throw new Error('Network response was not ok');
-                
-                const code = await response.text();
-
-                code_snippets = [...code_snippets, {
-                    name: info.name,
-                    language: info.language,
-                    code: code
-                }];
-                }
-        } catch (error) {
-            console.error('Error fetching the JavaScript file:', error);
-        }
+    function reset_visualization() {
+        console.log("reset visualization");
+        acc = mv.vec2(0.0, -9.81);
+        vel = mv.vec2(5, 0.0);
+        pos = mv.vec2(-0.4, 0.3);
     }
 </script>
 
@@ -188,21 +119,13 @@
         </ul>
     </div>
 
-    <!-- {#if !isLoading}
-        <CodeBlock code_snippets={code_snippets} classes="w-full rounded-lg" style="" />
-    {:else}
-        <p>Loading code snippets...</p>
-    {/if} -->
-
-    <div class="flex flex-row justify-center items-center m-auto">
-        {#if !isLoading}
-            <CodeBlock code_snippets={code_snippets} classes="rounded-none rounded-l-lg" style="min-width: 512px; height: 512px;" />
-        {:else}
-            <p>Loading code snippets...</p>
-        {/if}
-
-        <canvas bind:this={canvas} id="gl-canvas" width="512" height="512" class="rounded-r-lg"></canvas>
-    </div>
+    <Result bind:canvas={canvas} bind:view_index={view_index} loading={loading} code_snippets={code_snippets}>
+        <div slot='controls'>
+            <button on:click={reset_visualization} class="absolute left-0 top-0 m-4 p-2 bg-gray-100 rounded-lg hover:bg-gray-300 transition-colors">
+                <svelte:component this={ RotateCw } size={20}/>
+            </button>
+        </div>
+    </Result>
 </div>
 
 <style>

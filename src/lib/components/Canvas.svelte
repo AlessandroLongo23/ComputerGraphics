@@ -1,12 +1,13 @@
 <script>
     export let canvas;
     export let view_index;
+    export let width = 512;
 </script>
 
 <div class="relative {view_index !== 0 ? 'visible' : 'hidden'}">
-    <canvas bind:this={canvas} id="gl-canvas" width="512" height="512" class="rounded-{view_index == 2 ? 'r-' : ''}lg"></canvas>
+    <canvas bind:this={canvas} id="gl-canvas" width="{width}" height="512" class="rounded-{view_index == 1 ? 'r-' : ''}lg"></canvas>
 
-    <slot name='input/output'></slot>
+    <slot name='controls'/>
 </div>
 
 <style>

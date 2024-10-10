@@ -73,13 +73,13 @@ const content_tree = {
                     children: [
                         {
                             icon: Spline,
-                            label: '1.3.1. Exercise 1',
-                            href: '/1. 2D Basics/1.3. Model, view and projections/1.3.1. Exercise 1'
+                            label: '1.3.1. Wireframe cube',
+                            href: '/1. 2D Basics/1.3. Model, view and projections/1.3.1. Wireframe cube'
                         },
                         {
                             icon: Spline,
-                            label: '1.3.2. Exercise 2',
-                            href: '/1. 2D Basics/1.3. Model, view and projections/1.3.2. Exercise 2'
+                            label: '1.3.2. Perspective views',
+                            href: '/1. 2D Basics/1.3. Model, view and projections/1.3.2. Perspective views'
                         },
                     ]
                 }
@@ -116,6 +116,11 @@ const content_tree = {
                             href: '/2. 3D Rendering/2.1. Lighting and shading/2.1.4. Exercise 4'
                         },
                     ]
+                },
+                {
+                    icon: Box,
+                    label: '2.2. Loading external models',
+                    href: '/2. 3D Rendering/2.2. Loading external models',
                 }
             ] 
         },

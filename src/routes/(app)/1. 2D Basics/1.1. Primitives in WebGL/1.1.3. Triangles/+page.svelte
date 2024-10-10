@@ -1,87 +1,33 @@
 <script>
     import { onMount } from 'svelte';
     import { page } from '$app/stores'
-    import CodeBlock from '$lib/components/CodeBlock.svelte';
-    
-    import { WebGLUtils } from '$lib/utils.js';
-    import { vec2, vec4, flatten } from '$lib/Libraries/MV.js';
+    import { WebGLUtils, fetchCodeSnippets, initShaders } from '$lib/utils.js';
+    import * as mv from '$lib/Libraries/MV.js';
+    import Result from '$lib/components/Result.svelte'
 
+    let loading = true;
+    let view_index = 1;
     let canvas, gl, program;
+    let code_snippets = [];
+
     let vertices = [];
     let colors_array = [];
-    let vertexShaderSource, fragmentShaderSource;
-    let code_snippets = [];
-    let code_snippets_info = [
-        {
-            name: 'main.js',
-            language: 'JavaScript',
-            path: $page.url.pathname + '/main.js'
-        },
-        {
-            name: 'index.html',
-            language: 'HTML',
-            path: $page.url.pathname + '/index.html'
-        },
-        {
-            name: 'vshader.glsl',
-            language: 'GLSL',
-            path: $page.url.pathname + '/vshader.glsl'
-        },
-        {
-            name: 'fshader.glsl',
-            language: 'GLSL',
-            path: $page.url.pathname + '/fshader.glsl'
-        }
-    ];
-    let isLoading = true;
-
-    async function fetchShader(url) {
-        const response = await fetch(url);
-        if (!response.ok)
-            throw new Error(`Failed to fetch shader: ${url}`);
-
-        return await response.text();
-    }
-
-    function initShaders() {
-        const vertexShader = gl.createShader(gl.VERTEX_SHADER);
-        gl.shaderSource(vertexShader, vertexShaderSource);
-        gl.compileShader(vertexShader);
-
-        const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
-        gl.shaderSource(fragmentShader, fragmentShaderSource);
-        gl.compileShader(fragmentShader);
-
-        program = gl.createProgram();
-        gl.attachShader(program, vertexShader);
-        gl.attachShader(program, fragmentShader);
-        gl.linkProgram(program);
-        gl.useProgram(program);
-    }
 
     onMount(async () => {
         if (typeof window !== 'undefined') {
             gl = WebGLUtils.setupWebGL(canvas);
-            if (!gl) {
-                alert("WebGL isn’t available");
-                return;
-            }
-        
             gl.viewport(0, 0, canvas.width, canvas.height);
             gl.clearColor(0.3921, 0.5843, 0.9294, 1.0);
 
             try {
-                vertexShaderSource = await fetchShader($page.url.pathname + '/vshader.glsl');
-                fragmentShaderSource = await fetchShader($page.url.pathname + '/fshader.glsl');
-                                
-                initShaders();
+                [gl, program] = await initShaders(gl, program, $page.url.pathname + '/vshader.glsl', $page.url.pathname + '/fshader.glsl');
 
                 // vertices
-                vertices = [ vec2(0.0, 0.0), vec2(1.0, 0.0), vec2(1.0, 1.0) ];
+                vertices = [ mv.vec2(0.0, 0.0), mv.vec2(1.0, 0.0), mv.vec2(1.0, 1.0) ];
 
                 var vBuffer = gl.createBuffer();
                 gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
-                gl.bufferData(gl.ARRAY_BUFFER, flatten(vertices), gl.STATIC_DRAW);
+                gl.bufferData(gl.ARRAY_BUFFER, mv.flatten(vertices), gl.STATIC_DRAW);
 
                 var vPosition = gl.getAttribLocation(program, "vPosition");
                 gl.vertexAttribPointer(vPosition, 2, gl.FLOAT, false, 0, 0);
@@ -89,14 +35,14 @@
 
                 // colors
                 colors_array = [ 
-                    vec4(1.0, 0.0, 0.0, 1.0), 
-                    vec4(0.0, 1.0, 0.0, 1.0), 
-                    vec4(0.0, 0.0, 1.0, 1.0) 
+                    mv.vec4(1.0, 0.0, 0.0, 1.0), 
+                    mv.vec4(0.0, 1.0, 0.0, 1.0), 
+                    mv.vec4(0.0, 0.0, 1.0, 1.0) 
                 ];
 
                 var cBuffer = gl.createBuffer();
                 gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
-                gl.bufferData(gl.ARRAY_BUFFER, flatten(colors_array), gl.STATIC_DRAW);
+                gl.bufferData(gl.ARRAY_BUFFER, mv.flatten(colors_array), gl.STATIC_DRAW);
 
                 var vColor = gl.getAttribLocation(program, "vColor");
                 gl.vertexAttribPointer(vColor, 4, gl.FLOAT, false, 0, 0);
@@ -107,34 +53,14 @@
                 console.error(error);
             }
 
-            await fetchCodeSnippets();
-            isLoading = false;
+            code_snippets = await fetchCodeSnippets($page.url.pathname);
+            loading = false;
         }
     });
 
     function render() {
         gl.clear(gl.COLOR_BUFFER_BIT);
         gl.drawArrays(gl.TRIANGLES, 0, vertices.length);
-    }
-
-    async function fetchCodeSnippets() {
-        try {
-            for (let info of code_snippets_info) {
-                const response = await fetch(info.path); 
-                if (!response.ok)
-                    throw new Error('Network response was not ok');
-                
-                const code = await response.text();
-
-                code_snippets = [...code_snippets, {
-                    name: info.name,
-                    language: info.language,
-                    code: code
-                }];
-                }
-        } catch (error) {
-            console.error('Error fetching the JavaScript file:', error);
-        }
     }
 </script>
 
@@ -146,21 +72,7 @@
         </ul>
     </div>
 
-    <!-- {#if !isLoading}
-        <CodeBlock code_snippets={code_snippets} classes="w-full rounded-lg" style="" />
-    {:else}
-        <p>Loading code snippets...</p>
-    {/if} -->
-
-    <div class="flex flex-row justify-center items-center m-auto">
-        {#if !isLoading}
-            <CodeBlock code_snippets={code_snippets} classes="rounded-none rounded-l-lg" style="min-width: 512px; height: 512px;" />
-        {:else}
-            <p>Loading code snippets...</p>
-        {/if}
-
-        <canvas bind:this={canvas} id="gl-canvas" width="512" height="512" class="rounded-r-lg"></canvas>
-    </div>
+    <Result bind:canvas={canvas} bind:view_index={view_index} loading={loading} code_snippets={code_snippets}/>
 </div>
 
 <style>

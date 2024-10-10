@@ -1,78 +1,32 @@
 <script>
     import { onMount } from 'svelte';
     import { page } from '$app/stores'
-    import CodeBlock from '$lib/components/CodeBlock.svelte';
-    
-    import { WebGLUtils } from '$lib/utils.js';
+    import { WebGLUtils, fetchCodeSnippets } from '$lib/utils.js';
+    import Result from '$lib/components/Result.svelte';
 
+    let view_index = 1;
+    let loading = true;
     let canvas, gl;
-    let vertices = [];
     let code_snippets = [];
-    let code_snippets_info = [
-        {
-            name: 'main.js',
-            language: 'JavaScript',
-            path: $page.url.pathname + '/main.js'
-        },
-        {
-            name: 'index.html',
-            language: 'HTML',
-            path: $page.url.pathname + '/index.html'
-        },
-        {
-            name: 'vshader.glsl',
-            language: 'GLSL',
-            path: $page.url.pathname + '/vshader.glsl'
-        },
-        {
-            name: 'fshader.glsl',
-            language: 'GLSL',
-            path: $page.url.pathname + '/fshader.glsl'
-        }
-    ];
-    let isLoading = true;
+
+    let vertices = [];
 
     onMount(async () => {
         if (typeof window !== 'undefined') {
             gl = WebGLUtils.setupWebGL(canvas);
-            if (!gl) {
-                alert("WebGL isn’t available");
-                return;
-            }
-        
             gl.viewport(0, 0, canvas.width, canvas.height);
             gl.clearColor(0.3921, 0.5843, 0.9294, 1.0);
 
             render();
 
-            await fetchCodeSnippets();
-            isLoading = false;
+            code_snippets = await fetchCodeSnippets($page.url.pathname);
+            loading = false;
         }
     });
 
     function render() {
         gl.clear(gl.COLOR_BUFFER_BIT);
         gl.drawArrays(gl.POINTS, 0, vertices.length);
-    }
-
-    async function fetchCodeSnippets() {
-        try {
-            for (let info of code_snippets_info) {
-                const response = await fetch(info.path); 
-                if (!response.ok)
-                    throw new Error('Network response was not ok');
-                
-                const code = await response.text();
-
-                code_snippets = [...code_snippets, {
-                    name: info.name,
-                    language: info.language,
-                    code: code
-                }];
-                }
-        } catch (error) {
-            console.error('Error fetching the JavaScript file:', error);
-        }
     }
 </script>
 
@@ -86,21 +40,7 @@
         </ul>
     </div>
 
-    <!-- {#if !isLoading}
-        <CodeBlock code_snippets={code_snippets} classes="w-full rounded-lg" style="" />
-    {:else}
-        <p>Loading code snippets...</p>
-    {/if} -->
-
-    <div class="flex flex-row justify-evenly items-center m-auto">
-        {#if !isLoading}
-            <CodeBlock code_snippets={code_snippets} classes="rounded-none rounded-l-lg" style="min-width: 512px; height: 512px;" />
-        {:else}
-            <p>Loading code snippets...</p>
-        {/if}
-
-        <canvas bind:this={canvas} id="gl-canvas" width="512" height="512" class="rounded-r-lg"></canvas>
-    </div>
+    <Result bind:canvas={canvas} bind:view_index={view_index} loading={loading} code_snippets={code_snippets}/>
 </div>
 
 <style>

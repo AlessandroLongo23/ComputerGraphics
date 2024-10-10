@@ -1,74 +1,21 @@
 <script>
     import { onMount } from 'svelte';
     import { page } from '$app/stores'
-    import CodeBlock from '$lib/components/CodeBlock.svelte';
-    import Toggle from '$lib/components/Toggle.svelte';
-    import Canvas from '$lib/components/Canvas.svelte';
-    import { Dot, Triangle, Code, Play, Columns2 } from 'lucide-svelte';
-
-    import { WebGLUtils } from '$lib/utils.js';
+    import { WebGLUtils, fetchCodeSnippets, initShaders } from '$lib/utils.js';
     import { vec2, vec4, flatten, sizeof } from '$lib/Libraries/MV.js';
+    import Result from '$lib/components/Result.svelte';
+    import Toggle from '$lib/components/Toggle.svelte';
+    import { Dot, Triangle } from 'lucide-svelte'
 
-    let view_index = 0;
-
-    let code_snippets = [];
-    let code_snippets_info = [
-        {
-            name: 'main.js',
-            language: 'JavaScript',
-            path: $page.url.pathname + '/main.js'
-        },
-        {
-            name: 'index.html',
-            language: 'HTML',
-            path: $page.url.pathname + '/index.html'
-        },
-        {
-            name: 'vshader.glsl',
-            language: 'GLSL',
-            path: $page.url.pathname + '/vshader.glsl'
-        },
-        {
-            name: 'fshader.glsl',
-            language: 'GLSL',
-            path: $page.url.pathname + '/fshader.glsl'
-        }
-    ];
-    
-    let isLoading = true;
-
-    async function fetchShader(url) {
-        const response = await fetch(url);
-        if (!response.ok)
-            throw new Error(`Failed to fetch shader: ${url}`);
-
-        return await response.text();
-    }
-
-    let vertexShaderSource, fragmentShaderSource;
-    function initShaders() {
-        const vertexShader = gl.createShader(gl.VERTEX_SHADER);
-        gl.shaderSource(vertexShader, vertexShaderSource);
-        gl.compileShader(vertexShader);
-
-        const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
-        gl.shaderSource(fragmentShader, fragmentShaderSource);
-        gl.compileShader(fragmentShader);
-
-        program = gl.createProgram();
-        gl.attachShader(program, vertexShader);
-        gl.attachShader(program, fragmentShader);
-        gl.linkProgram(program);
-        gl.useProgram(program);
-    }
-
+    let view_index = 1;
+    let loading = true;
     let canvas, gl, program;
-    let cBuffer, vColor;
+    let code_snippets = [];
 
+    let cBuffer, vColor;
     let mode = 'points';
     let side = 20;
     let count = 0;
-
     let mode_index = 0;
     let colors_array;
     let vertices;
@@ -76,19 +23,11 @@
     onMount(async () => {
         if (typeof window !== 'undefined') {
             gl = WebGLUtils.setupWebGL(canvas);
-            if (!gl) {
-                alert("WebGL isn't available");
-                return;
-            }
-
             gl.viewport(0, 0, canvas.width, canvas.height);
             gl.clearColor(0.3921, 0.5843, 0.9294, 1.0);
 
             try {
-                vertexShaderSource = await fetchShader($page.url.pathname + '/vshader.glsl');
-                fragmentShaderSource = await fetchShader($page.url.pathname + '/fshader.glsl');
-
-                initShaders();
+                [gl, program] = await initShaders(gl, program, $page.url.pathname + '/vshader.glsl', $page.url.pathname + '/fshader.glsl');
 
                 // points
                 colors_array = [];
@@ -241,8 +180,8 @@
                 gl.bufferSubData(gl.ARRAY_BUFFER, 0, new Float32Array(vertices));
             });
 
-            await fetchCodeSnippets();
-            isLoading = false;
+            code_snippets = await fetchCodeSnippets($page.url.pathname);
+            loading = false;
         }
     });
 
@@ -251,26 +190,6 @@
         gl.clear(gl.COLOR_BUFFER_BIT);
         gl.drawArrays(gl.TRIANGLES, 0, vertices.length);
         window.requestAnimFrame(render, canvas);
-    }
-
-    async function fetchCodeSnippets() {
-        try {
-            for (let info of code_snippets_info) {
-                const response = await fetch(info.path); 
-                if (!response.ok)
-                    throw new Error('Network response was not ok');
-                
-                const code = await response.text();
-
-                code_snippets = [...code_snippets, {
-                    name: info.name,
-                    language: info.language,
-                    code: code
-                }];
-                }
-        } catch (error) {
-            console.error('Error fetching the JavaScript file:', error);
-        }
     }
 </script>
 
@@ -283,50 +202,33 @@
         </ul>
     </div>
 
-    <div class="mx-auto my-4">
-        <Toggle icons={[Code, Play, Columns2]} bind:selected={view_index} />
-    </div>
-
-    <div class="flex flex-row justify-center items-center w-4/5 m-auto">
-        <div class="{view_index !== 1 ? 'visible' : 'hidden'} w-full">
-            {#if !isLoading}
-                <CodeBlock code_snippets={code_snippets} classes="rounded-{view_index === 2 ? 'l-' : ''}lg" style="{view_index === 0 ? 'min-' : ''}width: 512px; height: 512px;" />
-            {:else}
-                <p>Loading code snippets...</p>
-            {/if}
-        </div>
-
-        <Canvas bind:canvas={canvas} view_index={view_index}>
-            <div slot='input/output'>
-                <div class="absolute left-0 top-0 flex flex-row justify-evenly items-center gap-4 w-full p-4 bg-gray-900/25 rounded-{view_index == 2 ? 'r-' : ''}lg">    
-                    <div class="flex flex-col justify-between items-center gap-2">
-                        <button id="clear" class="flex w-32 h-8 items-center justify-center px-auto py-4 transition-colors duration-200 text-sm bg-white hover:bg-gray-300 text-black rounded-lg">Clear canvas</button>
-                        <Toggle icons={[Dot, Triangle]} bind:selected={mode_index}/>
+    <Result bind:canvas={canvas} bind:view_index={view_index} loading={loading} code_snippets={code_snippets}>
+        <div slot='controls'>
+            <div class="absolute left-0 top-0 flex flex-row justify-evenly items-center gap-4 w-full p-4 bg-gray-900/25 rounded-{view_index == 2 ? 'r-' : ''}lg">    
+                <div class="flex flex-col justify-between items-center gap-2">
+                    <button id="clear" class="flex w-32 h-8 items-center justify-center px-auto py-4 transition-colors duration-200 text-sm bg-white hover:bg-gray-300 text-black rounded-lg">Clear canvas</button>
+                    <Toggle icons={[Dot, Triangle]} bind:selected={mode_index}/>
+                </div>
+                
+                <div class="flex flex-row justify-between items-center gap-4">
+                    <div class="flex flex-col w-32 bg-white rounded-lg p-1">
+                        <label for="mymenu" class="flex text-sm h-8 items-center justify-center text-black rounded-lg">Background</label>
+                        <select id="mymenu" class="flex text-sm h-8 bg-gray-300 text-black ps-4 rounded-lg">
+                            <option class="bg-white" value="0" selected>Blue</option>
+                            <option class="bg-white" value="1">Green</option>
+                            <option class="bg-white" value="2">Red</option>
+                        </select>
                     </div>
                     
-                    <div class="flex flex-row justify-between items-center gap-4">
-                        <div class="flex flex-col w-32 bg-white rounded-lg p-1">
-                            <label for="mymenu" class="flex text-sm h-8 items-center justify-center text-black rounded-lg">Background</label>
-                            <select id="mymenu" class="flex text-sm h-8 bg-gray-300 text-black ps-4 rounded-lg">
-                                <option class="bg-white" value="0" selected>Blue</option>
-                                <option class="bg-white" value="1">Green</option>
-                                <option class="bg-white" value="2">Red</option>
-                            </select>
-                        </div>
-                        
-                        <div class="flex flex-col w-32 bg-white rounded-lg p-1">
-                            <label for="pointscolor" class="flex text-sm h-8 items-center justify-center text-black rounded-lg">Point color</label>
-                            <select id="pointscolor" class="flex text-sm h-8 bg-gray-300 text-black ps-4 rounded-lg">
-                                <option class="bg-white" value="0" selected>Black</option>
-                                <option class="bg-white" value="1">White</option>
-                            </select>
-                        </div>
+                    <div class="flex flex-col w-32 bg-white rounded-lg p-1">
+                        <label for="pointscolor" class="flex text-sm h-8 items-center justify-center text-black rounded-lg">Point color</label>
+                        <select id="pointscolor" class="flex text-sm h-8 bg-gray-300 text-black ps-4 rounded-lg">
+                            <option class="bg-white" value="0" selected>Black</option>
+                            <option class="bg-white" value="1">White</option>
+                        </select>
                     </div>
                 </div>
             </div>
-        </Canvas>
-    </div>
+        </div>
+    </Result>
 </div>
-
-<style>
-</style>

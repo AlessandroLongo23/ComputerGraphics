@@ -14,6 +14,3 @@
         <Section title={section}></Section> 
     {/each}
 </div>
-
-<style>
-</style>

@@ -2,7 +2,18 @@ var indices, vertices;
 
 window.onload = function init() {
     // setting up the canvas, WebGL, and the shaders
-    setup_environment();
+    canvas = document.getElementById("gl-canvas");
+    gl = WebGLUtils.setupWebGL(canvas);
+    if (!gl) 
+        alert("WebGL isn’t available");
+
+    gl.viewport(0, 0, canvas.width, canvas.height);
+    gl.clearColor(0.3921, 0.5843, 0.9294, 1.0);
+
+    gl.enable(gl.DEPTH_TEST);
+
+    program = initShaders(gl, "vshader.glsl", "fshader.glsl");
+    gl.useProgram(program);
 
     // vertices
     vertices = [
@@ -100,19 +111,4 @@ function render() {
     gl.drawElements(gl.LINE_STRIP, indices.length, gl.UNSIGNED_BYTE, 0);
 
     requestAnimFrame(render);
-}
-
-function setup_environment() {
-    canvas = document.getElementById("gl-canvas");
-    gl = WebGLUtils.setupWebGL(canvas);
-    if (!gl) 
-        alert("WebGL isn’t available");
-
-    gl.viewport(0, 0, canvas.width, canvas.height);
-    gl.clearColor(0.3921, 0.5843, 0.9294, 1.0);
-
-    gl.enable(gl.DEPTH_TEST);
-
-    program = initShaders(gl, "vshader.glsl", "fshader.glsl");
-    gl.useProgram(program);
 }

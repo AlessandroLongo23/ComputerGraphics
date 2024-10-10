@@ -16,6 +16,3 @@
 
     <Button text="Start learning!" href="/home" style=""></Button> 
 </div>
-
-<style>
-</style>

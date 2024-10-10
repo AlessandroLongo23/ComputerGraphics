@@ -1,100 +1,40 @@
 <script>
     import { onMount } from 'svelte';
     import { page } from '$app/stores'
-    import CodeBlock from '$lib/components/CodeBlock.svelte';
-    import Toggle from '$lib/components/Toggle.svelte';
-    import Canvas from '$lib/components/Canvas.svelte';
-    import { Code, Play, Columns2 } from 'lucide-svelte';
+    import { WebGLUtils, fetchCodeSnippets, initShaders } from '$lib/utils.js';
+    import * as mv from '$lib/Libraries/MV.js';
+    import Result from '$lib/components/Result.svelte';
 
-    import { WebGLUtils } from '$lib/utils.js';
-    import { vec2, flatten, sizeof } from '$lib/Libraries/MV.js';
-
-    let view_index = 0;
-
-    let code_snippets = [];
-    let code_snippets_info = [
-        {
-            name: 'main.js',
-            language: 'JavaScript',
-            path: $page.url.pathname + '/main.js'
-        },
-        {
-            name: 'index.html',
-            language: 'HTML',
-            path: $page.url.pathname + '/index.html'
-        },
-        {
-            name: 'vshader.glsl',
-            language: 'GLSL',
-            path: $page.url.pathname + '/vshader.glsl'
-        },
-        {
-            name: 'fshader.glsl',
-            language: 'GLSL',
-            path: $page.url.pathname + '/fshader.glsl'
-        }
-    ];
-    let isLoading = true;
-
-    async function fetchShader(url) {
-        const response = await fetch(url);
-        if (!response.ok)
-            throw new Error(`Failed to fetch shader: ${url}`);
-
-        return await response.text();
-    }
-
-    let vertexShaderSource, fragmentShaderSource;
-    function initShaders() {
-        const vertexShader = gl.createShader(gl.VERTEX_SHADER);
-        gl.shaderSource(vertexShader, vertexShaderSource);
-        gl.compileShader(vertexShader);
-
-        const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
-        gl.shaderSource(fragmentShader, fragmentShaderSource);
-        gl.compileShader(fragmentShader);
-
-        program = gl.createProgram();
-        gl.attachShader(program, vertexShader);
-        gl.attachShader(program, fragmentShader);
-        gl.linkProgram(program);
-        gl.useProgram(program);
-    }
-
+    let view_index = 1;
+    let loading = true;
     let canvas, gl, program;
+    let code_snippets = [];
+
     let vertices = [];
     let index;
 
     onMount(async () => {
         if (typeof window !== 'undefined') {
             gl = WebGLUtils.setupWebGL(canvas);
-            if (!gl) {
-                alert("WebGL isn’t available");
-                return;
-            }
-        
             gl.viewport(0, 0, canvas.width, canvas.height);
             gl.clearColor(0.3921, 0.5843, 0.9294, 1.0);
 
             try {
-                vertexShaderSource = await fetchShader($page.url.pathname + '/vshader.glsl');
-                fragmentShaderSource = await fetchShader($page.url.pathname + '/fshader.glsl');
-
-                initShaders();
+                [gl, program] = await initShaders(gl, program, $page.url.pathname + '/vshader.glsl', $page.url.pathname + '/fshader.glsl');
 
                 vertices = [ 
-                    vec2(0.0, 0.0), 
-                    vec2(1.0, 0.0), 
-                    vec2(1.0, 1.0)
+                    mv.vec2(0.0, 0.0), 
+                    mv.vec2(1.0, 0.0), 
+                    mv.vec2(1.0, 1.0)
                 ];
                 index = vertices.length;
 
                 var max_points = 100;
                 var vBuffer = gl.createBuffer();
                 gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
-                gl.bufferData(gl.ARRAY_BUFFER, sizeof['vec2'] * max_points, gl.STATIC_DRAW);
+                gl.bufferData(gl.ARRAY_BUFFER, mv.sizeof['vec2'] * max_points, gl.STATIC_DRAW);
                 
-                gl.bufferSubData(gl.ARRAY_BUFFER, 0, flatten(vertices));
+                gl.bufferSubData(gl.ARRAY_BUFFER, 0, mv.flatten(vertices));
 
                 var vPosition = gl.getAttribLocation(program, "vPosition");
                 gl.vertexAttribPointer(vPosition, 2, gl.FLOAT, false, 0, 0);
@@ -121,8 +61,8 @@
                 console.error(error);
             }
 
-            await fetchCodeSnippets();
-            isLoading = false;
+            code_snippets = await fetchCodeSnippets($page.url.pathname);
+            loading = false;
         }
     });
 
@@ -130,26 +70,6 @@
         gl.clear(gl.COLOR_BUFFER_BIT);
         gl.drawArrays(gl.POINTS, 0, index);
         window.requestAnimFrame(render, canvas);
-    }
-
-    async function fetchCodeSnippets() {
-        try {
-            for (let info of code_snippets_info) {
-                const response = await fetch(info.path); 
-                if (!response.ok)
-                    throw new Error('Network response was not ok');
-                
-                const code = await response.text();
-
-                code_snippets = [...code_snippets, {
-                    name: info.name,
-                    language: info.language,
-                    code: code
-                }];
-                }
-        } catch (error) {
-            console.error('Error fetching the JavaScript file:', error);
-        }
     }
 </script>
 
@@ -162,21 +82,7 @@
         </ul>
     </div>
 
-    <div class="mx-auto my-4">
-        <Toggle icons={[Code, Play, Columns2]} bind:selected={view_index}/>
-    </div>
-
-    <div class="flex flex-row justify-center items-center w-4/5 m-auto">
-        <div class="{view_index !== 1 ? 'visible' : 'hidden'} w-full">
-            {#if !isLoading}
-                <CodeBlock code_snippets={code_snippets} classes="rounded-{view_index === 2 ? 'l-' : ''}lg" style="{view_index === 0 ? 'min-' : ''}width: 512px; height: 512px;" />
-            {:else}
-                <p>Loading code snippets...</p>
-            {/if}
-        </div>
-
-        <Canvas bind:canvas={canvas} view_index={view_index}/>
-    </div>
+    <Result bind:canvas={canvas} bind:view_index={view_index} loading={loading} code_snippets={code_snippets}/>
 </div>
 
 <style>
