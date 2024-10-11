@@ -31,7 +31,7 @@
 </script>
 
 <div class="flex flex-col justify-center items-start w-4/5 text-xl m-auto">
-    <div class="w-3/5 m-auto">
+    <div class="w-4/5 m-auto">
         <ul>
             <li>Create a HTML document with a 512x512 canvas element and write a script to create a WebGL context. [Angel 2.8]</li>
             <li>Setup a viewport and clear the canvas with the color cornflower blue (0.3921, 0.5843, 0.9294, 1.0). [Angel 2.5.1]</li>

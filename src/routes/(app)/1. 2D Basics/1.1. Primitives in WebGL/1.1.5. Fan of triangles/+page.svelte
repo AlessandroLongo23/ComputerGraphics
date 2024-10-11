@@ -12,7 +12,8 @@
     let code_snippets = [];
 
     let vertices = [];
-    let acc, vel, pos, posLoc, date, delta_time, t1, t2, damp, air_friction, rad_friction, num, rad;
+    let vel, pos, posLoc, date, delta_time, t1, t2, damp, air_friction, rad_friction, num, rad;
+    const acc = mv.vec2(0.0, -9.81);
 
     onMount(async () => {
         if (typeof window !== 'undefined') {
@@ -23,9 +24,7 @@
             try {
                 [gl, program] = await initShaders(gl, program, $page.url.pathname + '/vshader.glsl', $page.url.pathname + '/fshader.glsl');
 
-                acc = mv.vec2(0.0, -9.81);
-                vel = mv.vec2(5, 0.0);
-                pos = mv.vec2(-0.4, 0.3);
+                init_ball();
                 posLoc = gl.getUniformLocation(program, "pos");
 
                 gl.useProgram(program);
@@ -70,6 +69,15 @@
         delta_time = (t2 - t1) * 0.001;
         t1 = t2;
 
+        update();
+        bounce();
+
+        gl.uniform2f(posLoc, pos[0], pos[1]);
+        gl.drawArrays(gl.TRIANGLE_FAN, 0, vertices.length);
+        requestAnimFrame(render);
+    }
+
+    function update() {
         pos = mv.add(pos, mv.mult(vel, delta_time));
         if (Math.abs(pos[1] + 0.5) > 0.015 || Math.abs(vel[1]) > 0.015)
             vel = mv.add(vel, mv.mult(acc, delta_time));
@@ -80,7 +88,10 @@
         }
 
         vel = mv.mult(vel, air_friction);
+    }
 
+    function bounce() {
+        // floor and ceiling
         if (pos[1] < -0.5 && vel[1] < 0.0) {
             vel[0] = vel[0] * rad_friction;
             vel[1] = -vel[1] * damp[1];
@@ -89,6 +100,7 @@
             vel[1] = -vel[1] * damp[1];
         }
 
+        // lateral walls
         if (pos[0] > 0.5 || pos[0] < -0.5) {
             if (pos[0] > 0.5)
                 pos[0] = 1.0 - pos[0];
@@ -97,22 +109,16 @@
 
             vel[0] = -vel[0] * damp[0];
         }
-
-        gl.uniform2f(posLoc, pos[0], pos[1]);
-        gl.drawArrays(gl.TRIANGLE_FAN, 0, vertices.length);
-        requestAnimFrame(render);
     }
 
-    function reset_visualization() {
-        console.log("reset visualization");
-        acc = mv.vec2(0.0, -9.81);
-        vel = mv.vec2(5, 0.0);
-        pos = mv.vec2(-0.4, 0.3);
+    function init_ball() {
+        vel = mv.vec2(Math.random() * 20 - 10, Math.random() * 20 - 10);
+        pos = mv.vec2(Math.random() - 0.5, Math.random() - 0.5);
     }
 </script>
 
 <div class="flex flex-col justify-center items-start w-4/5 text-xl m-auto">
-    <div class="w-3/5 m-auto">
+    <div class="w-4/5 m-auto">
         <ul>
             <li>Create and draw a circle using the triangle fan drawing mode. [Angel 2.4.2] [The triangle fan drawing mode is not available in WebGPU. If using WebGPU, use the triangle-strip drawing mode to draw a circle.]</li>
             <li>Make the circle bounce up and down over time.</li>
@@ -121,7 +127,7 @@
 
     <Result bind:canvas={canvas} bind:view_index={view_index} loading={loading} code_snippets={code_snippets}>
         <div slot='controls'>
-            <button on:click={reset_visualization} class="absolute left-0 top-0 m-4 p-2 bg-gray-100 rounded-lg hover:bg-gray-300 transition-colors">
+            <button on:click={init_ball} class="absolute left-0 top-0 m-4 p-2 bg-gray-100 rounded-lg hover:bg-gray-300 transition-colors">
                 <svelte:component this={ RotateCw } size={20}/>
             </button>
         </div>

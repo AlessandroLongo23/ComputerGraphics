@@ -1,12 +1,12 @@
-const WebGLUtils = function() {
+export const WebGLUtils = function() {
     var setupWebGL = function(canvas, opt_attribs) {
-        if (typeof window === 'undefined') return null;
+        if (typeof window === 'undefined') 
+            return null;
 
         function showLink(str) {
             var container = canvas.parentNode;
-            if (container) {
+            if (container)
                 container.innerHTML = makeFailHTML(str);
-            }
         };
 
         if (!window.WebGLRenderingContext) {
@@ -15,9 +15,9 @@ const WebGLUtils = function() {
         }
 
         var context = create3DContext(canvas, opt_attribs);
-        if (!context) {
+        if (!context)
             showLink(OTHER_PROBLEM);
-        }
+
         return context;
     };
 
@@ -26,13 +26,14 @@ const WebGLUtils = function() {
 
         var names = ["webgl", "experimental-webgl", "webkit-3d", "moz-webgl"];
         var context = null;
-        for (var ii = 0; ii < names.length; ++ii) {
+        for (var i = 0; i < names.length; ++i) {
             try {
-                context = canvas.getContext(names[ii], opt_attribs);
-            } catch(e) {}
-            if (context) {
-                break;
+                context = canvas.getContext(names[i], opt_attribs);
+            } catch(e) {
+
             }
+            if (context)
+                break;
         }
         return context;
     };
@@ -56,7 +57,7 @@ if (typeof window !== 'undefined') {
     })();
 }
 
-async function fetchCodeSnippets(code_snippets_url) {
+export async function fetchCodeSnippets(code_snippets_url) {
     try {
         let code_snippets_info = [
             {
@@ -110,7 +111,7 @@ async function fetchShader(url) {
     return await response.text();
 }
 
-async function initShaders(gl, program, vertex_shader_url, fragment_shader_url) {
+export async function initShaders(gl, program, vertex_shader_url, fragment_shader_url) {
     let vertex_shader_source = await fetchShader(vertex_shader_url);
     let fragment_shader_source = await fetchShader(fragment_shader_url);
 
@@ -131,4 +132,9 @@ async function initShaders(gl, program, vertex_shader_url, fragment_shader_url) 
     return [gl, program];
 }
 
-export { WebGLUtils, fetchCodeSnippets, initShaders };
+export function capitalize(str) {
+    if (!str)
+        return '';
+
+    return str[0].toUpperCase() + str.slice(1);
+}

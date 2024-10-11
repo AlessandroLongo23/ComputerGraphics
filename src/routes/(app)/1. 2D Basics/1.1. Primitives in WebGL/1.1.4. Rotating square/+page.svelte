@@ -59,7 +59,7 @@
 </script>
 
 <div class="flex flex-col justify-center items-start w-4/5 text-xl m-auto">
-    <div class="w-3/5 m-auto">
+    <div class="w-4/5 m-auto">
         <ul>
             <li>Add a second triangle to the previous part such that you have a quadrilateral (which is maybe even a square). [Angel 2.4]</li>
             <li>Center your quad (short form of quadrilateral) and rotate it such that it has its vertices on the coordinate axes.</li>

@@ -1,10 +1,9 @@
 <script>
+    import { page } from '$app/stores'
+    import { getChildren } from '$lib/data/pages.js';
     import Section from "$lib/components/Section.svelte";
 
-    let sections = [
-        '2.1. Lighting and shading',
-        '2.2. Chapter',
-    ]
+    let sections = getChildren($page.url.pathname);
 </script>
 
 <div class="flex flex-row justify-evenly items-center w-3/4 m-auto">
@@ -12,6 +11,3 @@
         <Section title={section}></Section> 
     {/each}
 </div>
-
-<style>
-</style>

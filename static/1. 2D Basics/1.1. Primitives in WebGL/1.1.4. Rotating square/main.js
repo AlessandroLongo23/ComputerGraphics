@@ -1,14 +1,5 @@
 window.onload = function init() {
-    canvas = document.getElementById("gl-canvas");
-    gl = WebGLUtils.setupWebGL(canvas);
-    if (!gl) 
-        alert("WebGL isn’t available");
-
-    gl.viewport(0, 0, canvas.width, canvas.height);
-    gl.clearColor(0.3921, 0.5843, 0.9294, 1.0);
-
-    program = initShaders(gl, "vshader.glsl", "fshader.glsl");
-    gl.useProgram(program);
+    setup_WebGL();
 
     // theta
     theta = 0.0;
@@ -33,7 +24,6 @@ window.onload = function init() {
     render();
 }
 
-// continuous version
 function render() {
     gl.clear(gl.COLOR_BUFFER_BIT);
 
@@ -45,14 +35,17 @@ function render() {
     requestAnimFrame(render);
 }
 
-// timed version
+function setup_WebGL() {
+    canvas = document.getElementById("gl-canvas");
+    gl = WebGLUtils.setupWebGL(canvas);
+    if (!gl) {
+        alert("WebGL isn’t available");
+        return;
+    }
 
-// function render() {
-//     setTimeout(function() {
-//         requestAnimFrame(render);
-//         gl.clear(gl.COLOR_BUFFER_BIT);
-//         theta += 0.1;
-//         gl.uniform1f(thetaLoc, theta);
-//         gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-//     }, 100);
-// }
+    gl.viewport(0, 0, canvas.width, canvas.height);
+    gl.clearColor(0.3921, 0.5843, 0.9294, 1.0);
+
+    program = initShaders(gl, "vshader.glsl", "fshader.glsl");
+    gl.useProgram(program);
+}

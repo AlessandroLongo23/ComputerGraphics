@@ -1,14 +1,5 @@
 window.onload = function init() {
-    canvas = document.getElementById("gl-canvas");
-    gl = WebGLUtils.setupWebGL(canvas);
-    if (!gl) 
-        alert("WebGL isn’t available");
-
-    gl.viewport(0, 0, canvas.width, canvas.height);
-    gl.clearColor(0.3921, 0.5843, 0.9294, 1.0);
-
-    program = initShaders(gl, "vshader.glsl", "fshader.glsl");
-    gl.useProgram(program);
+    setup_WebGL();
 
     // vertices
     vertices = [ vec2(0.0, 0.0), vec2(1.0, 0.0), vec2(1.0, 1.0) ];
@@ -42,4 +33,19 @@ window.onload = function init() {
 function render() {
     gl.clear(gl.COLOR_BUFFER_BIT);
     gl.drawArrays(gl.TRIANGLES, 0, vertices.length);
+}
+
+function setup_WebGL() {
+    canvas = document.getElementById("gl-canvas");
+    gl = WebGLUtils.setupWebGL(canvas);
+    if (!gl) {
+        alert("WebGL isn’t available");
+        return;
+    }
+
+    gl.viewport(0, 0, canvas.width, canvas.height);
+    gl.clearColor(0.3921, 0.5843, 0.9294, 1.0);
+
+    program = initShaders(gl, "vshader.glsl", "fshader.glsl");
+    gl.useProgram(program);
 }

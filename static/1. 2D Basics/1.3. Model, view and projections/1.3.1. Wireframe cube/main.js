@@ -1,19 +1,7 @@
 var indices, vertices;
 
 window.onload = function init() {
-    // setting up the canvas, WebGL, and the shaders
-    canvas = document.getElementById("gl-canvas");
-    gl = WebGLUtils.setupWebGL(canvas);
-    if (!gl) 
-        alert("WebGL isn’t available");
-
-    gl.viewport(0, 0, canvas.width, canvas.height);
-    gl.clearColor(0.3921, 0.5843, 0.9294, 1.0);
-
-    gl.enable(gl.DEPTH_TEST);
-
-    program = initShaders(gl, "vshader.glsl", "fshader.glsl");
-    gl.useProgram(program);
+    setup_WebGL();
 
     // vertices
     vertices = [
@@ -36,7 +24,7 @@ window.onload = function init() {
     gl.enableVertexAttribArray(vPosition);
 
     // colors
-    var vertexColors = [
+    var vertex_colors = [
         [0.0, 0.0, 0.0, 1.0],  // black
         [1.0, 0.0, 0.0, 1.0],  // red
         [1.0, 1.0, 0.0, 1.0],  // yellow
@@ -49,7 +37,7 @@ window.onload = function init() {
 
     var cBuffer = gl.createBuffer();  // Buffer for colors
     gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, flatten(vertexColors), gl.STATIC_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER, flatten(vertex_colors), gl.STATIC_DRAW);
 
     var vColor = gl.getAttribLocation(program, "vColor");
     gl.vertexAttribPointer(vColor, 4, gl.FLOAT, false, 0, 0);  // 4 components for RGBA
@@ -80,8 +68,8 @@ window.onload = function init() {
 
     // Axis rotation setup
     rot = [0.0, 0.0, 0.0];
-    modelViewMatrixLoc = gl.getUniformLocation(program, "modelViewMatrix");
-    gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(ctm));
+    model_view_matrix_loc = gl.getUniformLocation(program, "model_view_matrix");
+    gl.uniformMatrix4fv(model_view_matrix_loc, false, flatten(ctm));
 
     render();
 }
@@ -97,9 +85,25 @@ function render() {
     ctm = mult(ctm, rotateY(rot[1]));
     ctm = mult(ctm, rotateZ(rot[2]));
     
-    gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(ctm));
+    gl.uniformMatrix4fv(model_view_matrix_loc, false, flatten(ctm));
 
     gl.drawElements(gl.LINE_STRIP, indices.length, gl.UNSIGNED_BYTE, 0);
 
     requestAnimFrame(render);
+}
+
+function setup_WebGL() {
+    canvas = document.getElementById("gl-canvas");
+
+    gl = WebGLUtils.setupWebGL(canvas);
+    if (!gl) {
+        alert("WebGL isn’t available");
+        return;
+    }
+
+    gl.viewport(0, 0, canvas.width, canvas.height);
+    gl.clearColor(0.3921, 0.5843, 0.9294, 1.0);
+
+    program = initShaders(gl, "vshader.glsl", "fshader.glsl");
+    gl.useProgram(program);
 }

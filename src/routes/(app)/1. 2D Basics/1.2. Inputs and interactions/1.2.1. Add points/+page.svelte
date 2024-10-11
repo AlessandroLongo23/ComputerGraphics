@@ -42,14 +42,14 @@
 
                 canvas.addEventListener("click", function(event) {
                     gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
-                    var t = vec2(
+                    var t = mv.vec2(
                         -1 + 2 * (event.clientX - canvas.getBoundingClientRect().x) / canvas.width, 
                         -1 + 2 * (canvas.height - (event.clientY - canvas.getBoundingClientRect().y)) / canvas.height
                     );
                     var data = new Float32Array(t);
                     
                     if (index < max_points) {
-                        gl.bufferSubData(gl.ARRAY_BUFFER, sizeof['vec2'] * index, data);
+                        gl.bufferSubData(gl.ARRAY_BUFFER, mv.sizeof['vec2'] * index, data);
                         index++;
                     } else {
                         console.log("Max points reached!");
@@ -74,7 +74,7 @@
 </script>
 
 <div class="flex flex-col justify-center items-start w-4/5 text-xl m-auto">
-    <div class="w-3/5 m-auto">
+    <div class="w-4/5 m-auto">
         <ul>
             <li>Start from your solution to Part 2 of Worksheet 1: A web application that clears the canvas and then draws three points. [Angel 2.8]</li>
             <li>Attach an event handler to the mouse click event and draw points on the canvas where the mouse was clicked. [Angel 3.7]</li>

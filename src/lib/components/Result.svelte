@@ -1,5 +1,5 @@
 <script>
-    import Toggle from '$lib/components/Toggle.svelte';
+    import Toggle from '$lib/components/UI/Toggle.svelte';
     import CodeBlock from '$lib/components/CodeBlock.svelte';
     import Canvas from '$lib/components/Canvas.svelte';
 
@@ -19,7 +19,7 @@
 <div class="flex flex-row justify-evenly items-center m-auto">
     <div class="{view_index !== 2 ? 'visible' : 'hidden'} w-full">
         {#if !loading}
-            <CodeBlock code_snippets={code_snippets} classes="rounded-none rounded-l-lg" style="min-width: 512px; height: 512px;"/>
+            <CodeBlock code_snippets={code_snippets} view_index={view_index} style="width: {view_index == 1 ? '768' : '1024'}px; height: 512px;"/>
         {:else}
             <p>Loading code snippets...</p>
         {/if}

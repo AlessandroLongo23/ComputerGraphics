@@ -4,7 +4,7 @@
     import { WebGLUtils, fetchCodeSnippets, initShaders } from '$lib/utils.js';
     import { vec2, vec4, flatten, sizeof } from '$lib/Libraries/MV.js';
     import Result from '$lib/components/Result.svelte';
-    import Toggle from '$lib/components/Toggle.svelte';
+    import Toggle from '$lib/components/UI/Toggle.svelte';
     import { Dot, Triangle } from 'lucide-svelte'
 
     let view_index = 1;
@@ -194,7 +194,7 @@
 </script>
 
 <div class="flex flex-col justify-center items-start w-4/5 text-xl m-auto">
-    <div class="w-3/5 m-auto">
+    <div class="w-4/5 m-auto">
         <ul>
             <li>We would now like to have two different drawing modes. One where we draw points and one where we interactively build a triangle by placing three points. Add a button for each drawing mode. [Angel 3.6.2]</li>
             <li>(Hint) What we do has some relation to the textbook CAD example [Angel 3.10], where a polygon is built interactively.</li>
@@ -204,7 +204,7 @@
 
     <Result bind:canvas={canvas} bind:view_index={view_index} loading={loading} code_snippets={code_snippets}>
         <div slot='controls'>
-            <div class="absolute left-0 top-0 flex flex-row justify-evenly items-center gap-4 w-full p-4 bg-gray-900/25 rounded-{view_index == 2 ? 'r-' : ''}lg">    
+            <div class="absolute left-0 top-0 flex flex-row justify-evenly items-center gap-4 w-full p-4 bg-gray-900/25 rounded-{view_index == 1 ? 'r-' : ''}lg">    
                 <div class="flex flex-col justify-between items-center gap-2">
                     <button id="clear" class="flex w-32 h-8 items-center justify-center px-auto py-4 transition-colors duration-200 text-sm bg-white hover:bg-gray-300 text-black rounded-lg">Clear canvas</button>
                     <Toggle icons={[Dot, Triangle]} bind:selected={mode_index}/>

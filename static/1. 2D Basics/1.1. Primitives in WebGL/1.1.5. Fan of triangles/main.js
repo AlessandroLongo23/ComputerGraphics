@@ -1,20 +1,9 @@
 window.onload = function init() {
-    canvas = document.getElementById("gl-canvas");
-    gl = WebGLUtils.setupWebGL(canvas);
-    if (!gl) 
-        alert("WebGL isn’t available");
-
-    gl.viewport(0, 0, canvas.width, canvas.height);
-    gl.clearColor(0.3921, 0.5843, 0.9294, 1.0);
-
-    program = initShaders(gl, "vshader.glsl", "fshader.glsl");
+    setup_WebGL();
 
     acc = vec2(0.0, -9.81);
-    vel = vec2(5, 0.0);
-    pos = vec2(-0.4, 0.3);
+    initBall();
     posLoc = gl.getUniformLocation(program, "pos");
-
-    gl.useProgram(program);
     
     date = new Date;
     deltaTime = 0.0;
@@ -49,6 +38,15 @@ function render() {
     deltatime = (t2 - t1) * 0.001;
     t1 = t2;
 
+    update();
+    bounce();
+
+    gl.uniform2f(posLoc, pos[0], pos[1]);
+    gl.drawArrays(gl.TRIANGLE_FAN, 0, vertices.length);
+    requestAnimFrame(render);
+}
+
+function update() {
     pos = add(pos, mult(vel, deltatime));
     if (Math.abs(pos[1] + 0.5) > 0.015 || Math.abs(vel[1]) > 0.015)
         vel = add(vel, mult(acc, deltatime));
@@ -57,9 +55,11 @@ function render() {
         vel[1] = 0.0;
         vel[0] = vel[0] * rad_friction;
     }
-
     vel = mult(vel, air_friction);
+}
 
+function bounce() {
+    // floor and ceiling
     if (pos[1] < -0.5 && vel[1] < 0.0) {
         vel[0] = vel[0] * rad_friction;
         vel[1] = -vel[1] * damp[1];
@@ -68,6 +68,7 @@ function render() {
         vel[1] = -vel[1] * damp[1];
     }
 
+    // lateral walls
     if (pos[0] > 0.5 || pos[0] < -0.5) {
         if (pos[0] > 0.5)
             pos[0] = 1.0 - pos[0];
@@ -76,10 +77,24 @@ function render() {
 
         vel[0] = -vel[0] * damp[0];
     }
+}
 
-    gl.uniform2f(posLoc, pos[0], pos[1]);
+function initBall() {
+    vel = mv.vec2(Math.random() * 20 - 10, Math.random() * 20 - 10);
+    pos = mv.vec2(Math.random() - 0.5, Math.random() - 0.5);
+}
 
-    gl.drawArrays(gl.TRIANGLE_FAN, 0, vertices.length);
+function setup_WebGL() {
+    canvas = document.getElementById("gl-canvas");
+    gl = WebGLUtils.setupWebGL(canvas);
+    if (!gl) {
+        alert("WebGL isn’t available");
+        return;
+    }
 
-    requestAnimFrame(render);
+    gl.viewport(0, 0, canvas.width, canvas.height);
+    gl.clearColor(0.3921, 0.5843, 0.9294, 1.0);
+
+    program = initShaders(gl, "vshader.glsl", "fshader.glsl");
+    gl.useProgram(program);
 }

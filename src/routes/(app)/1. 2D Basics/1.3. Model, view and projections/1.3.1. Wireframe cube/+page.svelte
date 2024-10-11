@@ -11,7 +11,7 @@
     let code_snippets = [];
 
     let vertices, indices, rot;
-    let modelViewMatrixLoc;
+    let model_view_matrix_loc;
 
     onMount(async () => {
         if (typeof window !== 'undefined') {
@@ -44,7 +44,7 @@
                 gl.enableVertexAttribArray(vPosition);
 
                 // colors
-                var vertexColors = [
+                var vertex_colors = [
                     [0.0, 0.0, 0.0, 1.0],  // black
                     [1.0, 0.0, 0.0, 1.0],  // red
                     [1.0, 1.0, 0.0, 1.0],  // yellow
@@ -57,7 +57,7 @@
 
                 var cBuffer = gl.createBuffer();  // Buffer for colors
                 gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
-                gl.bufferData(gl.ARRAY_BUFFER, mv.flatten(vertexColors), gl.STATIC_DRAW);
+                gl.bufferData(gl.ARRAY_BUFFER, mv.flatten(vertex_colors), gl.STATIC_DRAW);
 
                 var vColor = gl.getAttribLocation(program, "vColor");
                 gl.vertexAttribPointer(vColor, 4, gl.FLOAT, false, 0, 0);  // 4 components for RGBA
@@ -88,8 +88,8 @@
 
                 // Axis rotation setup
                 rot = [0.0, 0.0, 0.0];
-                modelViewMatrixLoc = gl.getUniformLocation(program, "modelViewMatrix");
-                gl.uniformMatrix4fv(modelViewMatrixLoc, false, mv.flatten(ctm));
+                model_view_matrix_loc = gl.getUniformLocation(program, "model_view_matrix");
+                gl.uniformMatrix4fv(model_view_matrix_loc, false, mv.flatten(ctm));
 
                 gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
                 gl.bufferSubData(gl.ARRAY_BUFFER, 0, mv.flatten(vertices));
@@ -115,15 +115,15 @@
         ctm = mv.mult(ctm, mv.rotateY(rot[1]));
         ctm = mv.mult(ctm, mv.rotateZ(rot[2]));
         
-        gl.uniformMatrix4fv(modelViewMatrixLoc, false, mv.flatten(ctm));
+        gl.uniformMatrix4fv(model_view_matrix_loc, false, mv.flatten(ctm));
         gl.drawElements(gl.LINE_STRIP, indices.length, gl.UNSIGNED_BYTE, 0);
         requestAnimFrame(render);
     }
 </script>
 
 <div class="flex flex-col justify-center items-start w-4/5 text-xl m-auto">
-    <div class="w-3/5 m-auto">
-        <p class="text-black text-bold text-xl">Draw a wireframe unit cube in isometric view.</p>  
+    <div class="w-4/5 m-auto">
+        <p class="text-black text-xl">Draw a wireframe unit cube in isometric view.</p>  
         <ul>
             <li>The default viewing volume uses orthographic projection. Draw a cube using orthographic projection. [Angel 2.6.1, 4.6]</li>
             <li>Position the cube in the world coordinate system with its diagonal going from (0, 0, 0) to (1, 1, 1).</li>

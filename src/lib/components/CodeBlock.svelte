@@ -3,10 +3,10 @@
     import hljs from 'highlight.js';
     import 'highlight.js/styles/atom-one-dark.css';
 
-    export let classes = '';
     export let style = '';
 
     export let code_snippets;
+    export let view_index;
     let current_snippet_index = 0;
     let button_icon = 'copy';
     $: current_code = code_snippets[current_snippet_index].code;
@@ -55,7 +55,7 @@
 </script>
 
 <div class="relative w-full">
-    <div class="button-container absolute flex flex-row w-full justify-between p-4 rounded-lg">
+    <div class="button-container absolute flex flex-row w-full justify-between p-4 rounded-lg {view_index == 1 ? 'rounded-r-none' : ''}">
         <div class="flex flex-row justify-start">
             {#if code_snippets.length > 1}
                 {#each code_snippets as code_snippet, i}
@@ -73,7 +73,7 @@
         </button>
     </div>
 
-    <pre class="language-{current_language} m-0 {classes}" style={style}>
+    <pre class="language-{current_language} m-0 rounded-lg {view_index == 1 ? 'rounded-r-none' : ''}" style={style}>
         <code class="language-{current_language}">
             {current_code}
         </code>

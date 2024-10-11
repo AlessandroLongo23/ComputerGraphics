@@ -1,12 +1,9 @@
 <script>
+    import { page } from '$app/stores'
+    import { getChildren } from '$lib/data/pages.js';
     import Section from "$lib/components/Section.svelte";
 
-    let sections = [
-        '1.2.1. Add points',
-        '1.2.2. Clear canvas',
-        '1.2.3. Triangles drawing mode',
-        '1.2.4. Circles drawing mode',
-    ]
+    let sections = getChildren($page.url.pathname);
 </script>
 
 <div class="flex flex-row justify-evenly items-center w-3/4 m-auto">

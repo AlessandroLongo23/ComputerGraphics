@@ -5,7 +5,7 @@
 </script>
 
 <div class="relative {view_index !== 0 ? 'visible' : 'hidden'}">
-    <canvas bind:this={canvas} id="gl-canvas" width="{width}" height="512" class="rounded-{view_index == 1 ? 'r-' : ''}lg"></canvas>
+    <canvas bind:this={canvas} id="gl-canvas" width="{width}" height="512" class="rounded-lg {view_index == 1 ? 'rounded-l-none' : ''}"></canvas>
 
     <slot name='controls'/>
 </div>

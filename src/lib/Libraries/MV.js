@@ -9,7 +9,7 @@
 //  Helper functions
 //
 
-export function _argumentsToArray(args) {
+function _argumentsToArray(args) {
     return [].concat.apply([], Array.prototype.slice.apply(args));
 }
 
