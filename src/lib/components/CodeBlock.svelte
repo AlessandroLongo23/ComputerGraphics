@@ -5,12 +5,12 @@
 
     export let style = '';
 
-    export let code_snippets;
-    export let view_index;
-    let current_snippet_index = 0;
-    let button_icon = 'copy';
-    $: current_code = code_snippets[current_snippet_index].code;
-    $: current_language = code_snippets[current_snippet_index].language;
+    export let codeSnippets;
+    export let viewIndex;
+    let currentSnippetIndex = 0;
+    let buttonIcon = 'copy';
+    $: currentCode = codeSnippets[currentSnippetIndex].code;
+    $: currentLanguage = codeSnippets[currentSnippetIndex].language;
 
     onMount(() => {
         highlightCode();
@@ -26,7 +26,7 @@
         setTimeout(() => {
             const block = document.querySelector('pre code');
             if (block) {
-                const processedCode = current_code.includes('&lt;') ? unescapeHtml(current_code) : current_code;
+                const processedCode = currentCode.includes('&lt;') ? unescapeHtml(currentCode) : currentCode;
                     
                 block.dataset.highlighted = '';
                 block.textContent = processedCode;
@@ -36,12 +36,12 @@
     }
 
     function copyToClipboard() {
-        const textToCopy = current_code.includes('&lt;') ? unescapeHtml(current_code) : current_code;
+        const textToCopy = currentCode.includes('&lt;') ? unescapeHtml(currentCode) : currentCode;
             
         navigator.clipboard.writeText(textToCopy).then(() => {
-            button_icon = 'check';
+            buttonIcon = 'check';
             setTimeout(() => {
-                button_icon = 'copy';
+                buttonIcon = 'copy';
             }, 2000);
         }).catch(err => {
             console.error('Could not copy text: ', err);
@@ -49,33 +49,33 @@
     }
 
     function selectSnippet(index) {
-        current_snippet_index = index;
+        currentSnippetIndex = index;
         highlightCode();
     }
 </script>
 
 <div class="relative w-full">
-    <div class="button-container absolute flex flex-row w-full justify-between p-4 rounded-lg {view_index == 1 ? 'rounded-r-none' : ''}">
+    <div class="button-container absolute flex flex-row w-full justify-between p-4 rounded-lg {viewIndex == 1 ? 'rounded-r-none' : ''}">
         <div class="flex flex-row justify-start">
-            {#if code_snippets.length > 1}
-                {#each code_snippets as code_snippet, i}
-                    <button class="flex me-2 text-sm h-8 transition-colors duration-200 items-center text-white px-4 py-4 rounded-lg w-auto" class:selected={i === current_snippet_index} on:click={() => selectSnippet(i)}> 
-                        {code_snippet.name} 
+            {#if codeSnippets.length > 1}
+                {#each codeSnippets as codeSnippet, i}
+                    <button class="flex me-2 text-sm h-8 transition-colors duration-200 items-center text-white px-4 py-4 rounded-lg w-auto" class:selected={i === currentSnippetIndex} on:click={() => selectSnippet(i)}> 
+                        {codeSnippet.name} 
                     </button>
                 {/each}
             {:else}
-                <p class="me-2 rounded-lg">{code_snippets[0].name}</p>
+                <p class="me-2 rounded-lg">{codeSnippets[0].name}</p>
             {/if}
         </div>
 
-        <button on:click={copyToClipboard} class="flex items-center transition-colors duration-200 text-sm h-8 text-white px-4 py-2 rounded-lg w-auto {button_icon == 'check' ? 'copied' : ''}">
-            <i class="fa fa-{button_icon} ? 'copy' : 'check'}"></i>
+        <button on:click={copyToClipboard} class="flex items-center transition-colors duration-200 text-sm h-8 text-white px-4 py-2 rounded-lg w-auto {buttonIcon == 'check' ? 'copied' : ''}">
+            <i class="fa fa-{buttonIcon} ? 'copy' : 'check'}"></i>
         </button>
     </div>
 
-    <pre class="language-{current_language} m-0 rounded-lg {view_index == 1 ? 'rounded-r-none' : ''}" style={style}>
-        <code class="language-{current_language}">
-            {current_code}
+    <pre class="language-{currentLanguage} m-0 rounded-lg {viewIndex == 1 ? 'rounded-r-none' : ''}" style={style}>
+        <code class="language-{currentLanguage}">
+            {currentCode}
         </code>
     </pre>
 </div>

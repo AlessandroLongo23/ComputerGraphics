@@ -1,15 +1,15 @@
 window.onload = function init() {
-    setup_WebGL();
+    setupWebGL();
 
     // points
-    colors_array = []
+    colors = []
     vertices = [];
     index = vertices.length;
 
-    var max_points = 100;
+    var maxPoints = 100;
     vBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, sizeof['vec2'] * max_points, gl.STATIC_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER, sizeof['vec2'] * maxPoints, gl.STATIC_DRAW);
     gl.bufferSubData(gl.ARRAY_BUFFER, 0, flatten(vertices));
     var vPosition = gl.getAttribLocation(program, "vPosition");
     gl.vertexAttribPointer(vPosition, 2, gl.FLOAT, false, 0, 0);
@@ -20,16 +20,16 @@ window.onload = function init() {
         // colors
         switch(document.getElementById("pointscolor").selectedIndex) {
             case 0:
-                colors_array.push(vec4(0.0, 0.0, 0.0, 1.0));
+                colors.push(vec4(0.0, 0.0, 0.0, 1.0));
                 break;
             case 1:
-                colors_array.push(vec4(1.0, 1.0, 1.0, 1.0));
+                colors.push(vec4(1.0, 1.0, 1.0, 1.0));
                 break;
         }
 
         cBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, flatten(colors_array), gl.STATIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER, flatten(colors), gl.STATIC_DRAW);
         vColor = gl.getAttribLocation(program, "vColor");
         gl.vertexAttribPointer(vColor, 4, gl.FLOAT, false, 0, 0);
         gl.enableVertexAttribArray(vColor);
@@ -41,7 +41,7 @@ window.onload = function init() {
         );
         var data = new Float32Array(t);
         
-        if (index < max_points) {
+        if (index < maxPoints) {
             gl.bufferSubData(gl.ARRAY_BUFFER, sizeof['vec2'] * index, data);
             index++;
         } else {
@@ -71,10 +71,10 @@ document.getElementById("clear").addEventListener("click", function() {
             break;
     }
 
-    colors_array = [];
+    colors = [];
     cBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, flatten(colors_array), gl.STATIC_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER, flatten(colors), gl.STATIC_DRAW);
     vColor = gl.getAttribLocation(program, "vColor");
     gl.vertexAttribPointer(vColor, 4, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(vColor);
@@ -84,7 +84,7 @@ document.getElementById("clear").addEventListener("click", function() {
     index = 0;
 });
 
-function setup_WebGL() {
+function setupWebGL() {
     canvas = document.getElementById("gl-canvas");
 
     gl = WebGLUtils.setupWebGL(canvas);

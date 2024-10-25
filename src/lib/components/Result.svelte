@@ -5,32 +5,29 @@
 
     import { Code, Columns2, Play } from 'lucide-svelte';
 
-    export let view_index;
+    export let viewIndex;
     export let canvas;
     export let loading;
-    export let code_snippets;
+    export let codeSnippets;
     export let width = 512;
 </script>
 
 <div class="mx-auto my-4">
-    <Toggle icons={[Code, Columns2, Play]} bind:selected={view_index}/>
+    <Toggle icons={[Code, Columns2, Play]} bind:selected={viewIndex}/>
 </div>
 
 <div class="flex flex-row justify-evenly items-center m-auto">
-    <div class="{view_index !== 2 ? 'visible' : 'hidden'} w-full">
+    <div class="{viewIndex !== 2 ? 'visible' : 'hidden'} w-full">
         {#if !loading}
-            <CodeBlock code_snippets={code_snippets} view_index={view_index} style="width: {view_index == 1 ? '768' : '1024'}px; height: 512px;"/>
+            <CodeBlock codeSnippets={codeSnippets} viewIndex={viewIndex} style="width: {viewIndex == 1 ? '768' : '1024'}px; height: 512px;"/>
         {:else}
             <p>Loading code snippets...</p>
         {/if}
     </div>
 
-    <Canvas bind:canvas={canvas} view_index={view_index} width={width}>
+    <Canvas bind:canvas={canvas} viewIndex={viewIndex} width={width}>
         <div slot='controls'>
             <slot name='controls'/>
         </div>
     </Canvas>
 </div>
-
-<style>
-</style>

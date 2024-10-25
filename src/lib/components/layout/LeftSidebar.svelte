@@ -2,35 +2,37 @@
     import { ChevronDown, Menu, GripVertical, X } from 'lucide-svelte';
     import { theme } from "$lib/stores";
     import { page } from '$app/stores';
-    import { content_tree } from '$lib/data/pages';
+    import { contentTree } from '$lib/data/pages';
     
     let isCollapsed = true;
-    let sidebarWidth = 350;
+    let sidebarWidth = 420;
+    // let minWidth = 450;
+    // let maxWidth = 450;
     let isDragging = false;
     
     function toggleSidebar() {
         isCollapsed = !isCollapsed;
     }
 
-    function startResize() {
-        isDragging = true;
-        document.addEventListener('mousemove', handleMouseMove);
-        document.addEventListener('mouseup', stopResize);
-    }
+    // function startResize() {
+    //     isDragging = true;
+    //     document.addEventListener('mousemove', handleMouseMove);
+    //     document.addEventListener('mouseup', stopResize);
+    // }
 
-    function handleMouseMove(event) {
-        if (isDragging)
-            sidebarWidth = Math.max(280, Math.min(400, event.clientX));
-    }
+    // function handleMouseMove(event) {
+    //     if (isDragging)
+    //         sidebarWidth = Math.max(minWidth, Math.min(maxWidth, event.clientX));
+    // }
 
-    function stopResize() {
-        isDragging = false;
-        document.removeEventListener('mousemove', handleMouseMove);
-        document.removeEventListener('mouseup', stopResize);
-    }
+    // function stopResize() {
+    //     isDragging = false;
+    //     document.removeEventListener('mousemove', handleMouseMove);
+    //     document.removeEventListener('mouseup', stopResize);
+    // }
 
     function isRouteActive(href) {
-        return $page.url.pathname === href;
+        return $page.url.pathname.replaceAll('%20', ' ') === href;
     }
 
     function isParentRouteActive(item) {
@@ -39,7 +41,9 @@
         
         if (item.children) {
             return item.children.some(child => {
-                if (isRouteActive(child.href)) return true;
+                if (isRouteActive(child.href)) 
+                    return true;
+                
                 if (child.children)
                     return child.children.some(grandchild => isRouteActive(grandchild.href));
 
@@ -52,7 +56,7 @@
     let expandedItems = new Set();
 
     $: if ($page) {
-        content_tree.children.forEach(item => {
+        contentTree.children.forEach(item => {
             if (isParentRouteActive(item)) {
                 expandedItems.add(item.href);
                 if (item.children) {
@@ -77,7 +81,7 @@
 
 <div class="flex min-h-screen">
     {#if !isCollapsed}
-        <div on:click={toggleSidebar} aria-hidden="true" class="fixed inset-0 bg-black/50 z-40 transition-all duration-300 ease-in-out opacity-0 {!isCollapsed ? 'opacity-100' : ''}"/>
+        <div on:click={toggleSidebar} aria-hidden="true" class="absolute inset-0 bg-black/50 z-40 transition-all duration-300 ease-in-out opacity-0 {!isCollapsed ? 'opacity-100' : ''}"/>
     {/if}
 
     <div class="relative">
@@ -89,62 +93,51 @@
                     </a>
                     
                     <div class="flex items-center">
-                        <button on:click={toggleSidebar} class="p-2 rounded-lg { $theme == 'light' ? 'hover:bg-gray-300' : 'hover:bg-gray-700' } transition-colors" aria-label="Collapse sidebar">
+                        <button on:click={toggleSidebar} class="p-1 rounded-lg { $theme == 'light' ? 'hover:bg-gray-300' : 'hover:bg-gray-700' } transition-colors" aria-label="Collapse sidebar">
                             <X size={18}/>
                         </button>
                     </div>
                 </div>
                 
                 <nav class="flex flex-col gap-1 pe-4">
-                    {#each content_tree.children as item}
-                        {@const hasChildren = item.children && item.children.length > 0}
+                    {#each contentTree.children as item}
+                        {@const hasChildren = item.children}
                         <div class="flex flex-col">
-                            <div class="flex items-center gap-4 p-2 ms-4 rounded-lg { $theme == 'light' ? 
-                                isRouteActive(item.href) ? 'bg-gray-300' : 'hover:bg-gray-300' : 
-                                isRouteActive(item.href) ? 'bg-gray-700' : 'hover:bg-gray-700'} transition-colors">
-                                <a href={item.href} class="flex items-center gap-4 flex-1 hover:no-underline { $theme == 'light' ? 'text-black' : 'text-white'}
-                                {isRouteActive(item.href) ? 'font-semibold' : ''}">
+                            <div class="flex items-center gap-4 ps-2 p-1 mb-1 ms-4 rounded-lg transition-colors hover:bg-gray-300 { isRouteActive(item.href) ? 'bg-gray-300' : ''}">
+                                <a href={item.href} class="flex items-center gap-4 flex-1 hover:no-underline text-black">
                                     <svelte:component this={item.icon} size={18}/>
                                     <span class="flex-1 truncate">{item.href.split("/").pop()}</span>
                                 </a>
 
                                 {#if hasChildren}
                                     <button on:click={() => toggleExpanded(item.href)} class="p-1 rounded hover:bg-gray-500/20">
-                                        <ChevronDown size={16} class="transition-transform duration-200 {expandedItems.has(item.href) ? 'rotate-180' : ''}"/>
+                                        <ChevronDown size={16} class="transition-transform duration-200 {expandedItems.has(item.href) ? 'text-red-500' : 'rotate-90'}"/>
                                     </button>
                                 {/if}
                             </div>
 
                             {#if hasChildren && expandedItems.has(item.href)}
-                                <div class="ml-4 border-l-2 { $theme == 'light' ? 'border-gray-300' : 'border-gray-700'} pl-2">
+                                <div class="ms-4 border-l-2 border-gray-300 pl-2">
                                     {#each item.children as child}
-                                        {@const hasGrandchildren = child.children && child.children.length > 0}
+                                        {@const hasGrandchildren = child.children}
                                         <div class="flex flex-col">
-                                            <div class="flex items-center gap-4 p-2 ms-4 rounded-lg transition-colors { $theme == 'light' ? 
-                                                isRouteActive(child.href) ? 'bg-gray-300' : 'hover:bg-gray-300' : 
-                                                isRouteActive(child.href) ? 'bg-gray-700' : 'hover:bg-gray-700'}">
-                                                <a href={child.href} class="flex items-center gap-4 flex-1 hover:no-underline { $theme == 'light' ? 'text-black' : 'text-white'}
-                                                {isRouteActive(child.href) ? 'font-semibold' : ''}">
+                                            <div class="flex items-center gap-4 ps-2 p-1 mb-1 ms-4 rounded-lg transition-colors hover:bg-gray-300 {isRouteActive(child.href) ? 'bg-gray-300' : ''}">
+                                                <a href={child.href} class="flex items-center gap-4 flex-1 hover:no-underline text-black">
                                                     <svelte:component this={child.icon} size={18}/>
                                                     <span class="flex-1 truncate">{child.href.split("/").pop()}</span>
                                                 </a>
 
                                                 {#if hasGrandchildren}
                                                     <button on:click={() => toggleExpanded(child.href)} class="p-1 rounded hover:bg-gray-500/20">
-                                                        <ChevronDown size={16} class="transition-transform duration-200 {expandedItems.has(child.href) ? 'rotate-180' : ''}"/>
+                                                        <ChevronDown size={16} class="transition-transform duration-200 {expandedItems.has(child.href) ? 'text-red-500' : 'rotate-90'}"/>
                                                     </button>
                                                 {/if}
                                             </div>
 
                                             {#if hasGrandchildren && expandedItems.has(child.href)}
-                                                <div class="pl-2 border-l-2 ml-4 {$theme == 'light' ? 'border-gray-300' : 'border-gray-700'}">
+                                                <div class="pl-2 border-l-2 ml-4 border-gray-300">
                                                     {#each child.children as grandchild}
-                                                        <a href={grandchild.href} 
-                                                        class="flex items-center gap-4 p-2 ms-4 rounded-lg hover:no-underline transition-colors 
-                                                                { $theme == 'light' ? 
-                                                                    isRouteActive(grandchild.href) ? 'bg-gray-300 font-semibold' : 'hover:bg-gray-300' : 
-                                                                    isRouteActive(grandchild.href) ? 'bg-gray-700 font-semibold' : 'hover:bg-gray-700'}
-                                                                { $theme == 'light' ? 'text-black' : 'text-white'}">
+                                                        <a href={grandchild.href} class="flex items-center gap-4 ps-2 p-1 mb-1 ms-4 rounded-lg hover:no-underline text-black transition-colors hover:bg-gray-300 {isRouteActive(grandchild.href) ? 'bg-gray-300' : ''}">
                                                             <svelte:component this={grandchild.icon} size={18}/>
                                                             <span class="flex-1 truncate">{grandchild.href.split("/").pop()}</span>
                                                         </a>
@@ -160,23 +153,22 @@
                 </nav>
             </div>
 
-
-            <div class="flex flex-row justify-center items-center mb-4">
-                <p class="text-xl">Computer</p>
-                <img src="/images/favicon-{ $theme }.png" alt="icon" class="w-8 h-8 mx-2">
-                <p class="text-xl">Graphics</p>
+            <div class="flex flex-row justify-center items-center mt-8 mb-4">
+                <p class="text-xl m-0">Computer</p>
+                <img src="/images/favicon-{$theme}.png" alt="icon" class="w-8 h-8 mx-2">
+                <p class="text-xl m-0">Graphics</p>
             </div>
 
-            <div on:mousedown={startResize} class="absolute top-0 right-0 w-4 h-full cursor-col-resize flex items-center justify-center hover:bg-gray-500/20 transition-colors">
+            <!-- <div on:mousedown={startResize} class="absolute top-0 right-0 w-4 h-full cursor-col-resize flex items-center justify-center hover:bg-gray-500/20 transition-colors">
                 <div class="p-1 rounded-md { $theme == 'light' ? 'text-gray-400' : 'text-gray-500' }">
                     <GripVertical size={16} />
                 </div>
-            </div>
+            </div> -->
         </aside>
     </div>
 
     <div class="flex-1">
-        <button on:click={toggleSidebar} class="fixed top-4 left-4 z-10 p-2 rounded-lg { $theme == 'light' ? 'hover:bg-gray-300' : 'hover:bg-gray-700' } transition-colors" aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}>
+        <button on:click={toggleSidebar} class="fixed top-4 left-4 z-10 p-1 rounded-lg hover:bg-gray-300 transition-colors" aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}>
             <Menu size={18}/>
         </button>
 
@@ -189,10 +181,3 @@
         <div class="fixed inset-0 z-[100] cursor-col-resize" />
     {/if}
 </div>
-
-<style>
-    :global(*) {
-        user-select: none;
-        font-size: 16px;
-    }
-</style>

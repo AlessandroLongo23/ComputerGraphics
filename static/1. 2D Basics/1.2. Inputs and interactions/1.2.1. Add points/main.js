@@ -1,5 +1,5 @@
 window.onload = function init() {
-    setup_WebGL();
+    setupWebGL();
 
     vertices = [ 
         vec2(0.0, 0.0), 
@@ -8,10 +8,10 @@ window.onload = function init() {
     ];
     index = vertices.length;
 
-    var max_points = 100;
+    var maxPoints = 100;
     var vBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, sizeof['vec2'] * max_points, gl.STATIC_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER, sizeof['vec2'] * maxPoints, gl.STATIC_DRAW);
     
     gl.bufferSubData(gl.ARRAY_BUFFER, 0, flatten(vertices));
 
@@ -27,7 +27,7 @@ window.onload = function init() {
         );
         var data = new Float32Array(t);
         
-        if (index < max_points) {
+        if (index < maxPoints) {
             gl.bufferSubData(gl.ARRAY_BUFFER, sizeof['vec2'] * index, data);
             index++;
         } else {
@@ -44,7 +44,7 @@ function render() {
     window.requestAnimFrame(render, canvas);
 }
 
-function setup_WebGL() {
+function setupWebGL() {
     canvas = document.getElementById("gl-canvas");
 
     gl = WebGLUtils.setupWebGL(canvas);

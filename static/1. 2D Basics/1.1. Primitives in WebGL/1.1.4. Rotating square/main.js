@@ -1,5 +1,5 @@
 window.onload = function init() {
-    setup_WebGL();
+    setupWebGL();
 
     // theta
     theta = 0.0;
@@ -35,7 +35,7 @@ function render() {
     requestAnimFrame(render);
 }
 
-function setup_WebGL() {
+function setupWebGL() {
     canvas = document.getElementById("gl-canvas");
     gl = WebGLUtils.setupWebGL(canvas);
     if (!gl) {

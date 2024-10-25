@@ -1,17 +1,17 @@
 attribute vec4 vPosition;
 
-uniform mat4 projection_matrix;
-uniform mat4 view_matrix;
-uniform mat4 model_matrix;
+uniform mat4 projectionMatrix;
+uniform mat4 viewMatrix;
+uniform mat4 modelMatrix;
 
-uniform vec3 light_direction;
+uniform vec3 lightDirection;
 
 varying vec4 vertex_color;
 
 void main() {
-    vec4 pos = model_matrix * vPosition;
+    vec4 pos = modelMatrix * vPosition;
     vec3 n = normalize(pos.xyz);
-    vec3 w_i = -normalize(light_direction);
+    vec3 w_i = -normalize(lightDirection);
     
     // diffuse lighting
     float k_d = 1.0;
@@ -21,5 +21,5 @@ void main() {
 
     // final color and position
     vertex_color = vec4(diffuse_color, 1.0);
-    gl_Position = projection_matrix * view_matrix * pos;
+    gl_Position = projectionMatrix * viewMatrix * pos;
 }

@@ -4,17 +4,32 @@
     import { WebGLUtils, fetchCodeSnippets, initShaders } from '$lib/utils.js';
     import * as mv from '$lib/Libraries/MV.js';
     import Result from '$lib/components/Result.svelte';
+    import Admonition from '$lib/components/UI/Admonition.svelte';
 
-    let view_index = 1;
+    let viewIndex = 1;
     let loading = true;
     let canvas, gl, program;
-    let code_snippets = [];
+    let codeSnippets = [];
 
     let vertices, indices, rot;
-    let model_view_matrix_loc;
+    let modelViewMatrixLoc;
 
     onMount(async () => {
         if (typeof window !== 'undefined') {
+            if (window.MathJax) {
+                window.MathJax.typesetPromise && window.MathJax.typesetPromise();
+
+                document.querySelectorAll("[class*='mjx']").forEach(function(el) {
+                    el.style.fontSize = '20px';
+                });
+
+                document.querySelectorAll("[size='s']").forEach(function(parent) {
+                    parent.querySelectorAll('*').forEach(function(el) {
+                        el.style.fontSize = '16px';
+                    });
+                });
+            }
+            
             gl = WebGLUtils.setupWebGL(canvas);
             gl.viewport(0, 0, canvas.width, canvas.height);
             gl.clearColor(0.3921, 0.5843, 0.9294, 1.0);
@@ -44,7 +59,7 @@
                 gl.enableVertexAttribArray(vPosition);
 
                 // colors
-                var vertex_colors = [
+                var colors = [
                     [0.0, 0.0, 0.0, 1.0],  // black
                     [1.0, 0.0, 0.0, 1.0],  // red
                     [1.0, 1.0, 0.0, 1.0],  // yellow
@@ -57,7 +72,7 @@
 
                 var cBuffer = gl.createBuffer();  // Buffer for colors
                 gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
-                gl.bufferData(gl.ARRAY_BUFFER, mv.flatten(vertex_colors), gl.STATIC_DRAW);
+                gl.bufferData(gl.ARRAY_BUFFER, mv.flatten(colors), gl.STATIC_DRAW);
 
                 var vColor = gl.getAttribLocation(program, "vColor");
                 gl.vertexAttribPointer(vColor, 4, gl.FLOAT, false, 0, 0);  // 4 components for RGBA
@@ -88,8 +103,8 @@
 
                 // Axis rotation setup
                 rot = [0.0, 0.0, 0.0];
-                model_view_matrix_loc = gl.getUniformLocation(program, "model_view_matrix");
-                gl.uniformMatrix4fv(model_view_matrix_loc, false, mv.flatten(ctm));
+                modelViewMatrixLoc = gl.getUniformLocation(program, "modelViewMatrix");
+                gl.uniformMatrix4fv(modelViewMatrixLoc, false, mv.flatten(ctm));
 
                 gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
                 gl.bufferSubData(gl.ARRAY_BUFFER, 0, mv.flatten(vertices));
@@ -99,7 +114,7 @@
                 console.error(error);
             }
 
-            code_snippets = await fetchCodeSnippets($page.url.pathname);
+            codeSnippets = await fetchCodeSnippets($page.url.pathname);
             loading = false;
         }
     });
@@ -115,7 +130,7 @@
         ctm = mv.mult(ctm, mv.rotateY(rot[1]));
         ctm = mv.mult(ctm, mv.rotateZ(rot[2]));
         
-        gl.uniformMatrix4fv(model_view_matrix_loc, false, mv.flatten(ctm));
+        gl.uniformMatrix4fv(modelViewMatrixLoc, false, mv.flatten(ctm));
         gl.drawElements(gl.LINE_STRIP, indices.length, gl.UNSIGNED_BYTE, 0);
         requestAnimFrame(render);
     }
@@ -123,14 +138,17 @@
 
 <div class="flex flex-col justify-center items-start w-4/5 text-xl m-auto">
     <div class="w-4/5 m-auto">
-        <p class="text-black text-xl">Draw a wireframe unit cube in isometric view.</p>  
-        <ul>
-            <li>The default viewing volume uses orthographic projection. Draw a cube using orthographic projection. [Angel 2.6.1, 4.6]</li>
-            <li>Position the cube in the world coordinate system with its diagonal going from (0, 0, 0) to (1, 1, 1).</li>
-            <li>Draw lines instead of triangles to draw in wireframe. [Angel 2.4] </li>
-            <li>Build a model-view matrix that transforms the cube vertices so that the cube is in isometric view. [Angel 4.12, 5.1.3, 5.3] [If using WebGPU, a projection matrix is needed for this assignment because the default interval for depth coordinates is [0,1] instead of [-1,1].]</li>
-        </ul>
+        <p>Draw a wireframe unit cube in isometric view.</p>  
+        <p>The default viewing volume uses orthographic projection. Draw a cube using orthographic projection. [Angel 2.6.1, 4.6]</p>
+        <p>Position the cube in the world coordinate system with its diagonal going from $(0,0,0)$ to $(1,1,1)$.</p>
+        <p>Draw lines instead of triangles to draw in wireframe. [Angel 2.4] </p>
+        <p>Build a model-view matrix that transforms the cube vertices so that the cube is in isometric view. [Angel 4.12, 5.1.3, 5.3]</p>
+        <Admonition type='warning'>
+            <p slot='textContent' class="m-0">
+                If using WebGPU, a projection matrix is needed for this assignment because the default interval for depth coordinates is $[0,1]$ instead of $[-1,1]$.
+            </p>
+        </Admonition>
     </div>
 
-    <Result bind:canvas={canvas} bind:view_index={view_index} loading={loading} code_snippets={code_snippets}/>
+    <Result bind:canvas={canvas} bind:viewIndex={viewIndex} loading={loading} codeSnippets={codeSnippets}/>
 </div>

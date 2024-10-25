@@ -1,5 +1,5 @@
 window.onload = function init() {
-    setup_WebGL();
+    setupWebGL();
 
     acc = vec2(0.0, -9.81);
     initBall();
@@ -9,8 +9,8 @@ window.onload = function init() {
     deltaTime = 0.0;
     t1 = date.getTime();
     damp = vec2(0.75, 0.5);
-    air_friction = 0.99;
-    rad_friction = 0.90;
+    airFriction = 0.99;
+    radFriction = 0.90;
 
     // vertices
     num = 100;
@@ -53,18 +53,18 @@ function update() {
     else { 
         pos[1] = -0.5;
         vel[1] = 0.0;
-        vel[0] = vel[0] * rad_friction;
+        vel[0] = vel[0] * radFriction;
     }
-    vel = mult(vel, air_friction);
+    vel = mult(vel, airFriction);
 }
 
 function bounce() {
     // floor and ceiling
     if (pos[1] < -0.5 && vel[1] < 0.0) {
-        vel[0] = vel[0] * rad_friction;
+        vel[0] = vel[0] * radFriction;
         vel[1] = -vel[1] * damp[1];
     } else if (pos[1] > 0.5 && vel[1] > 0.0) {
-        vel[0] = vel[0] * rad_friction;
+        vel[0] = vel[0] * radFriction;
         vel[1] = -vel[1] * damp[1];
     }
 
@@ -84,7 +84,7 @@ function initBall() {
     pos = mv.vec2(Math.random() - 0.5, Math.random() - 0.5);
 }
 
-function setup_WebGL() {
+function setupWebGL() {
     canvas = document.getElementById("gl-canvas");
     gl = WebGLUtils.setupWebGL(canvas);
     if (!gl) {

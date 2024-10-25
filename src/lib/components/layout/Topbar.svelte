@@ -1,26 +1,33 @@
 <script>
     import { onMount } from "svelte";
     import { page } from "$app/stores";
-    import { content_sequence } from "$lib/data/pages";
+    import { contentSequence } from "$lib/data/pages";
+    import Toggle from "$lib/components/UI/Toggle.svelte";
+    import { Sun, Moon } from "lucide-svelte";
+    import { theme } from "$lib/stores";
 
     let title, subtitle
-    let url, previous_page_url, next_page_url;
+    let url, previousPageUrl, nextPageUrl;
+
+    let themeIndex;
+    $: themeIndex = $theme === 'light' ? 0 : 1;
+    $: theme.set(themeIndex === 0 ? 'light' : 'dark');
 
     onMount(() => {
         url = $page.url.pathname;
-        previous_page_url = get_page(-1);
-        next_page_url = get_page(1);
-        update_title();
+        previousPageUrl = getPage(-1);
+        nextPageUrl = getPage(1);
+        updateTitle();
     });
 
     $: {
         url = $page.url.pathname;
-        previous_page_url = get_page(-1);
-        next_page_url = get_page(1);
-        update_title();
+        previousPageUrl = getPage(-1);
+        nextPageUrl = getPage(1);
+        updateTitle();
     }
 
-    function update_title() {
+    function updateTitle() {
         title = $page.url.pathname.split("/").pop()
         title = capitalize(title.replaceAll("%20", " "));
         subtitle = undefined;
@@ -44,22 +51,22 @@
         return str.charAt(0).toUpperCase() + str.slice(1);
     }
 
-    function get_page(off) {
+    function getPage(off) {
         if (url == '/home')
             return undefined;
 
-        let item = content_sequence.find(item => item.href?.split('/').pop() == url.split("/").pop().replaceAll("%20", " "))
-        let index = content_sequence.indexOf(item);
-        if (index + off < 0 || index + off >= content_sequence.length)
+        let item = contentSequence.find(item => item.href?.split('/').pop() == url.split("/").pop().replaceAll("%20", " "))
+        let index = contentSequence.indexOf(item);
+        if (index + off < 0 || index + off >= contentSequence.length)
             return undefined;
 
-        return content_sequence[index + off].href;
+        return contentSequence[index + off].href;
     }
 </script>
 
 <div class="flex flex-row justify-center items-center faded-border mx-16 mb-8 py-4">
-    {#if previous_page_url && url != "/home"}
-        <a href="{previous_page_url}">
+    {#if previousPageUrl && url != "/home"}
+        <a href="{previousPageUrl}">
             <i class="fa-solid fa-arrow-left text-2xl mx-6 m-auto text-black"></i>
         </a>
     {:else}
@@ -73,13 +80,17 @@
         <p class="text-4xl font-bold">{title}</p>
     </div>
 
-    {#if next_page_url && url != "/home"}
-        <a href="{next_page_url}">
+    {#if nextPageUrl && url != "/home"}
+        <a href="{nextPageUrl}">
             <i class="fa-solid fa-arrow-right text-2xl mx-6 m-auto text-black"></i>
         </a>
     {:else}
         <i class="px-6 text-black"></i>
     {/if}
+
+    <div class="absolute right-8">
+        <Toggle icons={[Sun, Moon]} bind:value={themeIndex}/>
+    </div>
 </div>
 
 <style>

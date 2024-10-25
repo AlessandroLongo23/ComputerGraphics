@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 :root {
-	--font-body: Averta, sans-serif;
+	--font-body: Inter, sans-serif;
 	--font-mono: 'Fira Mono', monospace;
 	--color-bg-0: rgb(202, 216, 228);
 	--color-bg-1: hsl(209, 36%, 86%);

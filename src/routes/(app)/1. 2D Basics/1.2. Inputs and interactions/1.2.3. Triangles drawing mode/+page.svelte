@@ -5,19 +5,20 @@
     import { vec2, vec4, flatten, sizeof } from '$lib/Libraries/MV.js';
     import Result from '$lib/components/Result.svelte';
     import Toggle from '$lib/components/UI/Toggle.svelte';
+    import Admonition from '$lib/components/UI/Admonition.svelte';
     import { Dot, Triangle } from 'lucide-svelte'
 
-    let view_index = 1;
+    let viewIndex = 1;
     let loading = true;
     let canvas, gl, program;
-    let code_snippets = [];
+    let codeSnippets = [];
 
     let cBuffer, vColor;
     let mode = 'points';
     let side = 20;
     let count = 0;
-    let mode_index = 0;
-    let colors_array;
+    let modeIndex = 0;
+    let colors;
     let vertices;
 
     onMount(async () => {
@@ -30,13 +31,13 @@
                 [gl, program] = await initShaders(gl, program, $page.url.pathname + '/vshader.glsl', $page.url.pathname + '/fshader.glsl');
 
                 // points
-                colors_array = [];
+                colors = [];
                 vertices = [];
                 
-                var max_points = 100;
+                var maxPoints = 100;
                 var vBuffer = gl.createBuffer();
                 gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
-                gl.bufferData(gl.ARRAY_BUFFER, sizeof['vec2'] * max_points, gl.STATIC_DRAW);
+                gl.bufferData(gl.ARRAY_BUFFER, sizeof['vec2'] * maxPoints, gl.STATIC_DRAW);
                 gl.bufferSubData(gl.ARRAY_BUFFER, 0, flatten(vertices));
                 
                 var vPosition = gl.getAttribLocation(program, "vPosition");
@@ -49,38 +50,38 @@
                         switch(document.getElementById("pointscolor").selectedIndex) {
                             case 0:
                                 for (var i = 0; i < 6; i++)
-                                    colors_array.push(vec4(0.0, 0.0, 0.0, 1.0));
+                                    colors.push(vec4(0.0, 0.0, 0.0, 1.0));
                                 break;
                             case 1:
                                 for (var i = 0; i < 6; i++)
-                                    colors_array.push(vec4(1.0, 1.0, 1.0, 1.0));
+                                    colors.push(vec4(1.0, 1.0, 1.0, 1.0));
                                 break;
                         }
                     } else if (mode == 'triangles') {
                         count++;
                         if (count == 3) {
-                            var first_vertex_color = colors_array[colors_array.length - 6];
-                            var second_vertex_color = colors_array[colors_array.length - 3];
-                            colors_array = colors_array.slice(0, colors_array.length - 12);
-                            colors_array.push(first_vertex_color);
-                            colors_array.push(second_vertex_color);
+                            var firstVertexColor = colors[colors.length - 6];
+                            var secondVertexColor = colors[colors.length - 3];
+                            colors = colors.slice(0, colors.length - 12);
+                            colors.push(firstVertexColor);
+                            colors.push(secondVertexColor);
                             switch(document.getElementById("pointscolor").selectedIndex) {
                                 case 0:
-                                    colors_array.push(vec4(0.0, 0.0, 0.0, 1.0)); 
+                                    colors.push(vec4(0.0, 0.0, 0.0, 1.0)); 
                                     break;
                                 case 1:
-                                    colors_array.push(vec4(1.0, 1.0, 1.0, 1.0));
+                                    colors.push(vec4(1.0, 1.0, 1.0, 1.0));
                                     break;
                             }
                         } else {
                             switch(document.getElementById("pointscolor").selectedIndex) {
                                 case 0:
                                     for (var i = 0; i < 6; i++)
-                                        colors_array.push(vec4(0.0, 0.0, 0.0, 1.0));
+                                        colors.push(vec4(0.0, 0.0, 0.0, 1.0));
                                     break;
                                 case 1:
                                     for (var i = 0; i < 6; i++)
-                                        colors_array.push(vec4(1.0, 1.0, 1.0, 1.0));
+                                        colors.push(vec4(1.0, 1.0, 1.0, 1.0));
                                     break;
                             }
                         }
@@ -88,7 +89,7 @@
 
                     cBuffer = gl.createBuffer();
                     gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
-                    gl.bufferData(gl.ARRAY_BUFFER, flatten(colors_array), gl.STATIC_DRAW);
+                    gl.bufferData(gl.ARRAY_BUFFER, flatten(colors), gl.STATIC_DRAW);
                     vColor = gl.getAttribLocation(program, "vColor");
                     gl.vertexAttribPointer(vColor, 4, gl.FLOAT, false, 0, 0);
                     gl.enableVertexAttribArray(vColor);
@@ -99,7 +100,7 @@
                         1 - 2 * (event.clientY - canvas.getBoundingClientRect().y) / canvas.height
                     );
                     if (mode == 'points') {
-                        var new_vertices = [
+                        var newVertices = [
                             vec2(t[0] - side / canvas.width, t[1] - side / canvas.height),
                             vec2(t[0] - side / canvas.width, t[1] + side / canvas.height),
                             vec2(t[0] + side / canvas.width, t[1] + side / canvas.height),
@@ -110,25 +111,25 @@
                         ]
                     } else if (mode == 'triangles') {
                         if (count == 3) {
-                            var first_vertex = vec2(
+                            var firstVertex = vec2(
                                 (vertices[vertices.length - 1][0] + vertices[vertices.length - 3][0]) / 2, 
                                 (vertices[vertices.length - 1][1] + vertices[vertices.length - 3][1]) / 2
                             );
-                            var second_vertex = vec2(
+                            var secondVertex = vec2(
                                 (vertices[vertices.length - 7][0] + vertices[vertices.length - 9][0]) / 2, 
                                 (vertices[vertices.length - 7][1] + vertices[vertices.length - 9][1]) / 2
                             );
 
                             vertices = vertices.slice(0, vertices.length - 12);
 
-                            var new_vertices = [
-                                first_vertex,
-                                second_vertex,
+                            var newVertices = [
+                                firstVertex,
+                                secondVertex,
                                 t
                             ]
                             count = 0;
                         } else {
-                            var new_vertices = [
+                            var newVertices = [
                                 vec2(t[0] - side / canvas.width, t[1] - side / canvas.height),
                                 vec2(t[0] - side / canvas.width, t[1] + side / canvas.height),
                                 vec2(t[0] + side / canvas.width, t[1] + side / canvas.height),
@@ -140,8 +141,8 @@
                         }
                     }
                     
-                    for (var i = 0; i < new_vertices.length; i++)
-                        vertices.push(new_vertices[i]);
+                    for (var i = 0; i < newVertices.length; i++)
+                        vertices.push(newVertices[i]);
 
                     gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
                     gl.bufferSubData(gl.ARRAY_BUFFER, 0, flatten(vertices));
@@ -165,10 +166,10 @@
                         break;
                 }
 
-                colors_array = [];
+                colors = [];
                 cBuffer = gl.createBuffer();
                 gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
-                gl.bufferData(gl.ARRAY_BUFFER, flatten(colors_array), gl.STATIC_DRAW);
+                gl.bufferData(gl.ARRAY_BUFFER, flatten(colors), gl.STATIC_DRAW);
                 vColor = gl.getAttribLocation(program, "vColor");
                 gl.vertexAttribPointer(vColor, 4, gl.FLOAT, false, 0, 0);
                 gl.enableVertexAttribArray(vColor);
@@ -180,13 +181,13 @@
                 gl.bufferSubData(gl.ARRAY_BUFFER, 0, new Float32Array(vertices));
             });
 
-            code_snippets = await fetchCodeSnippets($page.url.pathname);
+            codeSnippets = await fetchCodeSnippets($page.url.pathname);
             loading = false;
         }
     });
 
     function render() {
-        mode = mode_index == 0 ? 'points' : 'triangles';
+        mode = modeIndex == 0 ? 'points' : 'triangles';
         gl.clear(gl.COLOR_BUFFER_BIT);
         gl.drawArrays(gl.TRIANGLES, 0, vertices.length);
         window.requestAnimFrame(render, canvas);
@@ -195,19 +196,21 @@
 
 <div class="flex flex-col justify-center items-start w-4/5 text-xl m-auto">
     <div class="w-4/5 m-auto">
-        <ul>
-            <li>We would now like to have two different drawing modes. One where we draw points and one where we interactively build a triangle by placing three points. Add a button for each drawing mode. [Angel 3.6.2]</li>
-            <li>(Hint) What we do has some relation to the textbook CAD example [Angel 3.10], where a polygon is built interactively.</li>
-            <li>Let us draw all our shapes as triangles (using gl.TRIANGLES). When a point is drawn, add vertices (positions and colors) for two triangles representing this point to the vertex buffers. In the triangle drawing mode, keep a record (array) of the former points that were clicked and their colors. When the third point is clicked, replace the two points and their colors (four triangles) with the one triangle to be drawn and clear the record.</li>
-        </ul>
+        <p>We would now like to have two different drawing modes. One where we draw points and one where we interactively build a triangle by placing three points. Add a button for each drawing mode. [Angel 3.6.2]</p>
+        <Admonition type='tip'>
+            <p slot='textContent' class="m-0">
+                What we do has some relation to the textbook CAD example [Angel 3.10], where a polygon is built interactively.
+            </p>
+        </Admonition>
+    <p>Let us draw all our shapes as triangles (using gl.TRIANGLES). When a point is drawn, add vertices (positions and colors) for two triangles representing this point to the vertex buffers. In the triangle drawing mode, keep a record (array) of the former points that were clicked and their colors. When the third point is clicked, replace the two points and their colors (four triangles) with the one triangle to be drawn and clear the record.</p>
     </div>
 
-    <Result bind:canvas={canvas} bind:view_index={view_index} loading={loading} code_snippets={code_snippets}>
+    <Result bind:canvas={canvas} bind:viewIndex={viewIndex} loading={loading} codeSnippets={codeSnippets}>
         <div slot='controls'>
-            <div class="absolute left-0 top-0 flex flex-row justify-evenly items-center gap-4 w-full p-4 bg-gray-900/25 rounded-{view_index == 1 ? 'r-' : ''}lg">    
+            <div class="absolute left-0 top-0 flex flex-row justify-evenly items-center gap-4 w-full p-4 bg-gray-900/25 rounded-{viewIndex == 1 ? 'r-' : ''}lg">    
                 <div class="flex flex-col justify-between items-center gap-2">
                     <button id="clear" class="flex w-32 h-8 items-center justify-center px-auto py-4 transition-colors duration-200 text-sm bg-white hover:bg-gray-300 text-black rounded-lg">Clear canvas</button>
-                    <Toggle icons={[Dot, Triangle]} bind:selected={mode_index}/>
+                    <Toggle icons={[Dot, Triangle]} bind:selected={modeIndex}/>
                 </div>
                 
                 <div class="flex flex-row justify-between items-center gap-4">

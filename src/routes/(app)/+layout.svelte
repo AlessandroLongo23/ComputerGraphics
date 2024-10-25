@@ -10,6 +10,3 @@
         <slot />
     </LeftSidebar>
 </div>
-
-<style>
-</style>

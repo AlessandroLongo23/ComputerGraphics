@@ -1,5 +1,5 @@
 window.onload = function init() {
-    setup_WebGL();
+    setupWebGL();
 
     // vertices
     vertices = [ vec2(0.0, 0.0), vec2(1.0, 0.0), vec2(1.0, 1.0) ];
@@ -13,7 +13,7 @@ window.onload = function init() {
     gl.enableVertexAttribArray(vPosition);
 
     // colors
-    colors_array = [ 
+    colors = [ 
         vec4(1.0, 0.0, 0.0, 1.0), 
         vec4(0.0, 1.0, 0.0, 1.0), 
         vec4(0.0, 0.0, 1.0, 1.0) 
@@ -21,7 +21,7 @@ window.onload = function init() {
 
     var cBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, flatten(colors_array), gl.STATIC_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER, flatten(colors), gl.STATIC_DRAW);
 
     var vColor = gl.getAttribLocation(program, "vColor");
     gl.vertexAttribPointer(vColor, 4, gl.FLOAT, false, 0, 0);
@@ -35,7 +35,7 @@ function render() {
     gl.drawArrays(gl.TRIANGLES, 0, vertices.length);
 }
 
-function setup_WebGL() {
+function setupWebGL() {
     canvas = document.getElementById("gl-canvas");
     gl = WebGLUtils.setupWebGL(canvas);
     if (!gl) {

@@ -5,13 +5,13 @@
     import { vec2, vec4, flatten, sizeof } from '$lib/Libraries/MV.js';
     import Result from '$lib/components/Result.svelte';
 
-    let view_index = 1;
+    let viewIndex = 1;
     let loading = true;
     let canvas, gl, program;
-    let code_snippets = [];
+    let codeSnippets = [];
 
     let vertices = [];
-    let colors_array = [];
+    let colors = [];
     let cBuffer, vColor;
     let index;
 
@@ -25,14 +25,14 @@
                 [gl, program] = await initShaders(gl, program, $page.url.pathname + '/vshader.glsl', $page.url.pathname + '/fshader.glsl');
 
                 // points
-                colors_array = []
+                colors = []
                 vertices = [];
                 index = vertices.length;
 
-                var max_points = 100;
+                var maxPoints = 100;
                 var vBuffer = gl.createBuffer();
                 gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
-                gl.bufferData(gl.ARRAY_BUFFER, sizeof['vec2'] * max_points, gl.STATIC_DRAW);
+                gl.bufferData(gl.ARRAY_BUFFER, sizeof['vec2'] * maxPoints, gl.STATIC_DRAW);
                 gl.bufferSubData(gl.ARRAY_BUFFER, 0, flatten(vertices));
                 
                 var vPosition = gl.getAttribLocation(program, "vPosition");
@@ -42,16 +42,16 @@
                 canvas.addEventListener("click", function(event) {
                     switch(document.getElementById("pointscolor").selectedIndex) {
                         case 0:
-                            colors_array.push(vec4(0.0, 0.0, 0.0, 1.0));
+                            colors.push(vec4(0.0, 0.0, 0.0, 1.0));
                             break;
                         case 1:
-                            colors_array.push(vec4(1.0, 1.0, 1.0, 1.0));
+                            colors.push(vec4(1.0, 1.0, 1.0, 1.0));
                             break;
                     }
 
                     cBuffer = gl.createBuffer();
                     gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
-                    gl.bufferData(gl.ARRAY_BUFFER, flatten(colors_array), gl.STATIC_DRAW);
+                    gl.bufferData(gl.ARRAY_BUFFER, flatten(colors), gl.STATIC_DRAW);
                     vColor = gl.getAttribLocation(program, "vColor");
                     gl.vertexAttribPointer(vColor, 4, gl.FLOAT, false, 0, 0);
                     gl.enableVertexAttribArray(vColor);
@@ -60,11 +60,11 @@
                     var t = vec2(-1 + 2 * (event.clientX - canvas.getBoundingClientRect().x) / canvas.width, -1 + 2 * (canvas.height - (event.clientY - canvas.getBoundingClientRect().y)) / canvas.height);
                     var data = new Float32Array(t);
                     
-                    if (index < max_points) {
+                    if (index < maxPoints) {
                         gl.bufferSubData(gl.ARRAY_BUFFER, sizeof['vec2'] * index, data);
                         index++;
                     } else {
-                        console.log("Max points reached!");
+                        alert("Max points reached!");
                     }
                 });
 
@@ -86,10 +86,10 @@
                         break;
                 }
 
-                colors_array = [];
+                colors = [];
                 cBuffer = gl.createBuffer();
                 gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
-                gl.bufferData(gl.ARRAY_BUFFER, flatten(colors_array), gl.STATIC_DRAW);
+                gl.bufferData(gl.ARRAY_BUFFER, flatten(colors), gl.STATIC_DRAW);
                 vColor = gl.getAttribLocation(program, "vColor");
                 gl.vertexAttribPointer(vColor, 4, gl.FLOAT, false, 0, 0);
                 gl.enableVertexAttribArray(vColor);
@@ -99,7 +99,7 @@
                 index = 0;
             });
 
-            code_snippets = await fetchCodeSnippets($page.url.pathname);
+            codeSnippets = await fetchCodeSnippets($page.url.pathname);
             loading = false;
         }
     });
@@ -113,14 +113,12 @@
 
 <div class="flex flex-col justify-center items-start w-4/5 text-xl m-auto">
     <div class="w-4/5 m-auto">
-        <ul>
-            <li>Add a second triangle to the previous part such that you have a quadrilateral (which is maybe even a square). [Angel 2.4]</li>
-            <li>Center your quad (short form of quadrilateral) and rotate it such that it has its vertices on the coordinate axes.</li>
-            <li>Add a rotation so the quad rotates around its center. Animate the rotation angle over time. Use requestAnimationFrame to continuously call your render function. [Angel 3.1]</li>
-        </ul>
+        <p>Add a second triangle to the previous part such that you have a quadrilateral (which is maybe even a square). [Angel 2.4]</p>
+        <p>Center your quad (short form of quadrilateral) and rotate it such that it has its vertices on the coordinate axes.</p>
+        <p>Add a rotation so the quad rotates around its center. Animate the rotation angle over time. Use requestAnimationFrame to continuously call your render function. [Angel 3.1]</p>
     </div>
 
-    <Result bind:canvas={canvas} bind:view_index={view_index} loading={loading} code_snippets={code_snippets}>
+    <Result bind:canvas={canvas} bind:viewIndex={viewIndex} loading={loading} codeSnippets={codeSnippets}>
         <div slot='controls'>
             <div class="absolute left-0 top-0 flex flex-row justify-evenly items-center gap-4 w-full p-4 bg-gray-900/25">    
                 <button id="clear" class="flex w-32 h-8 items-center justify-center px-auto py-4 transition-colors duration-200 text-sm bg-white hover:bg-gray-300 text-black rounded-lg">

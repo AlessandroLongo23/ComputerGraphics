@@ -6,13 +6,13 @@
     import * as mv from '$lib/Libraries/MV.js';
     import Result from '$lib/components/Result.svelte';
 
-    let view_index = 1;
+    let viewIndex = 1;
     let loading = true;
     let canvas, gl, program;
-    let code_snippets = [];
+    let codeSnippets = [];
 
     let vertices = [];
-    let vel, pos, posLoc, date, delta_time, t1, t2, damp, air_friction, rad_friction, num, rad;
+    let vel, pos, posLoc, date, deltaTime, t1, t2, damp, airFriction, radFriction, num, rad;
     const acc = mv.vec2(0.0, -9.81);
 
     onMount(async () => {
@@ -24,17 +24,17 @@
             try {
                 [gl, program] = await initShaders(gl, program, $page.url.pathname + '/vshader.glsl', $page.url.pathname + '/fshader.glsl');
 
-                init_ball();
+                initBall();
                 posLoc = gl.getUniformLocation(program, "pos");
 
                 gl.useProgram(program);
                 
                 date = new Date;
-                delta_time = 0.0;
+                deltaTime = 0.0;
                 t1 = date.getTime();
                 damp = mv.vec2(0.75, 0.5);
-                air_friction = 0.99;
-                rad_friction = 0.90;
+                airFriction = 0.99;
+                radFriction = 0.90;
 
                 // vertices
                 num = 100;
@@ -56,7 +56,7 @@
                 console.error(error);
             }
 
-            code_snippets = await fetchCodeSnippets($page.url.pathname);
+            codeSnippets = await fetchCodeSnippets($page.url.pathname);
             loading = false;
         }
     });
@@ -66,7 +66,7 @@
 
         date = new Date;
         t2 = date.getTime();
-        delta_time = (t2 - t1) * 0.001;
+        deltaTime = (t2 - t1) * 0.001;
         t1 = t2;
 
         update();
@@ -78,25 +78,25 @@
     }
 
     function update() {
-        pos = mv.add(pos, mv.mult(vel, delta_time));
+        pos = mv.add(pos, mv.mult(vel, deltaTime));
         if (Math.abs(pos[1] + 0.5) > 0.015 || Math.abs(vel[1]) > 0.015)
-            vel = mv.add(vel, mv.mult(acc, delta_time));
+            vel = mv.add(vel, mv.mult(acc, deltaTime));
         else { 
             pos[1] = -0.5;
             vel[1] = 0.0;
-            vel[0] = vel[0] * rad_friction;
+            vel[0] = vel[0] * radFriction;
         }
 
-        vel = mv.mult(vel, air_friction);
+        vel = mv.mult(vel, airFriction);
     }
 
     function bounce() {
         // floor and ceiling
         if (pos[1] < -0.5 && vel[1] < 0.0) {
-            vel[0] = vel[0] * rad_friction;
+            vel[0] = vel[0] * radFriction;
             vel[1] = -vel[1] * damp[1];
         } else if (pos[1] > 0.5 && vel[1] > 0.0) {
-            vel[0] = vel[0] * rad_friction;
+            vel[0] = vel[0] * radFriction;
             vel[1] = -vel[1] * damp[1];
         }
 
@@ -111,7 +111,7 @@
         }
     }
 
-    function init_ball() {
+    function initBall() {
         vel = mv.vec2(Math.random() * 20 - 10, Math.random() * 20 - 10);
         pos = mv.vec2(Math.random() - 0.5, Math.random() - 0.5);
     }
@@ -119,20 +119,15 @@
 
 <div class="flex flex-col justify-center items-start w-4/5 text-xl m-auto">
     <div class="w-4/5 m-auto">
-        <ul>
-            <li>Create and draw a circle using the triangle fan drawing mode. [Angel 2.4.2] [The triangle fan drawing mode is not available in WebGPU. If using WebGPU, use the triangle-strip drawing mode to draw a circle.]</li>
-            <li>Make the circle bounce up and down over time.</li>
-        </ul>
+        <p>Create and draw a circle using the triangle fan drawing mode. [Angel 2.4.2] [The triangle fan drawing mode is not available in WebGPU. If using WebGPU, use the triangle-strip drawing mode to draw a circle.]</p>
+        <p>Make the circle bounce up and down over time.</p>
     </div>
 
-    <Result bind:canvas={canvas} bind:view_index={view_index} loading={loading} code_snippets={code_snippets}>
+    <Result bind:canvas={canvas} bind:viewIndex={viewIndex} loading={loading} codeSnippets={codeSnippets}>
         <div slot='controls'>
-            <button on:click={init_ball} class="absolute left-0 top-0 m-4 p-2 bg-gray-100 rounded-lg hover:bg-gray-300 transition-colors">
+            <button on:click={initBall} class="absolute left-0 top-0 m-4 p-2 bg-gray-100 rounded-lg hover:bg-gray-300 transition-colors">
                 <svelte:component this={ RotateCw } size={20}/>
             </button>
         </div>
     </Result>
 </div>
-
-<style>
-</style>

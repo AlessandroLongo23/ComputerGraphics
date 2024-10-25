@@ -4,7 +4,7 @@ function render() {
 }
 
 window.onload = function init() {
-    setup_WebGL();
+    setupWebGL();
 
     vertices = [ vec2(0.0, 0.0), vec2(1.0, 0.0), vec2(1.0, 1.0) ];
     var vBuffer = gl.createBuffer();
@@ -18,7 +18,7 @@ window.onload = function init() {
     render();
 }
 
-function setup_WebGL() {
+function setupWebGL() {
     canvas = document.getElementById("gl-canvas");
     gl = WebGLUtils.setupWebGL(canvas);
     if (!gl) {

@@ -57,47 +57,47 @@ if (typeof window !== 'undefined') {
     })();
 }
 
-export async function fetchCodeSnippets(code_snippets_url) {
+export async function fetchCodeSnippets(codeSnippets_url) {
     try {
-        let code_snippets_info = [
+        let codeSnippets_info = [
             {
                 name: 'main.js',
                 language: 'JavaScript',
-                path: code_snippets_url + '/main.js'
+                path: codeSnippets_url + '/main.js'
             },
             {
                 name: 'index.html',
                 language: 'HTML',
-                path: code_snippets_url + '/index.html'
+                path: codeSnippets_url + '/index.html'
             },
             {
                 name: 'vshader.glsl',
                 language: 'GLSL',
-                path: code_snippets_url + '/vshader.glsl'
+                path: codeSnippets_url + '/vshader.glsl'
             },
             {
                 name: 'fshader.glsl',
                 language: 'GLSL',
-                path: code_snippets_url + '/fshader.glsl'
+                path: codeSnippets_url + '/fshader.glsl'
             }
         ];
 
-        let code_snippets = [];
-        for (let info of code_snippets_info) {
+        let codeSnippets = [];
+        for (let info of codeSnippets_info) {
             const response = await fetch(info.path); 
             if (!response.ok)
                 throw new Error('Network response was not ok');
             
             const code = await response.text();
 
-            code_snippets = [...code_snippets, {
+            codeSnippets = [...codeSnippets, {
                 name: info.name,
                 language: info.language,
                 code: code
             }];
         }
 
-        return code_snippets;
+        return codeSnippets;
     } catch (error) {
         console.error('Error fetching the JavaScript file:', error);
     }

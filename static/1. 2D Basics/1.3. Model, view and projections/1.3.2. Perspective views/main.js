@@ -1,6 +1,8 @@
 var indices, vertices;
 
 window.onload = function init() {
+    setupWebGL();
+
     // vertices
     vertices = [
         vec3(-0.5, -0.5, 0.5),
@@ -22,7 +24,7 @@ window.onload = function init() {
     gl.enableVertexAttribArray(vPosition);
 
     // colors
-    var vertex_colors = [
+    var colors = [
         [0.0, 0.0, 0.0, 1.0],  // black
         [1.0, 0.0, 0.0, 1.0],  // red
         [1.0, 1.0, 0.0, 1.0],  // yellow
@@ -35,7 +37,7 @@ window.onload = function init() {
 
     var cBuffer = gl.createBuffer();  // Buffer for colors
     gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, flatten(vertex_colors), gl.STATIC_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER, flatten(colors), gl.STATIC_DRAW);
 
     var vColor = gl.getAttribLocation(program, "vColor");
     gl.vertexAttribPointer(vColor, 4, gl.FLOAT, false, 0, 0);  // 4 components for RGBA
@@ -62,8 +64,8 @@ window.onload = function init() {
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint8Array(indices), gl.STATIC_DRAW);
 
     // Initialize rotation and transformations
-    model_view_matrix_loc = gl.getUniformLocation(program, "model_view_matrix");
-    projection_matrix_loc = gl.getUniformLocation(program, "projection_matrix");
+    modelViewMatrixLoc = gl.getUniformLocation(program, "modelViewMatrix");
+    projectionMatrixLoc = gl.getUniformLocation(program, "projectionMatrix");
 
     render();
 }
@@ -73,18 +75,18 @@ function render() {
 
     // Cube 1 - One-point perspective (front view)
     var ctm = mat4();
-    var projection_matrix = perspective(45, canvas.width / canvas.height, .001, 10.0);
-    gl.uniformMatrix4fv(projection_matrix_loc, false, flatten(projection_matrix));
+    var projectionMatrix = perspective(45, canvas.width / canvas.height, .001, 10.0);
+    gl.uniformMatrix4fv(projectionMatrixLoc, false, flatten(projectionMatrix));
 
     ctm = mult(ctm, translate(-1.5, 0, -3));  // Move to the left
-    gl.uniformMatrix4fv(model_view_matrix_loc, false, flatten(ctm));
+    gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(ctm));
     gl.drawElements(gl.LINE_STRIP, indices.length, gl.UNSIGNED_BYTE, 0);
 
     // Cube 2 - Two-point perspective (X-axis rotated)
     ctm = mat4();
     ctm = mult(ctm, translate(0, 0, -3));  // Centered
     ctm = mult(ctm, rotateY(30));  // Rotate around Y-axis
-    gl.uniformMatrix4fv(model_view_matrix_loc, false, flatten(ctm));
+    gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(ctm));
     gl.drawElements(gl.LINE_STRIP, indices.length, gl.UNSIGNED_BYTE, 0);
 
     // Cube 3 - Three-point perspective (X, Y, and Z rotated)
@@ -93,13 +95,13 @@ function render() {
     ctm = mult(ctm, rotateX(20));
     ctm = mult(ctm, rotateY(30));
     ctm = mult(ctm, rotateZ(20));
-    gl.uniformMatrix4fv(model_view_matrix_loc, false, flatten(ctm));
+    gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(ctm));
     gl.drawElements(gl.LINE_STRIP, indices.length, gl.UNSIGNED_BYTE, 0);
 
     requestAnimFrame(render);
 }
 
-function setup_WebGL() {
+function setupWebGL() {
     canvas = document.getElementById("gl-canvas");
 
     gl = WebGLUtils.setupWebGL(canvas);

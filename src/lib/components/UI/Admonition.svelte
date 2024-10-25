@@ -6,14 +6,16 @@
     export let type = 'note';
     export let title = '';
 
-    let admonition;
-    $: admonition = admonitions.find(ad => ad.name == type);
+    let ad;
+    $: ad = admonitions.find(admonition => admonition.name === type);
 </script>
 
-<div class="border-l-8 border-{admonition.color}-500 bg-{admonition.color}-300/25 text-black p-4 rounded-lg">
-    <div class="flex flex-row justify-start items-center gap-4 mb-4">
-        <svelte:component this={admonition.icon} size={20} class="text-{admonition.color}-700"/>
-        <p class="m-0">{title || capitalize(admonition.name)}</p>
+{#if ad}
+    <div class="{ad.backgroundColor} border-l-8 {ad.borderColor} text-black p-4 rounded-lg mb-4">
+        <div class="flex flex-row justify-start items-center gap-4 mb-4">
+            <svelte:component this={ad.icon} size={20} class="{ad.iconColor}"/>
+            <p class="m-0">{title || capitalize(ad.name)}</p>
+        </div>
+        <slot name="textContent"/>
     </div>
-    <slot name="text_content"/>
-</div>
+{/if}

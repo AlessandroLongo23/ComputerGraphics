@@ -1,14 +1,5 @@
-var vertices, vBuffer;
-var subdivisions;
-var v0, v1, v2, v3;
-var theta_y = 30;
-var program;
-var gl;
-var canvas;
-var view_matrix_loc, model_matrix_loc, projection_matrix_loc;
-
 window.onload = function init() {
-    setup_WebGL();
+    setupWebGL();
 
     // enabling depth test and culling
     gl.enable(gl.DEPTH_TEST);
@@ -16,14 +7,14 @@ window.onload = function init() {
     gl.cullFace(gl.BACK);
 
     // Set the light direction
-    var light_direction = vec3(0.0, 0.0, -1.0);
-    var light_direction_loc = gl.getUniformLocation(program, "light_direction");
-    gl.uniform3fv(light_direction_loc, flatten(light_direction));
+    var lightDirection = vec3(0.0, 0.0, -1.0);
+    var lightDirectionLoc = gl.getUniformLocation(program, "lightDirection");
+    gl.uniform3fv(lightDirectionLoc, flatten(lightDirection));
 
     // Uniform locations for the matrices
-    view_matrix_loc = gl.getUniformLocation(program, "view_matrix");
-    model_matrix_loc = gl.getUniformLocation(program, "model_matrix");
-    projection_matrix_loc = gl.getUniformLocation(program, "projection_matrix");
+    viewMatrixLoc = gl.getUniformLocation(program, "viewMatrix");
+    modelMatrixLoc = gl.getUniformLocation(program, "modelMatrix");
+    projectionMatrixLoc = gl.getUniformLocation(program, "projectionMatrix");
 
     // vertices
     vertices = [];
@@ -31,34 +22,36 @@ window.onload = function init() {
     v1 = vec4(0.0, 0.942809, 0.333333, 1);
     v2 = vec4(-0.816497, -0.471405, 0.333333, 1);
     v3 = vec4(0.816497, -0.471405, 0.333333, 1);
-    subdivisions = 0;
     
-    build_polyhedron();
+    subdivisions = 0;
+    thetaY = 30;
+    
+    buildPolyhedron();
     render();
 };
 
 function render() {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-    theta_y += 0.005;
+    thetaY += 0.005;
 
     // projection matrix
-    var projection_matrix = perspective(45, canvas.width / canvas.height, 0.1, 100.0);
+    var projectionMatrix = perspective(45, canvas.width / canvas.height, 0.1, 100.0);
 
     // view matrix
     var dist = 3.0;
-    var eye = vec3(dist * Math.cos(theta_y), 0.0, dist * Math.sin(theta_y));
+    var eye = vec3(dist * Math.cos(thetaY), 0.0, dist * Math.sin(thetaY));
     var target = vec3(0.0, 0.0, 0.0);
     var up = vec3(0.0, 1.0, 0.0);
-    var view_matrix = lookAt(eye, target, up);
+    var viewMatrix = lookAt(eye, target, up);
 
     // model matrix
-    var model_matrix = mat4();
+    var modelMatrix = mat4();
 
     // Pass matrices to the shader
-    gl.uniformMatrix4fv(model_matrix_loc, false, flatten(model_matrix));
-    gl.uniformMatrix4fv(view_matrix_loc, false, flatten(view_matrix));
-    gl.uniformMatrix4fv(projection_matrix_loc, false, flatten(projection_matrix));
+    gl.uniformMatrix4fv(modelMatrixLoc, false, flatten(modelMatrix));
+    gl.uniformMatrix4fv(viewMatrixLoc, false, flatten(viewMatrix));
+    gl.uniformMatrix4fv(projectionMatrixLoc, false, flatten(projectionMatrix));
 
     // draw the model using triangles
     gl.drawArrays(gl.TRIANGLES, 0, vertices.length);
@@ -67,7 +60,7 @@ function render() {
     requestAnimFrame(render);
 }
 
-function build_polyhedron() {
+function buildPolyhedron() {
     vertices = [];
     tetrahedron(v0, v1, v2, v3, subdivisions);
 
@@ -115,7 +108,7 @@ document.getElementById("increment-subdivision-level").addEventListener("click",
     else
         subdivisions++;
 
-    build_polyhedron();
+    buildPolyhedron();
 });
 
 document.getElementById("decrement-subdivision-level").addEventListener("click", function() {
@@ -124,10 +117,10 @@ document.getElementById("decrement-subdivision-level").addEventListener("click",
     else
         subdivisions--;
 
-    build_polyhedron();
+    buildPolyhedron();
 });
 
-function setup_WebGL() {
+function setupWebGL() {
     canvas = document.getElementById("gl-canvas");
     gl = WebGLUtils.setupWebGL(canvas);
     if (!gl) {

@@ -5,10 +5,10 @@
     import * as mv from '$lib/Libraries/MV.js';
     import Result from '$lib/components/Result.svelte';
 
-    let view_index = 1;
+    let viewIndex = 1;
     let loading = true;
     let canvas, gl, program;
-    let code_snippets = [];
+    let codeSnippets = [];
 
     let vertices = [];
 
@@ -39,7 +39,7 @@
                 console.error(error);
             }
 
-            code_snippets = await fetchCodeSnippets($page.url.pathname);
+            codeSnippets = await fetchCodeSnippets($page.url.pathname);
             loading = false;
         }
     });
@@ -52,14 +52,9 @@
 
 <div class="flex flex-col justify-center items-start w-4/5 text-xl m-auto">
     <div class="w-4/5 m-auto">
-        <ul>
-            <li>Load and compile a shader program. Write a basic vertex shader and a constant color fragment shader. [Angel 2.8.3 to 2.8.8]</li>
-            <li>Setup a vertex buffer with the corresponding attribute pointer. Add the coordinates and draw three points of size 20 pixels, like in the figure. [Angel 2.4, 2.8, and 2.5.3] [If using WebGPU, note that points can only be of size 1. These points then need to be drawn as two triangles forming a square.] Shaders and buffers.</li>
-        </ul>
+        <p>Load and compile a shader program. Write a basic vertex shader and a constant color fragment shader. [Angel 2.8.3 to 2.8.8]</p>
+        <p>Setup a vertex buffer with the corresponding attribute pointer. Add the coordinates and draw three points of size 20 pixels, like in the figure. [Angel 2.4, 2.8, and 2.5.3] [If using WebGPU, note that points can only be of size 1. These points then need to be drawn as two triangles forming a square.] Shaders and buffers.</p>
     </div>
 
-    <Result bind:canvas={canvas} bind:view_index={view_index} loading={loading} code_snippets={code_snippets}/>
+    <Result bind:canvas={canvas} bind:viewIndex={viewIndex} loading={loading} codeSnippets={codeSnippets}/>
 </div>
-
-<style>
-</style>

@@ -6,16 +6,16 @@
     import Result from '$lib/components/Result.svelte';
     import Counter from '$lib/components/UI/Counter.svelte';
 
-    let view_index = 1;
+    let viewIndex = 1;
     let loading = true;
     let canvas, gl, program;
-    let code_snippets = [];
+    let codeSnippets = [];
 
-    let vertices, vBuffer, base_colors, vertex_colors;
-    let model_view_matrix_loc, projection_matrix_loc;
+    let vertices, vBuffer, baseColors, colors;
+    let modelViewMatrixLoc, projectionMatrixLoc;
     let subdivisions;
     let v0, v1, v2, v3;
-    let theta_y = 30;
+    let thetaY = 30;
 
     onMount(async () => {
         if (typeof window !== 'undefined') {
@@ -41,17 +41,17 @@
                 [gl, program] = await initShaders(gl, program, $page.url.pathname + '/vshader.glsl', $page.url.pathname + '/fshader.glsl');
 
                 // colors
-                base_colors = [
+                baseColors = [
                     mv.vec3(1.0, 0.0, 0.0),
                     mv.vec3(0.0, 1.0, 0.0),
                     mv.vec3(0.0, 0.0, 1.0),
                     mv.vec3(0.0, 0.0, 0.0)
                 ];
-                vertex_colors = [];
+                colors = [];
 
                 var cBuffer = gl.createBuffer();
                 gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
-                gl.bufferData(gl.ARRAY_BUFFER, mv.flatten(vertex_colors), gl.STATIC_DRAW);
+                gl.bufferData(gl.ARRAY_BUFFER, mv.flatten(colors), gl.STATIC_DRAW);
 
                 var vColor = gl.getAttribLocation(program, "vColor");
                 gl.vertexAttribPointer(vColor, 4, gl.FLOAT, false, 0, 0);  // 4 components for RGBA
@@ -64,18 +64,18 @@
                 v3 = mv.vec4(0.816497, -0.471405, 0.333333, 1);
                 subdivisions = 0;
                 
-                build_polyhedron();
+                buildPolyhedron();
 
                 // Initialize rotation and transformations
-                model_view_matrix_loc = gl.getUniformLocation(program, "model_view_matrix");
-                projection_matrix_loc = gl.getUniformLocation(program, "projection_matrix");
+                modelViewMatrixLoc = gl.getUniformLocation(program, "modelViewMatrix");
+                projectionMatrixLoc = gl.getUniformLocation(program, "projectionMatrix");
 
                 render();
             } catch (error) {
                 console.error(error);
             }
 
-            code_snippets = await fetchCodeSnippets($page.url.pathname);
+            codeSnippets = await fetchCodeSnippets($page.url.pathname);
             loading = false;
         }
     });
@@ -84,21 +84,21 @@
         gl.clear(gl.COLOR_BUFFER_BIT);
 
         var ctm = mv.mat4();
-        var projection_matrix = mv.perspective(45, canvas.width / canvas.height, .001, 10.0);
-        gl.uniformMatrix4fv(projection_matrix_loc, false, mv.flatten(projection_matrix));
+        var projectionMatrix = mv.perspective(45, canvas.width / canvas.height, .001, 10.0);
+        gl.uniformMatrix4fv(projectionMatrixLoc, false, mv.flatten(projectionMatrix));
 
-        theta_y += 0.025;
+        thetaY += 0.025;
 
         ctm = mv.mat4();
         ctm = mv.mult(ctm, mv.translate(0, -0.25, -4));
-        ctm = mv.mult(ctm, mv.rotateY(theta_y));
-        gl.uniformMatrix4fv(model_view_matrix_loc, false, mv.flatten(ctm));
+        ctm = mv.mult(ctm, mv.rotateY(thetaY));
+        gl.uniformMatrix4fv(modelViewMatrixLoc, false, mv.flatten(ctm));
         gl.drawArrays(gl.TRIANGLES, 0, vertices.length);
 
         requestAnimFrame(render);
     }
 
-    function build_polyhedron() {
+    function buildPolyhedron() {
         vertices = [];
         tetrahedron(v0, v1, v2, v3, subdivisions);
 
@@ -118,9 +118,9 @@
         divideTriangle(a, c, d, n, 3);
     }
 
-    function divideTriangle(a, b, c, count, color_index) {
+    function divideTriangle(a, b, c, count, colorIndex) {
         if (count == 0) {
-            triangle(a, b, c, color_index);
+            triangle(a, b, c, colorIndex);
             return;
         }
 
@@ -134,16 +134,16 @@
         divideTriangle(ab, bc, ac, count - 1);
     }
 
-    function triangle(a, b, c, color_index) {
-        vertex_colors.push(base_colors[color_index]);
+    function triangle(a, b, c, colorIndex) {
+        colors.push(baseColors[colorIndex]);
         vertices.push(a);
-        vertex_colors.push(base_colors[color_index]);
+        colors.push(baseColors[colorIndex]);
         vertices.push(b);
-        vertex_colors.push(base_colors[color_index]);
+        colors.push(baseColors[colorIndex]);
         vertices.push(c);
     }
 
-    $: subdivisions != undefined && build_polyhedron();
+    $: subdivisions != undefined && buildPolyhedron();
 </script>
 
 <div class="flex flex-col justify-center items-start w-4/5 text-xl m-auto">
@@ -154,9 +154,9 @@
         <p>Insert two buttons: one which increments the subdivision level and one which decrements the subdivision level. [Angel 3.6.2]</p>
     </div>
 
-    <Result bind:canvas={canvas} bind:view_index={view_index} loading={loading} code_snippets={code_snippets}>
+    <Result bind:canvas={canvas} bind:viewIndex={viewIndex} loading={loading} codeSnippets={codeSnippets}>
         <div slot='controls'>
-            <div class="absolute left-0 top-0 flex flex-row justify-evenly items-center gap-4 w-full p-4 bg-gray-900/25 rounded-{view_index == 1 ? 'r-' : ''}lg">    
+            <div class="absolute left-0 top-0 flex flex-row justify-evenly items-center gap-4 w-full p-4 bg-gray-900/25 rounded-{viewIndex == 1 ? 'r-' : ''}lg">    
                 <Counter bind:count={subdivisions} min={0} max={6}/>
             </div>
         </div>

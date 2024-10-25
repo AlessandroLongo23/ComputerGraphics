@@ -7,20 +7,20 @@ function render() {
 }
 
 window.onload = function init() {
-    setup_WebGL();
+    setupWebGL();
 
     mode = 'points';
     side = 20;
     count = 0;
-    max_points = 100;
+    maxPoints = 100;
     
     // points
-    colors_array = []
+    colors = []
     vertices = [];
 
     vBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, sizeof['vec2'] * max_points, gl.STATIC_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER, sizeof['vec2'] * maxPoints, gl.STATIC_DRAW);
     gl.bufferSubData(gl.ARRAY_BUFFER, 0, flatten(vertices));
     var vPosition = gl.getAttribLocation(program, "vPosition");
     gl.vertexAttribPointer(vPosition, 2, gl.FLOAT, false, 0, 0);
@@ -33,38 +33,38 @@ window.onload = function init() {
             switch(document.getElementById("pointscolor").selectedIndex) {
                 case 0:
                     for (var i = 0; i < 6; i++)
-                        colors_array.push(vec4(0.0, 0.0, 0.0, 1.0));
+                        colors.push(vec4(0.0, 0.0, 0.0, 1.0));
                     break;
                 case 1:
                     for (var i = 0; i < 6; i++)
-                        colors_array.push(vec4(1.0, 1.0, 1.0, 1.0));
+                        colors.push(vec4(1.0, 1.0, 1.0, 1.0));
                     break;
             }
         } else if (mode == 'triangles') {
             count++;
             if (count == 3) {
-                var first_vertex_color = colors_array[colors_array.length - 6];
-                var second_vertex_color = colors_array[colors_array.length - 3];
-                colors_array = colors_array.slice(0, colors_array.length - 12);
-                colors_array.push(first_vertex_color);
-                colors_array.push(second_vertex_color);
+                var firstVertexColor = colors[colors.length - 6];
+                var secondVertexColor = colors[colors.length - 3];
+                colors = colors.slice(0, colors.length - 12);
+                colors.push(firstVertexColor);
+                colors.push(secondVertexColor);
                 switch(document.getElementById("pointscolor").selectedIndex) {
                     case 0:
-                        colors_array.push(vec4(0.0, 0.0, 0.0, 1.0)); 
+                        colors.push(vec4(0.0, 0.0, 0.0, 1.0)); 
                         break;
                     case 1:
-                        colors_array.push(vec4(1.0, 1.0, 1.0, 1.0));
+                        colors.push(vec4(1.0, 1.0, 1.0, 1.0));
                         break;
                 }
             } else {
                 switch(document.getElementById("pointscolor").selectedIndex) {
                     case 0:
                         for (var i = 0; i < 6; i++)
-                            colors_array.push(vec4(0.0, 0.0, 0.0, 1.0));
+                            colors.push(vec4(0.0, 0.0, 0.0, 1.0));
                         break;
                     case 1:
                         for (var i = 0; i < 6; i++)
-                            colors_array.push(vec4(1.0, 1.0, 1.0, 1.0));
+                            colors.push(vec4(1.0, 1.0, 1.0, 1.0));
                         break;
                 }
             }
@@ -72,7 +72,7 @@ window.onload = function init() {
         
         cBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, flatten(colors_array), gl.STATIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER, flatten(colors), gl.STATIC_DRAW);
         vColor = gl.getAttribLocation(program, "vColor");
         gl.vertexAttribPointer(vColor, 4, gl.FLOAT, false, 0, 0);
         gl.enableVertexAttribArray(vColor);
@@ -83,7 +83,7 @@ window.onload = function init() {
             1 - 2 * (event.clientY - canvas.getBoundingClientRect().y) / canvas.height
         );
         if (mode == 'points') {
-            var new_vertices = [
+            var newVertices = [
                 vec2(t[0] - side / canvas.width, t[1] - side / canvas.height),
                 vec2(t[0] - side / canvas.width, t[1] + side / canvas.height),
                 vec2(t[0] + side / canvas.width, t[1] + side / canvas.height),
@@ -105,14 +105,14 @@ window.onload = function init() {
 
                 vertices = vertices.slice(0, vertices.length - 12);
 
-                var new_vertices = [
+                var newVertices = [
                     first_vertex,
                     second_vertex,
                     t
                 ]
                 count = 0;
             } else {
-                var new_vertices = [
+                var newVertices = [
                     vec2(t[0] - side / canvas.width, t[1] - side / canvas.height),
                     vec2(t[0] - side / canvas.width, t[1] + side / canvas.height),
                     vec2(t[0] + side / canvas.width, t[1] + side / canvas.height),
@@ -124,8 +124,8 @@ window.onload = function init() {
             }
         }
         
-        for (var i = 0; i < new_vertices.length; i++)
-            vertices.push(new_vertices[i]);
+        for (var i = 0; i < newVertices.length; i++)
+            vertices.push(newVertices[i]);
 
         gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
         gl.bufferSubData(gl.ARRAY_BUFFER, 0, flatten(vertices));
@@ -147,10 +147,10 @@ document.getElementById("clear").addEventListener("click", function() {
             break;
     }
 
-    colors_array = [];
+    colors = [];
     cBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, flatten(colors_array), gl.STATIC_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER, flatten(colors), gl.STATIC_DRAW);
     vColor = gl.getAttribLocation(program, "vColor");
     gl.vertexAttribPointer(vColor, 4, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(vColor);
@@ -162,15 +162,15 @@ document.getElementById("clear").addEventListener("click", function() {
     gl.bufferSubData(gl.ARRAY_BUFFER, 0, new Float32Array(vertices));
 });
 
-document.getElementById("points_mode").addEventListener("click", function() {
+document.getElementById("pointsMode").addEventListener("click", function() {
     mode = 'points';
 });
 
-document.getElementById("triangles_mode").addEventListener("click", function() {
+document.getElementById("trianglesMode").addEventListener("click", function() {
     mode = 'triangles';
 });
 
-function setup_WebGL() {
+function setupWebGL() {
     canvas = document.getElementById("gl-canvas");
 
     gl = WebGLUtils.setupWebGL(canvas);

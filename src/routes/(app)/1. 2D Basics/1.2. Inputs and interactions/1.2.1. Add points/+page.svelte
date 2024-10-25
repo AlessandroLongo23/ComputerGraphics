@@ -5,10 +5,10 @@
     import * as mv from '$lib/Libraries/MV.js';
     import Result from '$lib/components/Result.svelte';
 
-    let view_index = 1;
+    let viewIndex = 1;
     let loading = true;
     let canvas, gl, program;
-    let code_snippets = [];
+    let codeSnippets = [];
 
     let vertices = [];
     let index;
@@ -29,10 +29,10 @@
                 ];
                 index = vertices.length;
 
-                var max_points = 100;
+                var maxPoints = 100;
                 var vBuffer = gl.createBuffer();
                 gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
-                gl.bufferData(gl.ARRAY_BUFFER, mv.sizeof['vec2'] * max_points, gl.STATIC_DRAW);
+                gl.bufferData(gl.ARRAY_BUFFER, mv.sizeof['vec2'] * maxPoints, gl.STATIC_DRAW);
                 
                 gl.bufferSubData(gl.ARRAY_BUFFER, 0, mv.flatten(vertices));
 
@@ -48,11 +48,11 @@
                     );
                     var data = new Float32Array(t);
                     
-                    if (index < max_points) {
+                    if (index < maxPoints) {
                         gl.bufferSubData(gl.ARRAY_BUFFER, mv.sizeof['vec2'] * index, data);
                         index++;
                     } else {
-                        console.log("Max points reached!");
+                        alert("Max points reached!");
                     }
                 });
 
@@ -61,7 +61,7 @@
                 console.error(error);
             }
 
-            code_snippets = await fetchCodeSnippets($page.url.pathname);
+            codeSnippets = await fetchCodeSnippets($page.url.pathname);
             loading = false;
         }
     });
@@ -75,15 +75,10 @@
 
 <div class="flex flex-col justify-center items-start w-4/5 text-xl m-auto">
     <div class="w-4/5 m-auto">
-        <ul>
-            <li>Start from your solution to Part 2 of Worksheet 1: A web application that clears the canvas and then draws three points. [Angel 2.8]</li>
-            <li>Attach an event handler to the mouse click event and draw points on the canvas where the mouse was clicked. [Angel 3.7]</li>
-            <li>Points are offset from the tip of the mouse cursor. This is not as desired. Get the bounding rectangle of the canvas in the client area using event.target.getBoundingClientRect() and correct the mouse position using the left and top coordinates of this rectangle.</li>
-        </ul>
+        <p>Start from your solution to Part 2 of Worksheet 1: A web application that clears the canvas and then draws three points. [Angel 2.8]</p>
+        <p>Attach an event handler to the mouse click event and draw points on the canvas where the mouse was clicked. [Angel 3.7]</p>
+        <p>Points are offset from the tip of the mouse cursor. This is not as desired. Get the bounding rectangle of the canvas in the client area using event.target.getBoundingClientRect() and correct the mouse position using the left and top coordinates of this rectangle.</p>
     </div>
 
-    <Result bind:canvas={canvas} bind:view_index={view_index} loading={loading} code_snippets={code_snippets}/>
+    <Result bind:canvas={canvas} bind:viewIndex={viewIndex} loading={loading} codeSnippets={codeSnippets}/>
 </div>
-
-<style>
-</style>

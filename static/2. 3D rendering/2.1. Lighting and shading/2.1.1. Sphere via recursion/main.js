@@ -1,39 +1,30 @@
-var vertices, vBuffer, base_colors, vertex_colors, subdivisions;
-var v0, v1, v2, v3;
-var theta_y = 30;
-
 window.onload = function init() {
-    setup_WebGL();
+    setupWebGL();
+
+    // vertices
+    baseVertices = [
+        vec4(0.0, 0.0, -1.0, 1), 
+        vec4(0.0, 0.942809, 0.333333, 1),
+        vec4(-0.816497, -0.471405, 0.333333, 1),
+        vec4(0.816497, -0.471405, 0.333333, 1)
+    ]
 
     // colors
-    base_colors = [
+    baseColors = [
         vec3(1.0, 0.0, 0.0),
         vec3(0.0, 1.0, 0.0),
         vec3(0.0, 0.0, 1.0),
         vec3(0.0, 0.0, 0.0)
     ];
-    vertex_colors = [];
-
-    var cBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, flatten(vertex_colors), gl.STATIC_DRAW);
-
-    var vColor = gl.getAttribLocation(program, "vColor");
-    gl.vertexAttribPointer(vColor, 4, gl.FLOAT, false, 0, 0);  // 4 components for RGBA
-    gl.enableVertexAttribArray(vColor);
-
-    // vertices
-    v0 = vec4(0.0, 0.0, -1.0, 1); 
-    v1 = vec4(0.0, 0.942809, 0.333333, 1);
-    v2 = vec4(-0.816497, -0.471405, 0.333333, 1);
-    v3 = vec4(0.816497, -0.471405, 0.333333, 1);
-    subdivisions = 1;
     
-    build_polyhedron();
+    subdivisions = 1;
+    thetaY = 30;
+    
+    buildPolyhedron();
 
     // Initialize rotation and transformations
-    model_view_matrix_loc = gl.getUniformLocation(program, "model_view_matrix");
-    projection_matrix_loc = gl.getUniformLocation(program, "projection_matrix");
+    modelViewMatrixLoc = gl.getUniformLocation(program, "modelViewMatrix");
+    projectionMatrixLoc = gl.getUniformLocation(program, "projectionMatrix");
 
     render();
 };
@@ -41,25 +32,27 @@ window.onload = function init() {
 function render() {
     gl.clear(gl.COLOR_BUFFER_BIT);
 
+    var projectionMatrix = perspective(45, canvas.width / canvas.height, .001, 10.0);
+    gl.uniformMatrix4fv(projectionMatrixLoc, false, flatten(projectionMatrix));
+    
+    thetaY += 0.025;
+    
     var ctm = mat4();
-    var projection_matrix = perspective(45, canvas.width / canvas.height, .001, 10.0);
-    gl.uniformMatrix4fv(projection_matrix_loc, false, flatten(projection_matrix));
-
-    theta_y += 0.025;
-
-    ctm = mat4();
     ctm = mult(ctm, translate(0, 0, -3));
-    ctm = mult(ctm, rotateY(theta_y));
-    gl.uniformMatrix4fv(model_view_matrix_loc, false, flatten(ctm));
+    ctm = mult(ctm, rotateY(thetaY));
+    gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(ctm));
+
     gl.drawArrays(gl.TRIANGLES, 0, vertices.length);
 
     requestAnimFrame(render);
 }
 
-function build_polyhedron() {
+function buildPolyhedron() {
     vertices = [];
-    tetrahedron(v0, v1, v2, v3, subdivisions);
+    colors = [];
+    tetrahedron(baseVertices[0], baseVertices[1], baseVertices[2], baseVertices[3], subdivisions);
 
+    // vertices
     vBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, flatten(vertices), gl.STATIC_DRAW);
@@ -67,6 +60,15 @@ function build_polyhedron() {
     var vPosition = gl.getAttribLocation(program, "vPosition");
     gl.vertexAttribPointer(vPosition, 4, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(vPosition);
+
+    // colors
+    cBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, flatten(colors), gl.STATIC_DRAW);
+
+    var vColor = gl.getAttribLocation(program, "vColor");
+    gl.vertexAttribPointer(vColor, 4, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(vColor);
 }
 
 function tetrahedron(a, b, c, d, n) {
@@ -76,9 +78,9 @@ function tetrahedron(a, b, c, d, n) {
     divideTriangle(a, c, d, n, 3);
 }
 
-function divideTriangle(a, b, c, count, color_index) {
+function divideTriangle(a, b, c, count, colorIndex) {
     if (count == 0) {
-        triangle(a, b, c, color_index);
+        triangle(a, b, c, colorIndex);
         return;
     }
 
@@ -92,12 +94,12 @@ function divideTriangle(a, b, c, count, color_index) {
     divideTriangle(ab, bc, ac, count - 1);
 }
 
-function triangle(a, b, c, color_index) {
-    vertex_colors.push(base_colors[color_index]);
+function triangle(a, b, c, colorIndex) {
+    colors.push(baseColors[colorIndex]);
     vertices.push(a);
-    vertex_colors.push(base_colors[color_index]);
+    colors.push(baseColors[colorIndex]);
     vertices.push(b);
-    vertex_colors.push(base_colors[color_index]);
+    colors.push(baseColors[colorIndex]);
     vertices.push(c);
 }
 
@@ -107,7 +109,7 @@ document.getElementById("increment-subdivision-level").addEventListener("click",
     else
         subdivisions++;
 
-    build_polyhedron();
+    buildPolyhedron();
 });
 
 document.getElementById("decrement-subdivision-level").addEventListener("click", function() {
@@ -116,10 +118,10 @@ document.getElementById("decrement-subdivision-level").addEventListener("click",
     else
         subdivisions--;
 
-    build_polyhedron();
+    buildPolyhedron();
 });
 
-function setup_WebGL() {
+function setupWebGL() {
     canvas = document.getElementById("gl-canvas");
 
     gl = WebGLUtils.setupWebGL(canvas);

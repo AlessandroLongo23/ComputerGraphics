@@ -8,16 +8,16 @@
     import Counter from '$lib/components/UI/Counter.svelte';
     import Toggle from '$lib/components/UI/Toggle.svelte';
 
-    let view_index = 1;
+    let viewIndex = 1;
     let loading = true;
     let canvas, gl, program;
-    let code_snippets = [];
+    let codeSnippets = [];
 
     let vertices, vBuffer;
-    let view_matrix_loc, model_matrix_loc, projection_matrix_loc;
+    let viewMatrixLoc, modelMatrixLoc, projectionMatrixLoc;
     let subdivisions;
     let v0, v1, v2, v3;
-    let theta_y = 30;
+    let thetaY = 30;
     let culling;
 
     onMount(async () => {
@@ -46,14 +46,14 @@
                 culling = 1;
 
                 // Set the light direction
-                var light_direction = mv.vec3(0.0, 0.0, -1.0);
-                var light_direction_loc = gl.getUniformLocation(program, "light_direction");
-                gl.uniform3fv(light_direction_loc, mv.flatten(light_direction));
+                var lightDirection = mv.vec3(0.0, 0.0, -1.0);
+                var lightDirectionLoc = gl.getUniformLocation(program, "lightDirection");
+                gl.uniform3fv(lightDirectionLoc, mv.flatten(lightDirection));
 
                 // Uniform locations for the matrices
-                view_matrix_loc = gl.getUniformLocation(program, "view_matrix");
-                model_matrix_loc = gl.getUniformLocation(program, "model_matrix");
-                projection_matrix_loc = gl.getUniformLocation(program, "projection_matrix");
+                viewMatrixLoc = gl.getUniformLocation(program, "viewMatrix");
+                modelMatrixLoc = gl.getUniformLocation(program, "modelMatrix");
+                projectionMatrixLoc = gl.getUniformLocation(program, "projectionMatrix");
 
                 // vertices
                 vertices = [];
@@ -63,13 +63,13 @@
                 v3 = mv.vec4(0.816497, -0.471405, 0.333333, 1);
                 subdivisions = 0;
                 
-                build_polyhedron();
+                buildPolyhedron();
                 render();
             } catch (error) {
                 console.error(error);
             }
 
-            code_snippets = await fetchCodeSnippets($page.url.pathname);
+            codeSnippets = await fetchCodeSnippets($page.url.pathname);
             loading = false;
         }
     });
@@ -88,27 +88,27 @@
             gl.disable(gl.CULL_FACE);
         }
 
-        theta_y += 0.005;
+        thetaY += 0.005;
 
         // projection matrix
-        var projection_matrix = mv.perspective(45, canvas.width / canvas.height, 0.1, 100.0);
+        var projectionMatrix = mv.perspective(45, canvas.width / canvas.height, 0.1, 100.0);
 
         // view matrix
         var dist = 4.0;
-        var eye = mv.vec3(dist * Math.cos(theta_y), 0.0, dist * Math.sin(theta_y));
+        var eye = mv.vec3(dist * Math.cos(thetaY), 0.0, dist * Math.sin(thetaY));
         var target = mv.vec3(0.0, 0.0, 0.0);
         var up = mv.vec3(0.0, 1.0, 0.0);
-        var view_matrix = mv.lookAt(eye, target, up);
+        var viewMatrix = mv.lookAt(eye, target, up);
 
         // model matrix
-        var model_matrix = mv.mat4();
-        var model_pos = mv.vec3(0.0, -0.25, 0.0);
-        model_matrix = mv.mult(model_matrix, mv.translate(model_pos));
+        var modelMatrix = mv.mat4();
+        var modelPos = mv.vec3(0.0, -0.25, 0.0);
+        modelMatrix = mv.mult(modelMatrix, mv.translate(modelPos));
 
         // Pass matrices to the shader
-        gl.uniformMatrix4fv(model_matrix_loc, false, mv.flatten(model_matrix));
-        gl.uniformMatrix4fv(view_matrix_loc, false, mv.flatten(view_matrix));
-        gl.uniformMatrix4fv(projection_matrix_loc, false, mv.flatten(projection_matrix));
+        gl.uniformMatrix4fv(modelMatrixLoc, false, mv.flatten(modelMatrix));
+        gl.uniformMatrix4fv(viewMatrixLoc, false, mv.flatten(viewMatrix));
+        gl.uniformMatrix4fv(projectionMatrixLoc, false, mv.flatten(projectionMatrix));
 
         // draw the model using triangles
         gl.drawArrays(gl.TRIANGLES, 0, vertices.length);
@@ -117,7 +117,7 @@
         requestAnimFrame(render);
     }
 
-    function build_polyhedron() {
+    function buildPolyhedron() {
         vertices = [];
         tetrahedron(v0, v1, v2, v3, subdivisions);
 
@@ -159,7 +159,7 @@
         vertices.push(c);
     }
 
-    $: subdivisions != undefined && build_polyhedron();
+    $: subdivisions != undefined && buildPolyhedron();
 </script>
 
 <div class="flex flex-col justify-center items-start w-4/5 text-xl m-auto">
@@ -170,9 +170,9 @@
         <p>Let the camera orbit the sphere over time. [Angel 3.1]</p>
     </div>
 
-    <Result bind:canvas={canvas} bind:view_index={view_index} loading={loading} code_snippets={code_snippets}>
+    <Result bind:canvas={canvas} bind:viewIndex={viewIndex} loading={loading} codeSnippets={codeSnippets}>
         <div slot='controls'>
-            <div class="absolute left-0 top-0 flex flex-row justify-evenly items-center gap-4 w-full p-4 bg-gray-900/25 rounded-{view_index == 1 ? 'r-' : ''}lg">    
+            <div class="absolute left-0 top-0 flex flex-row justify-evenly items-center gap-4 w-full p-4 bg-gray-900/25 rounded-{viewIndex == 1 ? 'r-' : ''}lg">    
                 <Toggle bind:selected={culling} icons={[X, SendToBack, BringToFront]}/>
                 <Counter bind:count={subdivisions} min={0} max={6}/>
             </div>

@@ -8,16 +8,16 @@
     import Counter from '$lib/components/UI/Counter.svelte';
     import Toggle from '$lib/components/UI/Toggle.svelte';
 
-    let view_index = 1;
+    let viewIndex = 1;
     let loading = true;
     let canvas, gl, program;
-    let code_snippets = [];
+    let codeSnippets = [];
 
-    let vertices, vBuffer, vertex_colors;
-    let model_view_matrix_loc, projection_matrix_loc;
+    let vertices, vBuffer, colors;
+    let modelViewMatrixLoc, projectionMatrixLoc;
     let subdivisions;
     let v0, v1, v2, v3;
-    let theta_y = 30;
+    let thetaY = 30;
     let culling;
 
     onMount(async () => {
@@ -46,11 +46,11 @@
                 culling = 0;
 
                 // colors
-                vertex_colors = [];
+                colors = [];
 
                 var cBuffer = gl.createBuffer();
                 gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
-                gl.bufferData(gl.ARRAY_BUFFER, mv.flatten(vertex_colors), gl.STATIC_DRAW);
+                gl.bufferData(gl.ARRAY_BUFFER, mv.flatten(colors), gl.STATIC_DRAW);
 
                 var vColor = gl.getAttribLocation(program, "vColor");
                 gl.vertexAttribPointer(vColor, 4, gl.FLOAT, false, 0, 0);
@@ -63,18 +63,18 @@
                 v3 = mv.vec4(0.816497, -0.471405, 0.333333, 1);
                 subdivisions = 1;
                 
-                build_polyhedron();
+                buildPolyhedron();
 
                 // Initialize rotation and transformations
-                model_view_matrix_loc = gl.getUniformLocation(program, "model_view_matrix");
-                projection_matrix_loc = gl.getUniformLocation(program, "projection_matrix");
+                modelViewMatrixLoc = gl.getUniformLocation(program, "modelViewMatrix");
+                projectionMatrixLoc = gl.getUniformLocation(program, "projectionMatrix");
 
                 render();
             } catch (error) {
                 console.error(error);
             }
 
-            code_snippets = await fetchCodeSnippets($page.url.pathname);
+            codeSnippets = await fetchCodeSnippets($page.url.pathname);
             loading = false;
         }
     });
@@ -94,23 +94,23 @@
         }
 
         var ctm = mv.mat4();
-        var projection_matrix = mv.perspective(45, canvas.width / canvas.height, .001, 10.0);
-        gl.uniformMatrix4fv(projection_matrix_loc, false, mv.flatten(projection_matrix));
+        var projectionMatrix = mv.perspective(45, canvas.width / canvas.height, .001, 10.0);
+        gl.uniformMatrix4fv(projectionMatrixLoc, false, mv.flatten(projectionMatrix));
 
-        theta_y += 0.025;
+        thetaY += 0.25;
 
         ctm = mv.mat4();
         ctm = mv.mult(ctm, mv.translate(0, -0.25, -4));
-        ctm = mv.mult(ctm, mv.rotateY(theta_y));
-        gl.uniformMatrix4fv(model_view_matrix_loc, false, mv.flatten(ctm));
+        ctm = mv.mult(ctm, mv.rotateY(thetaY));
+        gl.uniformMatrix4fv(modelViewMatrixLoc, false, mv.flatten(ctm));
         gl.drawArrays(gl.TRIANGLES, 0, vertices.length);
 
         requestAnimFrame(render);
     }
 
-    function build_polyhedron() {
+    function buildPolyhedron() {
         vertices = [];
-        vertex_colors = [];
+        colors = [];
         tetrahedron(v0, v1, v2, v3, subdivisions);
 
         vBuffer = gl.createBuffer();
@@ -124,7 +124,7 @@
         // Bind color buffer
         var cBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, mv.flatten(vertex_colors), gl.STATIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER, mv.flatten(colors), gl.STATIC_DRAW);
 
         var vColor = gl.getAttribLocation(program, "vColor");
         gl.vertexAttribPointer(vColor, 3, gl.FLOAT, false, 0, 0);
@@ -155,28 +155,28 @@
     }
 
     function triangle(a, b, c) {
-        vertex_colors.push(mv.vec3(0.5 * a[0] + 0.5, 0.5 * a[1] + 0.5, 0.5 * a[2] + 0.5))
+        colors.push(mv.vec3(0.5 * a[0] + 0.5, 0.5 * a[1] + 0.5, 0.5 * a[2] + 0.5))
         vertices.push(a);
-        vertex_colors.push(mv.vec3(0.5 * b[0] + 0.5, 0.5 * b[1] + 0.5, 0.5 * b[2] + 0.5))
+        colors.push(mv.vec3(0.5 * b[0] + 0.5, 0.5 * b[1] + 0.5, 0.5 * b[2] + 0.5))
         vertices.push(b);
-        vertex_colors.push(mv.vec3(0.5 * c[0] + 0.5, 0.5 * c[1] + 0.5, 0.5 * c[2] + 0.5))
+        colors.push(mv.vec3(0.5 * c[0] + 0.5, 0.5 * c[1] + 0.5, 0.5 * c[2] + 0.5))
         vertices.push(c);
     }
 
-    $: subdivisions != undefined && build_polyhedron();
+    $: subdivisions != undefined && buildPolyhedron();
 </script>
 
 <div class="flex flex-col justify-center items-start w-4/5 text-xl m-auto">
     <div class="w-4/5 m-auto">
         <p class="text-black">Use depth buffer and back face culling to remove hidden surfaces.</p>  
-        <p>Draw the vertex positions as colors (𝒄𝒄= 0.5 ∙𝒑𝒑+ 0.5). [Part 3 of Worksheet 1, Angel 2.10]</p>
+        <p>Draw the vertex positions as colors ($\textbf c=0.5\cdot\textbf p+0.5$). [Part 3 of Worksheet 1, Angel 2.10]</p>
         <p>Use the depth buffer to ensure that you are looking at the nearest part of the surface of the sphere. [Angel 2.10.4, 5.8] </p>
         <p>Enable back face culling to improve efficiency. [Angel 5.8]</p>
     </div>
 
-    <Result bind:canvas={canvas} bind:view_index={view_index} loading={loading} code_snippets={code_snippets}>
+    <Result bind:canvas={canvas} bind:viewIndex={viewIndex} loading={loading} codeSnippets={codeSnippets}>
         <div slot='controls'>
-            <div class="absolute left-0 top-0 flex flex-row justify-evenly items-center gap-4 w-full p-4 bg-gray-900/25 rounded-{view_index == 1 ? 'r-' : ''}lg">    
+            <div class="absolute left-0 top-0 flex flex-row justify-evenly items-center gap-4 w-full p-4 bg-gray-900/25 rounded-{viewIndex == 1 ? 'r-' : ''}lg">    
                 <Toggle bind:selected={culling} icons={[X, SendToBack, BringToFront]}/>
                 <Counter bind:count={subdivisions} min={0} max={6}/>
             </div>

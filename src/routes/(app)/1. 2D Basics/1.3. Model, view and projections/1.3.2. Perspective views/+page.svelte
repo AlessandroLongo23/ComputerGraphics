@@ -5,14 +5,14 @@
     import * as mv from '$lib/Libraries/MV.js';
     import Result from '$lib/components/Result.svelte';
 
-    let view_index = 1;
+    let viewIndex = 1;
     let loading = true;
     let canvas, gl, program;
-    let code_snippets = [];
+    let codeSnippets = [];
 
     let vertices, indices;
-    let model_view_matrix_loc;
-    let projection_matrix_loc;
+    let modelViewMatrixLoc;
+    let projectionMatrixLoc;
 
     onMount(async () => {
         if (typeof window !== 'undefined') {
@@ -45,7 +45,7 @@
                 gl.enableVertexAttribArray(vPosition);
 
                 // colors
-                var vertex_colors = [
+                var colors = [
                     [0.0, 0.0, 0.0, 1.0],  // black
                     [1.0, 0.0, 0.0, 1.0],  // red
                     [1.0, 1.0, 0.0, 1.0],  // yellow
@@ -58,7 +58,7 @@
 
                 var cBuffer = gl.createBuffer();  // Buffer for colors
                 gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
-                gl.bufferData(gl.ARRAY_BUFFER, mv.flatten(vertex_colors), gl.STATIC_DRAW);
+                gl.bufferData(gl.ARRAY_BUFFER, mv.flatten(colors), gl.STATIC_DRAW);
 
                 var vColor = gl.getAttribLocation(program, "vColor");
                 gl.vertexAttribPointer(vColor, 4, gl.FLOAT, false, 0, 0);  // 4 components for RGBA
@@ -85,15 +85,15 @@
                 gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint8Array(indices), gl.STATIC_DRAW);
 
                 // Initialize rotation and transformations
-                model_view_matrix_loc = gl.getUniformLocation(program, "model_view_matrix");
-                projection_matrix_loc = gl.getUniformLocation(program, "projection_matrix");
+                modelViewMatrixLoc = gl.getUniformLocation(program, "modelViewMatrix");
+                projectionMatrixLoc = gl.getUniformLocation(program, "projectionMatrix");
 
                 render();
             } catch (error) {
                 console.error(error);
             }
 
-            code_snippets = await fetchCodeSnippets($page.url.pathname);
+            codeSnippets = await fetchCodeSnippets($page.url.pathname);
             loading = false;
         }
     });
@@ -103,18 +103,18 @@
 
         // Cube 1 - One-point perspective (front view)
         var ctm = mv.mat4();
-        var projection_matrix = mv.perspective(45, canvas.width / canvas.height, .001, 10.0);
-        gl.uniformMatrix4fv(projection_matrix_loc, false, mv.flatten(projection_matrix));
+        var projectionMatrix = mv.perspective(45, canvas.width / canvas.height, .001, 10.0);
+        gl.uniformMatrix4fv(projectionMatrixLoc, false, mv.flatten(projectionMatrix));
 
         ctm = mv.mult(ctm, mv.translate(-1.5, 0, -3));  // Move to the left
-        gl.uniformMatrix4fv(model_view_matrix_loc, false, mv.flatten(ctm));
+        gl.uniformMatrix4fv(modelViewMatrixLoc, false, mv.flatten(ctm));
         gl.drawElements(gl.LINE_STRIP, indices.length, gl.UNSIGNED_BYTE, 0);
 
         // Cube 2 - Two-point perspective (X-axis rotated)
         ctm = mv.mat4();
         ctm = mv.mult(ctm, mv.translate(0, 0, -3));  // Centered
         ctm = mv.mult(ctm, mv.rotateY(30));  // Rotate around Y-axis
-        gl.uniformMatrix4fv(model_view_matrix_loc, false, mv.flatten(ctm));
+        gl.uniformMatrix4fv(modelViewMatrixLoc, false, mv.flatten(ctm));
         gl.drawElements(gl.LINE_STRIP, indices.length, gl.UNSIGNED_BYTE, 0);
 
         // Cube 3 - Three-point perspective (X, Y, and Z rotated)
@@ -123,7 +123,7 @@
         ctm = mv.mult(ctm, mv.rotateX(20));
         ctm = mv.mult(ctm, mv.rotateY(30));
         ctm = mv.mult(ctm, mv.rotateZ(20));
-        gl.uniformMatrix4fv(model_view_matrix_loc, false, mv.flatten(ctm));
+        gl.uniformMatrix4fv(modelViewMatrixLoc, false, mv.flatten(ctm));
         gl.drawElements(gl.LINE_STRIP, indices.length, gl.UNSIGNED_BYTE, 0);
 
         requestAnimFrame(render);
@@ -132,12 +132,10 @@
 
 <div class="flex flex-col justify-center items-start w-4/5 text-xl m-auto">
     <div class="w-4/5 m-auto">
-        <p class="text-black text-xl">Draw the unit cube in different classical perspective views.</p>  
-        <ul>
-            <li>Introduce a projection matrix that sets the camera to be a pinhole camera with a 45 degrees vertical field of view. [Angel 1.4.1, 5.5-5.7] </li>
-            <li>Draw the cube three times in the same rendering. Transform the cubes so that one is in one-point (front) perspective, one is in two-point (X) perspective, and one is in three-point perspective. [Angel 4.9-4.11, 5.1.5]</li>
-        </ul>
+        <p>Draw the unit cube in different classical perspective views.</p>  
+        <p>Introduce a projection matrix that sets the camera to be a pinhole camera with a 45 degrees vertical field of view. [Angel 1.4.1, 5.5-5.7] </p>
+        <p>Draw the cube three times in the same rendering. Transform the cubes so that one is in one-point (front) perspective, one is in two-point (X) perspective, and one is in three-point perspective. [Angel 4.9-4.11, 5.1.5]</p>
     </div>
 
-    <Result bind:canvas={canvas} bind:view_index={view_index} loading={loading} code_snippets={code_snippets} width={1024}/>
+    <Result bind:canvas={canvas} bind:viewIndex={viewIndex} loading={loading} codeSnippets={codeSnippets} width={1024}/>
 </div>

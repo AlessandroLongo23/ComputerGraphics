@@ -1,14 +1,15 @@
 var vertices, vBuffer;
+var normals, nBuffer;
 var subdivisions, min_sub, max_sub;
 var v0, v1, v2, v3;
-var theta_y = 30;
+var thetaY = 30;
 var gl, canvas, program;
-var view_matrix_loc, model_matrix_loc, projection_matrix_loc, eye_pos_loc;
-var k_loc, L_loc, k_s_loc, s_loc;
-var k, L, k_s, s;
+var viewMatrixLoc, modelMatrixLoc, projectionMatrixLoc, eyePosLoc;
+var kLoc, LLoc, ksLoc, sLoc;
+var k, L, ks, s;
 
 window.onload = function init() {
-    setup_WebGL();
+    setupWebGL();
     
     // enabling depth test and culling
     gl.enable(gl.DEPTH_TEST);
@@ -16,23 +17,23 @@ window.onload = function init() {
     gl.cullFace(gl.BACK);
 
     // set the camera position
-    eye_pos_loc = gl.getUniformLocation(program, "eye_pos");
+    eyePosLoc = gl.getUniformLocation(program, "eyePos");
 
     // set the light direction
-    var light_direction = vec3(0.0, 0.0, -1.0);
-    var light_direction_loc = gl.getUniformLocation(program, "light_direction");
-    gl.uniform3fv(light_direction_loc, flatten(light_direction));
+    var lightDirection = vec3(0.0, 0.0, -1.0);
+    var lightDirectionLoc = gl.getUniformLocation(program, "lightDirection");
+    gl.uniform3fv(lightDirectionLoc, flatten(lightDirection));
 
     // and all the lighting parameters
-    k_loc = gl.getUniformLocation(program, "k");
-    L_loc = gl.getUniformLocation(program, "L");
-    k_s_loc = gl.getUniformLocation(program, "k_s");
-    s_loc = gl.getUniformLocation(program, "s");
+    kLoc = gl.getUniformLocation(program, "k");
+    LLoc = gl.getUniformLocation(program, "L");
+    ksLoc = gl.getUniformLocation(program, "ks");
+    sLoc = gl.getUniformLocation(program, "s");
 
     // Uniform locations for the matrices
-    view_matrix_loc = gl.getUniformLocation(program, "view_matrix");
-    model_matrix_loc = gl.getUniformLocation(program, "model_matrix");
-    projection_matrix_loc = gl.getUniformLocation(program, "projection_matrix");
+    viewMatrixLoc = gl.getUniformLocation(program, "viewMatrix");
+    modelMatrixLoc = gl.getUniformLocation(program, "modelMatrix");
+    projectionMatrixLoc = gl.getUniformLocation(program, "projectionMatrix");
 
     // vertices
     vertices = [];
@@ -41,40 +42,42 @@ window.onload = function init() {
     v2 = vec4(-0.816497, -0.471405, 0.333333, 1);
     v3 = vec4(0.816497, -0.471405, 0.333333, 1);
 
+    normals = [];
+
     min_sub = 0;
     max_sub = 8;
     subdivisions = max_sub;
     
-    build_polyhedron();
+    buildPolyhedron();
     render();
 };
 
 function render() {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-    theta_y += 0.005;
+    thetaY += 0.005;
 
     // projection matrix
-    var projection_matrix = perspective(45, canvas.width / canvas.height, 0.1, 100.0);
+    var projectionMatrix = perspective(45, canvas.width / canvas.height, 0.1, 100.0);
 
     // view matrix
     var dist = 3.0;
-    var eye_pos = vec3(dist * Math.cos(theta_y), 0.0, dist * Math.sin(theta_y));
+    var eyePos = vec3(dist * Math.cos(thetaY), 0.0, dist * Math.sin(thetaY));
     var target = vec3(0.0, 0.0, 0.0);
     var up = vec3(0.0, 1.0, 0.0);
-    var view_matrix = lookAt(eye_pos, target, up);
+    var viewMatrix = lookAt(eyePos, target, up);
 
     // model matrix
-    var model_matrix = mat4();
+    var modelMatrix = mat4();
 
     // update the lighting parameters
-    update_lighting();
+    updateLighting();
 
     // Pass matrices to the shader
-    gl.uniformMatrix4fv(model_matrix_loc, false, flatten(model_matrix));
-    gl.uniformMatrix4fv(view_matrix_loc, false, flatten(view_matrix));
-    gl.uniformMatrix4fv(projection_matrix_loc, false, flatten(projection_matrix));
-    gl.uniform3fv(eye_pos_loc, flatten(eye_pos));
+    gl.uniformMatrix4fv(modelMatrixLoc, false, flatten(modelMatrix));
+    gl.uniformMatrix4fv(viewMatrixLoc, false, flatten(viewMatrix));
+    gl.uniformMatrix4fv(projectionMatrixLoc, false, flatten(projectionMatrix));
+    gl.uniform3fv(eyePosLoc, flatten(eyePos));
 
     // draw the model using triangles
     gl.drawArrays(gl.TRIANGLES, 0, vertices.length);
@@ -83,7 +86,7 @@ function render() {
     requestAnimFrame(render);
 }
 
-function build_polyhedron() {
+function buildPolyhedron() {
     vertices = [];
     tetrahedron(v0, v1, v2, v3, subdivisions);
 
@@ -94,6 +97,14 @@ function build_polyhedron() {
     var vPosition = gl.getAttribLocation(program, "vPosition");
     gl.vertexAttribPointer(vPosition, 4, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(vPosition);
+
+    nBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, nBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, flatten(normals), gl.STATIC_DRAW);
+
+    var vNormal = gl.getAttribLocation(program, "vNormal");
+    gl.vertexAttribPointer(vNormal, 4, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(vNormal);
 }
 
 function tetrahedron(a, b, c, d, n) {
@@ -122,8 +133,11 @@ function divideTriangle(a, b, c, count) {
 
 function triangle(a, b, c) {
     vertices.push(a);
+    normals.push(a);
     vertices.push(b);
+    normals.push(b);
     vertices.push(c);
+    normals.push(c);
 }
 
 document.getElementById("increment-subdivision-level").addEventListener("click", function() {
@@ -132,7 +146,7 @@ document.getElementById("increment-subdivision-level").addEventListener("click",
     else
         subdivisions++;
 
-    build_polyhedron();
+    buildPolyhedron();
 });
 
 document.getElementById("decrement-subdivision-level").addEventListener("click", function() {
@@ -141,22 +155,22 @@ document.getElementById("decrement-subdivision-level").addEventListener("click",
     else
         subdivisions--;
 
-    build_polyhedron();
+    buildPolyhedron();
 });
 
-function update_lighting() {
-    k = document.getElementById("k").value;
-    L = document.getElementById("L").value;
-    k_s = document.getElementById("k_s").value;
-    s = document.getElementById("s").value;
+function updateLighting() {
+    k = parseFloat(document.getElementById("k").value);
+    L = parseFloat(document.getElementById("L").value);
+    ks = parseFloat(document.getElementById("ks").value);
+    s = parseFloat(document.getElementById("s").value);
 
-    gl.uniform1f(k_loc, k);
-    gl.uniform1f(L_loc, L);
-    gl.uniform1f(k_s_loc, k_s);
-    gl.uniform1f(s_loc, Math.pow(10, s));
+    gl.uniform1f(kLoc, k);
+    gl.uniform1f(LLoc, L);
+    gl.uniform1f(ksLoc, ks);
+    gl.uniform1f(sLoc, Math.pow(10, s));
 } 
 
-function setup_WebGL() {
+function setupWebGL() {
     canvas = document.getElementById("gl-canvas");
     gl = WebGLUtils.setupWebGL(canvas);
     if (!gl) {

@@ -8,18 +8,18 @@
     import Slider from '$lib/components/UI/Slider.svelte';
     import Admonition from '$lib/components/UI/Admonition.svelte';
 
-    let view_index = 1;
+    let viewIndex = 1;
     let loading = true;
     let canvas, gl, program;
-    let code_snippets = [];
+    let codeSnippets = [];
 
     let vertices, vBuffer;
     let subdivisions;
     let v0, v1, v2, v3;
-    let theta_y = 30;
-    let view_matrix_loc, model_matrix_loc, projection_matrix_loc, eye_pos_loc;
-    let k_loc, L_loc, k_s_loc, s_loc;
-    let k, L, k_s, s;
+    let thetaY = 30;
+    let viewMatrixLoc, modelMatrixLoc, projectionMatrixLoc, eyePosLoc;
+    let kLoc, LLoc, ksLoc, sLoc;
+    let k, L, ks, s;
 
     onMount(async () => {
         if (typeof window !== 'undefined') {
@@ -36,25 +36,25 @@
                 gl.cullFace(gl.BACK);
 
                 // set the camera position
-                eye_pos_loc = gl.getUniformLocation(program, "eye_pos");
+                eyePosLoc = gl.getUniformLocation(program, "eyePos");
 
                 // Set the light direction
-                var light_direction = mv.vec3(0.0, 0.0, -1.0);
-                var light_direction_loc = gl.getUniformLocation(program, "light_direction");
-                gl.uniform3fv(light_direction_loc, mv.flatten(light_direction));
+                var lightDirection = mv.vec3(0.0, 0.0, -1.0);
+                var lightDirectionLoc = gl.getUniformLocation(program, "lightDirection");
+                gl.uniform3fv(lightDirectionLoc, mv.flatten(lightDirection));
 
                 // and all the lighting parameters
-                k_loc = gl.getUniformLocation(program, "k");
-                L_loc = gl.getUniformLocation(program, "L");
-                k_s_loc = gl.getUniformLocation(program, "k_s");
-                s_loc = gl.getUniformLocation(program, "s");
-                k = L = k_s = 0.5;
+                kLoc = gl.getUniformLocation(program, "k");
+                LLoc = gl.getUniformLocation(program, "L");
+                ksLoc = gl.getUniformLocation(program, "ks");
+                sLoc = gl.getUniformLocation(program, "s");
+                k = L = ks = 0.5;
                 s = 2.0;
 
                 // Uniform locations for the matrices
-                view_matrix_loc = gl.getUniformLocation(program, "view_matrix");
-                model_matrix_loc = gl.getUniformLocation(program, "model_matrix");
-                projection_matrix_loc = gl.getUniformLocation(program, "projection_matrix");
+                viewMatrixLoc = gl.getUniformLocation(program, "viewMatrix");
+                modelMatrixLoc = gl.getUniformLocation(program, "modelMatrix");
+                projectionMatrixLoc = gl.getUniformLocation(program, "projectionMatrix");
 
                 // vertices
                 vertices = [];
@@ -65,13 +65,13 @@
 
                 subdivisions = 6;
                 
-                build_polyhedron();
+                buildPolyhedron();
                 render();
             } catch (error) {
                 console.error(error);
             }
 
-            code_snippets = await fetchCodeSnippets($page.url.pathname);
+            codeSnippets = await fetchCodeSnippets($page.url.pathname);
             loading = false;
         }
     });
@@ -79,29 +79,29 @@
     function render() {
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-        theta_y += 0.005;
+        thetaY += 0.005;
 
         // projection matrix
-        var projection_matrix = mv.perspective(45, canvas.width / canvas.height, 0.1, 100.0);
+        var projectionMatrix = mv.perspective(45, canvas.width / canvas.height, 0.1, 100.0);
 
         // view matrix
         var dist = 5.0;
-        var eye_pos = mv.vec3(dist * Math.cos(theta_y), 0.0, dist * Math.sin(theta_y));
+        var eyePos = mv.vec3(dist * Math.cos(thetaY), 0.0, dist * Math.sin(thetaY));
         var target = mv.vec3(0.0, 0.0, 0.0);
         var up = mv.vec3(0.0, 1.0, 0.0);
-        var view_matrix = mv.lookAt(eye_pos, target, up);
+        var viewMatrix = mv.lookAt(eyePos, target, up);
 
         // model matrix
-        var model_matrix = mv.mat4();
+        var modelMatrix = mv.mat4();
 
         // update the lighting parameters
-        update_lighting();
+        updateLighting();
 
         // Pass matrices to the shader
-        gl.uniformMatrix4fv(model_matrix_loc, false, mv.flatten(model_matrix));
-        gl.uniformMatrix4fv(view_matrix_loc, false, mv.flatten(view_matrix));
-        gl.uniformMatrix4fv(projection_matrix_loc, false, mv.flatten(projection_matrix));
-        gl.uniform3fv(eye_pos_loc, mv.flatten(eye_pos));
+        gl.uniformMatrix4fv(modelMatrixLoc, false, mv.flatten(modelMatrix));
+        gl.uniformMatrix4fv(viewMatrixLoc, false, mv.flatten(viewMatrix));
+        gl.uniformMatrix4fv(projectionMatrixLoc, false, mv.flatten(projectionMatrix));
+        gl.uniform3fv(eyePosLoc, mv.flatten(eyePos));
 
         // draw the model using triangles
         gl.drawArrays(gl.TRIANGLES, 0, vertices.length);
@@ -110,7 +110,7 @@
         requestAnimFrame(render);
     }
 
-    function build_polyhedron() {
+    function buildPolyhedron() {
         vertices = [];
         tetrahedron(v0, v1, v2, v3, subdivisions);
 
@@ -152,14 +152,14 @@
         vertices.push(c);
     }
 
-    function update_lighting() {
-        gl.uniform1f(k_loc, k);
-        gl.uniform1f(L_loc, L);
-        gl.uniform1f(k_s_loc, k_s);
-        gl.uniform1f(s_loc, Math.pow(10, s));
+    function updateLighting() {
+        gl.uniform1f(kLoc, k);
+        gl.uniform1f(LLoc, L);
+        gl.uniform1f(ksLoc, ks);
+        gl.uniform1f(sLoc, Math.pow(10, s));
     } 
 
-    $: subdivisions != undefined && build_polyhedron();
+    $: subdivisions != undefined && buildPolyhedron();
 </script>
 
 <div class="flex flex-col justify-center items-start w-4/5 text-xl m-auto">
@@ -169,29 +169,29 @@
             model to the fragment shader and varying positions and normals across triangles 
             instead of colors [Angel 6.5.3, 6.10].
         </p>
-        <Admonition type='note'>
-            <p slot='text_content' class="m-0">
+        <Admonition type='warning' color='orange'>
+            <p slot='textContent' class="m-0">
                 Remember to re-normalize direction vectors that are varying and therefore 
                 linearly interpolated across a triangle.
             </p>
         </Admonition>        
     </div>
 
-    <Result bind:canvas={canvas} bind:view_index={view_index} loading={loading} code_snippets={code_snippets}>
+    <Result bind:canvas={canvas} bind:viewIndex={viewIndex} loading={loading} codeSnippets={codeSnippets}>
         <div slot='controls'>
-            <div class="absolute left-0 top-0 flex flex-col justify-evenly items-center gap-4 w-full p-4 bg-gray-900/25 rounded-{view_index == 1 ? 'r-' : ''}lg">    
+            <div class="absolute left-0 top-0 flex flex-col justify-evenly items-center gap-4 w-full p-4 bg-gray-900/25 rounded-{viewIndex == 1 ? 'r-' : ''}lg">    
                 <Counter bind:count={subdivisions} min={0} max={6}/>
             </div>
 
-            <div class="absolute left-0 bottom-0 flex flex-row justify-evenly items-center gap-4 w-full p-4 bg-gray-900/75 rounded-{view_index == 1 ? 'r-' : ''}lg">
+            <div class="absolute left-0 bottom-0 flex flex-row justify-evenly items-center gap-4 w-full p-4 bg-gray-900/75 rounded-{viewIndex == 1 ? 'r-' : ''}lg">
                 <div class="flex flex-col justify-evenly w-full">
                     <Slider min={0} max={1} bind:value={k} step={0.01} id={k} label="k"/>
                     <Slider min={0} max={1} bind:value={L} step={0.01} id={L} label="L"/>
                 </div>    
 
                 <div class="flex flex-col justify-evenly w-full">
-                    <Slider min={0} max={1} bind:value={k_s} step={0.01} id={k_s} label="k_s"/>
-                    <Slider min={0} max={3} bind:value={s} step={0.01} id={s} label="s"/>
+                    <Slider min={0} max={1} bind:value={ks} step={0.01} id={ks} label="k_s"/>
+                    <Slider min={0} max={3} bind:value={s} step={0.01} id={s} label="s" f={(x) => Math.round(Math.pow(10, x))}/>
                 </div>
             </div>
         </div>

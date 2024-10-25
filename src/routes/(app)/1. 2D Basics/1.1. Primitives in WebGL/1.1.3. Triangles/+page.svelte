@@ -6,12 +6,12 @@
     import Result from '$lib/components/Result.svelte'
 
     let loading = true;
-    let view_index = 1;
+    let viewIndex = 1;
     let canvas, gl, program;
-    let code_snippets = [];
+    let codeSnippets = [];
 
     let vertices = [];
-    let colors_array = [];
+    let colors = [];
 
     onMount(async () => {
         if (typeof window !== 'undefined') {
@@ -34,7 +34,7 @@
                 gl.enableVertexAttribArray(vPosition);
 
                 // colors
-                colors_array = [ 
+                colors = [ 
                     mv.vec4(1.0, 0.0, 0.0, 1.0), 
                     mv.vec4(0.0, 1.0, 0.0, 1.0), 
                     mv.vec4(0.0, 0.0, 1.0, 1.0) 
@@ -42,7 +42,7 @@
 
                 var cBuffer = gl.createBuffer();
                 gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
-                gl.bufferData(gl.ARRAY_BUFFER, mv.flatten(colors_array), gl.STATIC_DRAW);
+                gl.bufferData(gl.ARRAY_BUFFER, mv.flatten(colors), gl.STATIC_DRAW);
 
                 var vColor = gl.getAttribLocation(program, "vColor");
                 gl.vertexAttribPointer(vColor, 4, gl.FLOAT, false, 0, 0);
@@ -53,7 +53,7 @@
                 console.error(error);
             }
 
-            code_snippets = await fetchCodeSnippets($page.url.pathname);
+            codeSnippets = await fetchCodeSnippets($page.url.pathname);
             loading = false;
         }
     });
@@ -66,14 +66,9 @@
 
 <div class="flex flex-col justify-center items-start w-4/5 text-xl m-auto">
     <div class="w-4/5 m-auto">
-        <ul>
-            <li>Change the code in the previous example to draw triangles instead of points. [Angel 2.4.2]</li>
-            <li>Extend the application to include a second buffer for vertex colors and draw the triangle with a red, a green, and a blue vertex color. [Angel 2.5.1 and 2.10]</li>
-        </ul>
+        <p>Change the code in the previous example to draw triangles instead of points. [Angel 2.4.2]</p>
+        <p>Extend the application to include a second buffer for vertex colors and draw the triangle with a red, a green, and a blue vertex color. [Angel 2.5.1 and 2.10]</p>
     </div>
 
-    <Result bind:canvas={canvas} bind:view_index={view_index} loading={loading} code_snippets={code_snippets}/>
+    <Result bind:canvas={canvas} bind:viewIndex={viewIndex} loading={loading} codeSnippets={codeSnippets}/>
 </div>
-
-<style>
-</style>
