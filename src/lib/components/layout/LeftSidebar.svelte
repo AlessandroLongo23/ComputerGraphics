@@ -1,10 +1,9 @@
 <script>
-    import { run } from 'svelte/legacy';
-
     import { ChevronDown, Menu, GripVertical, X } from 'lucide-svelte';
     import { theme } from "$lib/stores";
     import { page } from '$app/stores';
     import { contentTree } from '$lib/data/pages';
+    import { onMount } from 'svelte';
     let { children } = $props();
     
     let isCollapsed = $state(true);
@@ -34,6 +33,22 @@
     //     document.removeEventListener('mouseup', stopResize);
     // }
 
+    let expandedItems = $state(new Set());
+
+    $effect(() => {
+        contentTree.children.forEach(item => {
+            if (isParentRouteActive(item)) {
+                expandedItems.add(item.href);
+                if (item.children) {
+                    item.children.forEach(child => {
+                        if (isParentRouteActive(child))
+                            expandedItems.add(child.href);
+                    });
+                }
+            }
+        });
+    });
+
     function isRouteActive(href) {
         return $page.url.pathname.replaceAll('%20', ' ') === href;
     }
@@ -56,24 +71,6 @@
         return false;
     }
 
-    let expandedItems = $state(new Set());
-
-    run(() => {
-        if ($page) {
-            contentTree.children.forEach(item => {
-                if (isParentRouteActive(item)) {
-                    expandedItems.add(item.href);
-                    if (item.children) {
-                        item.children.forEach(child => {
-                            if (isParentRouteActive(child))
-                                expandedItems.add(child.href);
-                        });
-                    }
-                }
-            });
-        }
-    });
-
     function toggleExpanded(href) {
         if (expandedItems.has(href))
             expandedItems.delete(href);
@@ -86,7 +83,7 @@
 
 <div class="flex min-h-screen">
     {#if !isCollapsed}
-        <div onclick={toggleSidebar} aria-hidden="true" class="absolute inset-0 bg-black/50 z-40 transition-all duration-300 ease-in-out opacity-0 {!isCollapsed ? 'opacity-100' : ''}"></div>
+        <div onclick={toggleSidebar} aria-hidden="true" class="absolute inset-0 bg-black/50 z-40 transition-all duration-300 ease-in-out opacity-0 {!isCollapsed && 'opacity-100'}"></div>
     {/if}
 
     <div class="relative">
@@ -108,7 +105,7 @@
                     {#each contentTree.children as item}
                         {@const hasChildren = item.children}
                         <div class="flex flex-col">
-                            <div class="flex items-center gap-4 ps-2 p-1 mb-1 ms-4 rounded-lg transition-colors hover:bg-gray-300 { isRouteActive(item.href) ? 'bg-gray-300' : ''}">
+                            <div class="flex items-center gap-4 ps-2 p-1 mb-1 ms-4 rounded-lg transition-colors hover:bg-gray-300 { isRouteActive(item.href) && 'bg-gray-300'}">
                                 <a href={item.href} class="flex items-center gap-4 flex-1 hover:no-underline text-black">
                                     <item.icon size={18}/>
                                     <span class="flex-1 truncate">{item.href.split("/").pop()}</span>
@@ -126,7 +123,7 @@
                                     {#each item.children as child}
                                         {@const hasGrandchildren = child.children}
                                         <div class="flex flex-col">
-                                            <div class="flex items-center gap-4 ps-2 p-1 mb-1 ms-4 rounded-lg transition-colors hover:bg-gray-300 {isRouteActive(child.href) ? 'bg-gray-300' : ''}">
+                                            <div class="flex items-center gap-4 ps-2 p-1 mb-1 ms-4 rounded-lg transition-colors hover:bg-gray-300 {isRouteActive(child.href) && 'bg-gray-300'}">
                                                 <a href={child.href} class="flex items-center gap-4 flex-1 hover:no-underline text-black">
                                                     <child.icon size={18}/>
                                                     <span class="flex-1 truncate">{child.href.split("/").pop()}</span>
@@ -142,7 +139,7 @@
                                             {#if hasGrandchildren && expandedItems.has(child.href)}
                                                 <div class="pl-2 border-l-2 ml-4 border-gray-300">
                                                     {#each child.children as grandchild}
-                                                        <a href={grandchild.href} class="flex items-center gap-4 ps-2 p-1 mb-1 ms-4 rounded-lg hover:no-underline text-black transition-colors hover:bg-gray-300 {isRouteActive(grandchild.href) ? 'bg-gray-300' : ''}">
+                                                        <a href={grandchild.href} class="flex items-center gap-4 ps-2 p-1 mb-1 ms-4 rounded-lg hover:no-underline text-black transition-colors hover:bg-gray-300 {isRouteActive(grandchild.href) && 'bg-gray-300'}">
                                                             <grandchild.icon size={18}/>
                                                             <span class="flex-1 truncate">{grandchild.href.split("/").pop()}</span>
                                                         </a>

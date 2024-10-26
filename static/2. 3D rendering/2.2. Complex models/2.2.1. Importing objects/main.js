@@ -1,9 +1,3 @@
-var obj;
-var vertices, vBuffer;
-var thetaY = 0;
-var gl, canvas, program;
-var modelViewMatrixLoc, projectionMatrixLoc;
-
 window.onload = function init() {
     setupWebGL();
 
@@ -70,9 +64,7 @@ window.onload = function init() {
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, iBuffer);
             gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW);
 
-            // Initialize rotation and transformations
-            modelViewMatrixLoc = gl.getUniformLocation(program, "modelViewMatrix");
-            projectionMatrixLoc = gl.getUniformLocation(program, "projectionMatrix");
+            thetaY = Math.PI / 6;
 
             // Start rendering
             render();

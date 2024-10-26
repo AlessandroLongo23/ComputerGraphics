@@ -5,7 +5,7 @@
     import Result from '$lib/components/Result.svelte';
 
     let viewIndex = $state(1);
-    let loading = $state(true);
+    let isLoading = $state(true);
     let canvas = $state(), gl;
     let codeSnippets = $state([]);
 
@@ -13,6 +13,20 @@
 
     onMount(async () => {
         if (typeof window !== 'undefined') {
+            if (window.MathJax) {
+                window.MathJax.typesetPromise && window.MathJax.typesetPromise();
+
+                document.querySelectorAll("[class*='mjx']").forEach(function(el) {
+                    el.style.fontSize = '20px';
+                });
+
+                document.querySelectorAll("[size='s']").forEach(function(parent) {
+                    parent.querySelectorAll('*').forEach(function(el) {
+                        el.style.fontSize = '16px';
+                    });
+                });
+            }
+            
             gl = WebGLUtils.setupWebGL(canvas);
             gl.viewport(0, 0, canvas.width, canvas.height);
             gl.clearColor(0.3921, 0.5843, 0.9294, 1.0);
@@ -20,7 +34,7 @@
             render();
 
             codeSnippets = await fetchCodeSnippets($page.url.pathname);
-            loading = false;
+            isLoading = false;
         }
     });
 
@@ -38,5 +52,5 @@
         <p>Setup the WebGL context using Angel’s “setupWebGL”. You can use the window.onload event to initialize and setup the application. [Angel 2.8]</p>
     </div>
 
-    <Result bind:canvas={canvas} bind:viewIndex={viewIndex} loading={loading} codeSnippets={codeSnippets}/>
+    <Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets}/>
 </div>

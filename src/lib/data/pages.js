@@ -114,7 +114,39 @@ export const contentTree = {
                 },
                 {
                     icon: chapterIcons[1],
-                    href: '/2. 3D Rendering/2.2. Loading external models',
+                    href: '/2. 3D Rendering/2.2. Complex models',
+                    children: [
+                        {
+                            icon: chapterIcons[1],
+                            href: '/2. 3D Rendering/2.2. Complex models/2.2.1. Importing objects'
+                        },
+                        {
+                            icon: chapterIcons[1],
+                            href: '/2. 3D Rendering/2.2. Complex models/2.2.2. Phong on Suzanne'
+                        }
+                    ]
+                },
+                {
+                    icon: chapterIcons[1],
+                    href: '/2. 3D Rendering/2.3. Texture mapping',
+                    children: [
+                        {
+                            icon: chapterIcons[1],
+                            href: '/2. 3D Rendering/2.3. Texture mapping/2.3.1. Checkerboard texture'
+                        },
+                        {
+                            icon: chapterIcons[1],
+                            href: '/2. 3D Rendering/2.3. Texture mapping/2.3.2. Wrapping and filtering'
+                        },
+                        {
+                            icon: chapterIcons[1],
+                            href: '/2. 3D Rendering/2.3. Texture mapping/2.3.3. Sphere texturing'
+                        },
+                        {
+                            icon: chapterIcons[1],
+                            href: '/2. 3D Rendering/2.3. Texture mapping/2.3.4. Earth model'
+                        }
+                    ]
                 }
             ] 
         },

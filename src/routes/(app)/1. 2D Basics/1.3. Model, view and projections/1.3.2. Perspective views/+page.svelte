@@ -6,7 +6,7 @@
     import Result from '$lib/components/Result.svelte';
 
     let viewIndex = $state(1);
-    let loading = $state(true);
+    let isLoading = $state(true);
     let canvas = $state(), gl, program;
     let codeSnippets = $state([]);
 
@@ -16,6 +16,20 @@
 
     onMount(async () => {
         if (typeof window !== 'undefined') {
+            if (window.MathJax) {
+                window.MathJax.typesetPromise && window.MathJax.typesetPromise();
+
+                document.querySelectorAll("[class*='mjx']").forEach(function(el) {
+                    el.style.fontSize = '20px';
+                });
+
+                document.querySelectorAll("[size='s']").forEach(function(parent) {
+                    parent.querySelectorAll('*').forEach(function(el) {
+                        el.style.fontSize = '16px';
+                    });
+                });
+            }
+
             gl = WebGLUtils.setupWebGL(canvas);
             gl.viewport(0, 0, canvas.width, canvas.height);
             gl.clearColor(0.3921, 0.5843, 0.9294, 1.0);
@@ -94,7 +108,7 @@
             }
 
             codeSnippets = await fetchCodeSnippets($page.url.pathname);
-            loading = false;
+            isLoading = false;
         }
     });
 
@@ -137,5 +151,5 @@
         <p>Draw the cube three times in the same rendering. Transform the cubes so that one is in one-point (front) perspective, one is in two-point (X) perspective, and one is in three-point perspective. [Angel 4.9-4.11, 5.1.5]</p>
     </div>
 
-    <Result bind:canvas={canvas} bind:viewIndex={viewIndex} loading={loading} codeSnippets={codeSnippets} width={1024}/>
+    <Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets} width={1024}/>
 </div>

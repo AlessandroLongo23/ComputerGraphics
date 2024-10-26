@@ -11,7 +11,7 @@
     import Admonition from '$lib/components/UI/Admonition.svelte';
 
     let viewIndex = $state(1);
-    let loading = $state(true);
+    let isLoading = $state(true);
     let canvas = $state(), gl, program;
     let codeSnippets = $state([]);
 
@@ -25,6 +25,20 @@
 
     onMount(async () => {
         if (typeof window !== 'undefined') {
+            if (window.MathJax) {
+                window.MathJax.typesetPromise && window.MathJax.typesetPromise();
+
+                document.querySelectorAll("[class*='mjx']").forEach(function(el) {
+                    el.style.fontSize = '20px';
+                });
+
+                document.querySelectorAll("[size='s']").forEach(function(parent) {
+                    parent.querySelectorAll('*').forEach(function(el) {
+                        el.style.fontSize = '16px';
+                    });
+                });
+            }
+
             gl = WebGLUtils.setupWebGL(canvas);
             gl.viewport(0, 0, canvas.width, canvas.height);
             gl.clearColor(0.3921, 0.5843, 0.9294, 1.0);
@@ -74,7 +88,7 @@
             }
 
             codeSnippets = await fetchCodeSnippets($page.url.pathname);
-            loading = false;
+            isLoading = false;
         }
     });
 
@@ -175,34 +189,32 @@
         </p>
         <Admonition type='warning' color='orange'>
             {#snippet textContent()}
-                        <p  class="m-0">
+                <p class="m-0">
                     Remember to re-normalize direction vectors that are varying and therefore 
                     linearly interpolated across a triangle.
                 </p>
-                    {/snippet}
+            {/snippet}
         </Admonition>        
     </div>
 
-    <Result bind:canvas={canvas} bind:viewIndex={viewIndex} loading={loading} codeSnippets={codeSnippets}>
+    <Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets}>
         {#snippet controls()}
-                <div >
-                <div class="absolute left-0 top-0 flex flex-col justify-evenly items-center gap-4 w-full p-4 bg-gray-900/25 rounded-{viewIndex == 1 ? 'r-' : ''}lg">    
-                    <Counter bind:count={subdivisions} min={0} max={6}/>
-                </div>
+            <div class="absolute left-0 top-0 flex flex-col justify-evenly items-center gap-4 w-full p-4 bg-gray-900/25 rounded-{viewIndex == 1 && 'r-'}lg">    
+                <Counter bind:count={subdivisions} min={0} max={6}/>
+            </div>
 
-                <div class="absolute left-0 bottom-0 flex flex-row justify-evenly items-center gap-4 w-full p-4 bg-gray-900/75 rounded-{viewIndex == 1 ? 'r-' : ''}lg">
-                    <div class="flex flex-col justify-evenly w-full">
-                        <Slider min={0} max={1} bind:value={k} step={0.01} id={k} label="k"/>
-                        <Slider min={0} max={1} bind:value={L} step={0.01} id={L} label="L"/>
-                    </div>    
+            <div class="absolute left-0 bottom-0 flex flex-row justify-evenly items-center gap-4 w-full p-4 bg-gray-900/75 rounded-{viewIndex == 1 && 'r-'}lg">
+                <div class="flex flex-col justify-evenly w-full">
+                    <Slider min={0} max={1} bind:value={k} step={0.01} id={k} label="k"/>
+                    <Slider min={0} max={1} bind:value={L} step={0.01} id={L} label="L"/>
+                </div>    
 
-                    <div class="flex flex-col justify-evenly w-full">
-                        <Slider min={0} max={1} bind:value={ks} step={0.01} id={ks} label="k_s"/>
-                        <Slider min={0} max={3} bind:value={s} step={0.01} id={s} label="s" f={(x) => Math.round(Math.pow(10, x))}/>
-                    </div>
+                <div class="flex flex-col justify-evenly w-full">
+                    <Slider min={0} max={1} bind:value={ks} step={0.01} id={ks} label="k_s"/>
+                    <Slider min={0} max={3} bind:value={s} step={0.01} id={s} label="s" f={(x) => Math.round(Math.pow(10, x))}/>
                 </div>
             </div>
-            {/snippet}
+        {/snippet}
     </Result>
 </div>
 

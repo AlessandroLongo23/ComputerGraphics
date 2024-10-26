@@ -9,7 +9,7 @@
     import Counter from '$lib/components/UI/Counter.svelte';
 
     let viewIndex = $state(1);
-    let loading = $state(true);
+    let isLoading = $state(true);
     let canvas = $state(), gl, program;
     let codeSnippets = $state([]);
 
@@ -78,7 +78,7 @@
             }
 
             codeSnippets = await fetchCodeSnippets($page.url.pathname);
-            loading = false;
+            isLoading = false;
         }
     });
 
@@ -158,9 +158,9 @@
         <p>Insert two buttons: one which increments the subdivision level and one which decrements the subdivision level. [Angel 3.6.2]</p>
     </div>
 
-    <Result bind:canvas={canvas} bind:viewIndex={viewIndex} loading={loading} codeSnippets={codeSnippets}>
+    <Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets}>
         {#snippet controls()}
-            <div class="absolute left-0 top-0 flex flex-row justify-evenly items-center gap-4 w-full p-4 bg-gray-900/25 rounded-{viewIndex == 1 ? 'r-' : ''}lg">    
+            <div class="absolute left-0 top-0 flex flex-row justify-evenly items-center gap-4 w-full p-4 bg-gray-900/25 rounded-{viewIndex == 1 && 'r-'}lg">    
                 <Counter bind:count={subdivisions} min={0} max={6}/>
             </div>
         {/snippet}

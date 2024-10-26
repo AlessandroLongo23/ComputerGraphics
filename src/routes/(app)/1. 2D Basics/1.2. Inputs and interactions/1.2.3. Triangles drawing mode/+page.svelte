@@ -8,10 +8,10 @@
     import Admonition from '$lib/components/UI/Admonition.svelte';
     import { Dot, Triangle } from 'lucide-svelte'
 
-    let viewIndex = 1;
-    let loading = true;
-    let canvas, gl, program;
-    let codeSnippets = [];
+    let viewIndex = $state(1);
+    let isLoading = $state(true);
+    let canvas = $state(), gl, program;
+    let codeSnippets = $state([]);
 
     let cBuffer, vColor;
     let mode = 'points';
@@ -23,6 +23,20 @@
 
     onMount(async () => {
         if (typeof window !== 'undefined') {
+            if (window.MathJax) {
+                window.MathJax.typesetPromise && window.MathJax.typesetPromise();
+
+                document.querySelectorAll("[class*='mjx']").forEach(function(el) {
+                    el.style.fontSize = '20px';
+                });
+
+                document.querySelectorAll("[size='s']").forEach(function(parent) {
+                    parent.querySelectorAll('*').forEach(function(el) {
+                        el.style.fontSize = '16px';
+                    });
+                });
+            }
+
             gl = WebGLUtils.setupWebGL(canvas);
             gl.viewport(0, 0, canvas.width, canvas.height);
             gl.clearColor(0.3921, 0.5843, 0.9294, 1.0);
@@ -184,7 +198,7 @@
             });
 
             codeSnippets = await fetchCodeSnippets($page.url.pathname);
-            loading = false;
+            isLoading = false;
         }
     });
 
@@ -209,9 +223,9 @@
         <p>Let us draw all our shapes as triangles (using gl.TRIANGLES). When a point is drawn, add vertices (positions and colors) for two triangles representing this point to the vertex buffers. In the triangle drawing mode, keep a record (array) of the former points that were clicked and their colors. When the third point is clicked, replace the two points and their colors (four triangles) with the one triangle to be drawn and clear the record.</p>
     </div>
 
-    <Result bind:canvas={canvas} bind:viewIndex={viewIndex} loading={loading} codeSnippets={codeSnippets}>
+    <Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets}>
         {#snippet controls()}
-            <div class="absolute left-0 top-0 flex flex-row justify-evenly items-center gap-4 w-full p-4 bg-gray-900/25 rounded-{viewIndex == 1 ? 'r-' : ''}lg">    
+            <div class="absolute left-0 top-0 flex flex-row justify-evenly items-center gap-4 w-full p-4 bg-gray-900/25 rounded-{viewIndex == 1 && 'r-'}lg">    
                 <div class="flex flex-col justify-between items-center gap-2">
                     <button id="clear" class="flex w-32 h-8 items-center justify-center px-auto py-4 transition-colors duration-200 text-sm bg-white hover:bg-gray-300 text-black rounded-lg">Clear canvas</button>
                     <!-- <Toggle bind:selected={modeIndex} icons={[Dot, Triangle]}/> -->

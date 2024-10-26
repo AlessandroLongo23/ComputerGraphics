@@ -6,8 +6,8 @@
 {@render children?.()}
 
 <style>
-    /* :global(*) {
+    :global(*) {
         user-select: none;
         font-size: 16px;
-    } */
+    }
 </style>

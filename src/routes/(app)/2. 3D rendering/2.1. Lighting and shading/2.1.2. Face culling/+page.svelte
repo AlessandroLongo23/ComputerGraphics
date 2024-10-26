@@ -11,7 +11,7 @@
     import Toggle from '$lib/components/UI/Toggle.svelte';
 
     let viewIndex = $state(1);
-    let loading = $state(true);
+    let isLoading = $state(true);
     let canvas = $state(), gl, program;
     let codeSnippets = $state([]);
 
@@ -77,7 +77,7 @@
             }
 
             codeSnippets = await fetchCodeSnippets($page.url.pathname);
-            loading = false;
+            isLoading = false;
         }
     });
 
@@ -178,14 +178,12 @@
         <p>Enable back face culling to improve efficiency. [Angel 5.8]</p>
     </div>
 
-    <Result bind:canvas={canvas} bind:viewIndex={viewIndex} loading={loading} codeSnippets={codeSnippets}>
+    <Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets}>
         {#snippet controls()}
-                <div >
-                <div class="absolute left-0 top-0 flex flex-row justify-evenly items-center gap-4 w-full p-4 bg-gray-900/25 rounded-{viewIndex == 1 ? 'r-' : ''}lg">    
-                    <!-- <Toggle bind:selected={culling} icons={[X, SendToBack, BringToFront]}/> -->
-                    <Counter bind:count={subdivisions} min={0} max={6}/>
-                </div>
+            <div class="absolute left-0 top-0 flex flex-row justify-evenly items-center gap-4 w-full p-4 bg-gray-900/25 rounded-{viewIndex == 1 && 'r-'}lg">    
+                <!-- <Toggle bind:selected={culling} icons={[X, SendToBack, BringToFront]}/> -->
+                <Counter bind:count={subdivisions} min={0} max={6}/>
             </div>
-            {/snippet}
+        {/snippet}
     </Result>
 </div>

@@ -22,7 +22,7 @@ void main() {
     // specular
     float ks = 0.2;
     float s = 100.0;
-    vec3 w_r = reflect(w_i, n);
+    vec3 w_r = reflect(-w_i, n);
     vec3 w_o = normalize(eyePos - fPosition);
     float specular = pow(max(dot(w_r, w_o), 0.0), s);
     vec3 specular_color = ks * specular * vec3(L);

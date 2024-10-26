@@ -7,7 +7,7 @@
     import Admonition from '$lib/components/UI/Admonition.svelte';
 
     let viewIndex = $state(1);
-    let loading = $state(true);
+    let isLoading = $state(true);
     let canvas = $state(), gl, program;
     let codeSnippets = $state([]);
 
@@ -115,7 +115,7 @@
             }
 
             codeSnippets = await fetchCodeSnippets($page.url.pathname);
-            loading = false;
+            isLoading = false;
         }
     });
 
@@ -145,12 +145,12 @@
         <p>Build a model-view matrix that transforms the cube vertices so that the cube is in isometric view. [Angel 4.12, 5.1.3, 5.3]</p>
         <Admonition type='warning'>
             {#snippet textContent()}
-                        <p  class="m-0">
+                <p class="m-0">
                     If using WebGPU, a projection matrix is needed for this assignment because the default interval for depth coordinates is $[0,1]$ instead of $[-1,1]$.
                 </p>
-                    {/snippet}
+            {/snippet}
         </Admonition>
     </div>
 
-    <Result bind:canvas={canvas} bind:viewIndex={viewIndex} loading={loading} codeSnippets={codeSnippets}/>
+    <Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets}/>
 </div>

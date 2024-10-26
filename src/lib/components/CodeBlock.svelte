@@ -53,7 +53,7 @@
 </script>
 
 <div class="relative w-full">
-    <div class="button-container absolute flex flex-row w-full justify-between p-4 rounded-lg {viewIndex == 1 ? 'rounded-r-none' : ''}">
+    <div class="button-container absolute flex flex-row w-full justify-between p-4 rounded-lg {viewIndex == 1 && 'rounded-r-none'}">
         <div class="flex flex-row justify-start">
             {#if codeSnippets.length > 1}
                 {#each codeSnippets as codeSnippet, i}
@@ -66,12 +66,12 @@
             {/if}
         </div>
 
-        <button onclick={copyToClipboard} class="flex items-center transition-colors duration-200 text-sm h-8 text-white px-4 py-2 rounded-lg w-auto {buttonIcon == 'check' ? 'copied' : ''}">
+        <button onclick={copyToClipboard} class="flex items-center transition-colors duration-200 text-sm h-8 text-white px-4 py-2 rounded-lg w-auto {buttonIcon == 'check' && 'copied'}" aria-label="Copy code to clipboard">
             <i class="fa fa-{buttonIcon} ? 'copy' : 'check'}"></i>
         </button>
     </div>
 
-    <pre class="language-{currentLanguage} m-0 rounded-lg {viewIndex == 1 ? 'rounded-r-none' : ''}" style={style}>
+    <pre class="language-{currentLanguage} m-0 rounded-lg {viewIndex == 1 && 'rounded-r-none'}" style={style}>
         <code class="language-{currentLanguage}">
             {currentCode}
         </code>

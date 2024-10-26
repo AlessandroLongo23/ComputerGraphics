@@ -6,7 +6,7 @@
     import Result from '$lib/components/Result.svelte';
 
     let viewIndex = $state(1);
-    let loading = $state(true);
+    let isLoading = $state(true);
     let canvas = $state(), gl, program;
     let codeSnippets = $state([]);
 
@@ -14,6 +14,20 @@
 
     onMount(async () => {
         if (typeof window !== 'undefined') {
+            if (window.MathJax) {
+                window.MathJax.typesetPromise && window.MathJax.typesetPromise();
+
+                document.querySelectorAll("[class*='mjx']").forEach(function(el) {
+                    el.style.fontSize = '20px';
+                });
+
+                document.querySelectorAll("[size='s']").forEach(function(parent) {
+                    parent.querySelectorAll('*').forEach(function(el) {
+                        el.style.fontSize = '16px';
+                    });
+                });
+            }
+            
             gl = WebGLUtils.setupWebGL(canvas);
             gl.viewport(0, 0, canvas.width, canvas.height);
             gl.clearColor(0.3921, 0.5843, 0.9294, 1.0);
@@ -40,7 +54,7 @@
             }
 
             codeSnippets = await fetchCodeSnippets($page.url.pathname);
-            loading = false;
+            isLoading = false;
         }
     });
 
@@ -56,5 +70,5 @@
         <p>Setup a vertex buffer with the corresponding attribute pointer. Add the coordinates and draw three points of size 20 pixels, like in the figure. [Angel 2.4, 2.8, and 2.5.3] [If using WebGPU, note that points can only be of size 1. These points then need to be drawn as two triangles forming a square.] Shaders and buffers.</p>
     </div>
 
-    <Result bind:canvas={canvas} bind:viewIndex={viewIndex} loading={loading} codeSnippets={codeSnippets}/>
+    <Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets}/>
 </div>
