@@ -6,10 +6,10 @@
     import Result from '$lib/components/Result.svelte';
     import Admonition from '$lib/components/UI/Admonition.svelte';
 
-    let viewIndex = 1;
-    let loading = true;
-    let canvas, gl, program;
-    let codeSnippets = [];
+    let viewIndex = $state(1);
+    let loading = $state(true);
+    let canvas = $state(), gl, program;
+    let codeSnippets = $state([]);
 
     let vertices, indices, rot;
     let modelViewMatrixLoc;
@@ -144,9 +144,11 @@
         <p>Draw lines instead of triangles to draw in wireframe. [Angel 2.4] </p>
         <p>Build a model-view matrix that transforms the cube vertices so that the cube is in isometric view. [Angel 4.12, 5.1.3, 5.3]</p>
         <Admonition type='warning'>
-            <p slot='textContent' class="m-0">
-                If using WebGPU, a projection matrix is needed for this assignment because the default interval for depth coordinates is $[0,1]$ instead of $[-1,1]$.
-            </p>
+            {#snippet textContent()}
+                        <p  class="m-0">
+                    If using WebGPU, a projection matrix is needed for this assignment because the default interval for depth coordinates is $[0,1]$ instead of $[-1,1]$.
+                </p>
+                    {/snippet}
         </Admonition>
     </div>
 

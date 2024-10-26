@@ -3,14 +3,12 @@
     import hljs from 'highlight.js';
     import 'highlight.js/styles/atom-one-dark.css';
 
-    export let style = '';
 
-    export let codeSnippets;
-    export let viewIndex;
-    let currentSnippetIndex = 0;
-    let buttonIcon = 'copy';
-    $: currentCode = codeSnippets[currentSnippetIndex].code;
-    $: currentLanguage = codeSnippets[currentSnippetIndex].language;
+    let { style = '', codeSnippets, viewIndex } = $props();
+    let currentSnippetIndex = $state(0);
+    let buttonIcon = $state('copy');
+    let currentCode = $derived(codeSnippets[currentSnippetIndex].code);
+    let currentLanguage = $derived(codeSnippets[currentSnippetIndex].language);
 
     onMount(() => {
         highlightCode();
@@ -59,7 +57,7 @@
         <div class="flex flex-row justify-start">
             {#if codeSnippets.length > 1}
                 {#each codeSnippets as codeSnippet, i}
-                    <button class="flex me-2 text-sm h-8 transition-colors duration-200 items-center text-white px-4 py-4 rounded-lg w-auto" class:selected={i === currentSnippetIndex} on:click={() => selectSnippet(i)}> 
+                    <button class="flex me-2 text-sm h-8 transition-colors duration-200 items-center text-white px-4 py-4 rounded-lg w-auto" class:selected={i === currentSnippetIndex} onclick={() => selectSnippet(i)}> 
                         {codeSnippet.name} 
                     </button>
                 {/each}
@@ -68,7 +66,7 @@
             {/if}
         </div>
 
-        <button on:click={copyToClipboard} class="flex items-center transition-colors duration-200 text-sm h-8 text-white px-4 py-2 rounded-lg w-auto {buttonIcon == 'check' ? 'copied' : ''}">
+        <button onclick={copyToClipboard} class="flex items-center transition-colors duration-200 text-sm h-8 text-white px-4 py-2 rounded-lg w-auto {buttonIcon == 'check' ? 'copied' : ''}">
             <i class="fa fa-{buttonIcon} ? 'copy' : 'check'}"></i>
         </button>
     </div>

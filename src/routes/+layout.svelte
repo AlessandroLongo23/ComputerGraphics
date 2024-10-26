@@ -1,12 +1,13 @@
 <script>
     import "../style/app.css";
+    let { children } = $props();
 </script>
   
-<slot />
+{@render children?.()}
 
 <style>
-    :global(*) {
+    /* :global(*) {
         user-select: none;
         font-size: 16px;
-    }
+    } */
 </style>

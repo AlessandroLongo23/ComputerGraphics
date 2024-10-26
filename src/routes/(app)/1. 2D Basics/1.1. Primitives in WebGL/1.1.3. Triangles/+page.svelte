@@ -5,10 +5,10 @@
     import * as mv from '$lib/Libraries/MV.js';
     import Result from '$lib/components/Result.svelte'
 
-    let loading = true;
-    let viewIndex = 1;
-    let canvas, gl, program;
-    let codeSnippets = [];
+    let loading = $state(true);
+    let viewIndex = $state(1);
+    let canvas = $state(), gl, program;
+    let codeSnippets = $state([]);
 
     let vertices = [];
     let colors = [];

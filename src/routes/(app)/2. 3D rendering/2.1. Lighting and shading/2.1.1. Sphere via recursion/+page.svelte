@@ -1,4 +1,6 @@
 <script>
+    import { run } from 'svelte/legacy';
+
     import { onMount } from 'svelte';
     import { page } from '$app/stores'
     import { WebGLUtils, fetchCodeSnippets, initShaders } from '$lib/utils.js';
@@ -6,14 +8,14 @@
     import Result from '$lib/components/Result.svelte';
     import Counter from '$lib/components/UI/Counter.svelte';
 
-    let viewIndex = 1;
-    let loading = true;
-    let canvas, gl, program;
-    let codeSnippets = [];
+    let viewIndex = $state(1);
+    let loading = $state(true);
+    let canvas = $state(), gl, program;
+    let codeSnippets = $state([]);
 
     let vertices, vBuffer, baseColors, colors;
     let modelViewMatrixLoc, projectionMatrixLoc;
-    let subdivisions;
+    let subdivisions = $state();
     let v0, v1, v2, v3;
     let thetaY = 30;
 
@@ -143,7 +145,9 @@
         vertices.push(c);
     }
 
-    $: subdivisions != undefined && buildPolyhedron();
+    run(() => {
+        subdivisions != undefined && buildPolyhedron();
+    });
 </script>
 
 <div class="flex flex-col justify-center items-start w-4/5 text-xl m-auto">
@@ -155,11 +159,11 @@
     </div>
 
     <Result bind:canvas={canvas} bind:viewIndex={viewIndex} loading={loading} codeSnippets={codeSnippets}>
-        <div slot='controls'>
+        {#snippet controls()}
             <div class="absolute left-0 top-0 flex flex-row justify-evenly items-center gap-4 w-full p-4 bg-gray-900/25 rounded-{viewIndex == 1 ? 'r-' : ''}lg">    
                 <Counter bind:count={subdivisions} min={0} max={6}/>
             </div>
-        </div>
+        {/snippet}
     </Result>
 </div>
 

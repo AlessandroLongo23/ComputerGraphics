@@ -1,4 +1,6 @@
 <script>
+    import { run } from 'svelte/legacy';
+
     import { onMount } from 'svelte';
     import { page } from '$app/stores'
     import { WebGLUtils, fetchCodeSnippets, initShaders } from '$lib/utils.js';
@@ -8,18 +10,18 @@
     import Slider from '$lib/components/UI/Slider.svelte';
     import Admonition from '$lib/components/UI/Admonition.svelte';
 
-    let viewIndex = 1;
-    let loading = true;
-    let canvas, gl, program;
-    let codeSnippets = [];
+    let viewIndex = $state(1);
+    let loading = $state(true);
+    let canvas = $state(), gl, program;
+    let codeSnippets = $state([]);
 
     let vertices, vBuffer;
-    let subdivisions;
+    let subdivisions = $state();
     let v0, v1, v2, v3;
     let thetaY = 30;
     let viewMatrixLoc, modelMatrixLoc, projectionMatrixLoc, eyePosLoc;
     let kLoc, LLoc, ksLoc, sLoc;
-    let k, L, ks, s;
+    let k = $state(), L = $state(), ks = $state(), s = $state();
 
     onMount(async () => {
         if (typeof window !== 'undefined') {
@@ -33,7 +35,7 @@
                 // enabling depth test and culling
                 gl.enable(gl.DEPTH_TEST);
                 gl.enable(gl.CULL_FACE);
-                gl.cullFace(gl.BACK);
+                gl.cullFace(gl.FRONT);
 
                 // set the camera position
                 eyePosLoc = gl.getUniformLocation(program, "eyePos");
@@ -159,7 +161,9 @@
         gl.uniform1f(sLoc, Math.pow(10, s));
     } 
 
-    $: subdivisions != undefined && buildPolyhedron();
+    run(() => {
+        subdivisions != undefined && buildPolyhedron();
+    });
 </script>
 
 <div class="flex flex-col justify-center items-start w-4/5 text-xl m-auto">
@@ -170,31 +174,35 @@
             instead of colors [Angel 6.5.3, 6.10].
         </p>
         <Admonition type='warning' color='orange'>
-            <p slot='textContent' class="m-0">
-                Remember to re-normalize direction vectors that are varying and therefore 
-                linearly interpolated across a triangle.
-            </p>
+            {#snippet textContent()}
+                        <p  class="m-0">
+                    Remember to re-normalize direction vectors that are varying and therefore 
+                    linearly interpolated across a triangle.
+                </p>
+                    {/snippet}
         </Admonition>        
     </div>
 
     <Result bind:canvas={canvas} bind:viewIndex={viewIndex} loading={loading} codeSnippets={codeSnippets}>
-        <div slot='controls'>
-            <div class="absolute left-0 top-0 flex flex-col justify-evenly items-center gap-4 w-full p-4 bg-gray-900/25 rounded-{viewIndex == 1 ? 'r-' : ''}lg">    
-                <Counter bind:count={subdivisions} min={0} max={6}/>
-            </div>
+        {#snippet controls()}
+                <div >
+                <div class="absolute left-0 top-0 flex flex-col justify-evenly items-center gap-4 w-full p-4 bg-gray-900/25 rounded-{viewIndex == 1 ? 'r-' : ''}lg">    
+                    <Counter bind:count={subdivisions} min={0} max={6}/>
+                </div>
 
-            <div class="absolute left-0 bottom-0 flex flex-row justify-evenly items-center gap-4 w-full p-4 bg-gray-900/75 rounded-{viewIndex == 1 ? 'r-' : ''}lg">
-                <div class="flex flex-col justify-evenly w-full">
-                    <Slider min={0} max={1} bind:value={k} step={0.01} id={k} label="k"/>
-                    <Slider min={0} max={1} bind:value={L} step={0.01} id={L} label="L"/>
-                </div>    
+                <div class="absolute left-0 bottom-0 flex flex-row justify-evenly items-center gap-4 w-full p-4 bg-gray-900/75 rounded-{viewIndex == 1 ? 'r-' : ''}lg">
+                    <div class="flex flex-col justify-evenly w-full">
+                        <Slider min={0} max={1} bind:value={k} step={0.01} id={k} label="k"/>
+                        <Slider min={0} max={1} bind:value={L} step={0.01} id={L} label="L"/>
+                    </div>    
 
-                <div class="flex flex-col justify-evenly w-full">
-                    <Slider min={0} max={1} bind:value={ks} step={0.01} id={ks} label="k_s"/>
-                    <Slider min={0} max={3} bind:value={s} step={0.01} id={s} label="s" f={(x) => Math.round(Math.pow(10, x))}/>
+                    <div class="flex flex-col justify-evenly w-full">
+                        <Slider min={0} max={1} bind:value={ks} step={0.01} id={ks} label="k_s"/>
+                        <Slider min={0} max={3} bind:value={s} step={0.01} id={s} label="s" f={(x) => Math.round(Math.pow(10, x))}/>
+                    </div>
                 </div>
             </div>
-        </div>
+            {/snippet}
     </Result>
 </div>
 

@@ -6,10 +6,10 @@
     import * as mv from '$lib/Libraries/MV.js';
     import Result from '$lib/components/Result.svelte';
 
-    let viewIndex = 1;
-    let loading = true;
-    let canvas, gl, program;
-    let codeSnippets = [];
+    let viewIndex = $state(1);
+    let loading = $state(true);
+    let canvas = $state(), gl, program;
+    let codeSnippets = $state([]);
 
     let vertices = [];
     let vel, pos, posLoc, date, deltaTime, t1, t2, damp, airFriction, radFriction, num, rad;
@@ -124,10 +124,12 @@
     </div>
 
     <Result bind:canvas={canvas} bind:viewIndex={viewIndex} loading={loading} codeSnippets={codeSnippets}>
-        <div slot='controls'>
-            <button on:click={initBall} class="absolute left-0 top-0 m-4 p-2 bg-gray-100 rounded-lg hover:bg-gray-300 transition-colors">
-                <svelte:component this={ RotateCw } size={20}/>
-            </button>
-        </div>
+        {#snippet controls()}
+                <div >
+                <button onclick={initBall} class="absolute left-0 top-0 m-4 p-2 bg-gray-100 rounded-lg hover:bg-gray-300 transition-colors">
+                    <RotateCw size={20}/>
+                </button>
+            </div>
+            {/snippet}
     </Result>
 </div>

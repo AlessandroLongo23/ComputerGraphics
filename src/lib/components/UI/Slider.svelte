@@ -1,8 +1,14 @@
 <script>
-    export let min, max, value, step;
-    export let id, label;
-    export let showValue = true;
-    export let f = ((x) => x);
+    let {
+        min,
+        max,
+        value = $bindable(),
+        step,
+        id,
+        label,
+        showValue = true,
+        f = (x) => x
+    } = $props();
 </script>
 
 <div class="flex flex-row justify-start gap-2 items-center">

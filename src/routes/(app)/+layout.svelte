@@ -2,11 +2,12 @@
     import Topbar from "$lib/components/layout/Topbar.svelte";
     import LeftSidebar from "$lib/components/layout/LeftSidebar.svelte";
     import { theme } from "$lib/stores";
+    let { children } = $props();
 </script>
 
 <div class="{ theme }">
     <LeftSidebar>
         <Topbar/>
-        <slot />
+        {@render children?.()}
     </LeftSidebar>
 </div>

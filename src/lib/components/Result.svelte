@@ -5,15 +5,18 @@
 
     import { Code, Columns2, Play } from 'lucide-svelte';
 
-    export let viewIndex;
-    export let canvas;
-    export let loading;
-    export let codeSnippets;
-    export let width = 512;
+    let {
+        viewIndex = $bindable(),
+        canvas = $bindable(),
+        loading,
+        codeSnippets,
+        width = 512,
+        controls
+    } = $props();
 </script>
 
 <div class="mx-auto my-4">
-    <Toggle icons={[Code, Columns2, Play]} bind:selected={viewIndex}/>
+    <!-- <Toggle bind:selected={viewIndex} icons={[Code, Columns2, Play]}/> -->
 </div>
 
 <div class="flex flex-row justify-evenly items-center m-auto">
@@ -26,8 +29,8 @@
     </div>
 
     <Canvas bind:canvas={canvas} viewIndex={viewIndex} width={width}>
-        <div slot='controls'>
-            <slot name='controls'/>
-        </div>
+        {#snippet controls()}
+            {@render controls?.()}
+        {/snippet}
     </Canvas>
 </div>

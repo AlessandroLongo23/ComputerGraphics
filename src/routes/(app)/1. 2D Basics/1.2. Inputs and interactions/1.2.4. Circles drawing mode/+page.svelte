@@ -1,3 +1,4 @@
+<!-- @migration-task Error while migrating Svelte code: `i` has already been declared -->
 <script>
     import { onMount } from 'svelte';
     import { page } from '$app/stores'
@@ -50,11 +51,11 @@
                     if (mode == 'points') {
                         switch(document.getElementById("pointscolor").selectedIndex) {
                             case 0:
-                                for (var i = 0; i < 6; i++)
+                                for (i = 0; i < 6; i++)
                                     colors.push(vec4(0.0, 0.0, 0.0, 1.0));
                                 break;
                             case 1:
-                                for (var i = 0; i < 6; i++)
+                                for (i = 0; i < 6; i++)
                                     colors.push(vec4(1.0, 1.0, 1.0, 1.0));
                                 break;
                         }
@@ -77,11 +78,11 @@
                         } else {
                             switch(document.getElementById("pointscolor").selectedIndex) {
                                 case 0:
-                                    for (var i = 0; i < 6; i++)
+                                    for (i = 0; i < 6; i++)
                                         colors.push(vec4(0.0, 0.0, 0.0, 1.0));
                                     break;
                                 case 1:
-                                    for (var i = 0; i < 6; i++)
+                                    for (i = 0; i < 6; i++)
                                         colors.push(vec4(1.0, 1.0, 1.0, 1.0));
                                     break;
                             }
@@ -109,11 +110,11 @@
                         } else {
                             switch(document.getElementById("pointscolor").selectedIndex) {
                                 case 0:
-                                    for (var i = 0; i < 6; i++)
+                                    for (i = 0; i < 6; i++)
                                         colors.push(vec4(0.0, 0.0, 0.0, 1.0));
                                     break;
                                 case 1:
-                                    for (var i = 0; i < 6; i++)
+                                    for (i = 0; i < 6; i++)
                                         colors.push(vec4(1.0, 1.0, 1.0, 1.0));
                                     break;
                             }
@@ -132,8 +133,9 @@
                         -1 + 2 * (event.clientX - canvas.getBoundingClientRect().x) / canvas.width,
                         1 - 2 * (event.clientY - canvas.getBoundingClientRect().y) / canvas.height
                     );
+                    var newVertices = [];
                     if (mode == 'points') {
-                        var newVertices = [
+                        newVertices = [
                             vec2(t[0] - side / canvas.width, t[1] - side / canvas.height),
                             vec2(t[0] - side / canvas.width, t[1] + side / canvas.height),
                             vec2(t[0] + side / canvas.width, t[1] + side / canvas.height),
@@ -155,14 +157,14 @@
 
                             vertices = vertices.slice(0, vertices.length - 12);
 
-                            var newVertices = [
+                            newVertices = [
                                 firstVertex,
                                 secondVertex,
                                 t
                             ]
                             count = 0;
                         } else {
-                            var newVertices = [
+                            newVertices = [
                                 vec2(t[0] - side / canvas.width, t[1] - side / canvas.height),
                                 vec2(t[0] - side / canvas.width, t[1] + side / canvas.height),
                                 vec2(t[0] + side / canvas.width, t[1] + side / canvas.height),
@@ -180,7 +182,7 @@
                             );
                             var rad = Math.sqrt(Math.pow(center[0] - t[0], 2) + Math.pow(center[1] - t[1], 2));
 
-                            var newVertices = [];
+                            newVertices = [];
                             for (let angle = 0; angle < Math.PI * 2; angle += Math.PI * 2 / numTriangles) {
                                 newVertices.push(vec2(
                                     center[0] + rad * Math.cos(angle),
@@ -194,7 +196,7 @@
                             }
                             count = 0;
                         } else {
-                            var newVertices = [
+                            newVertices = [
                                 vec2(t[0] - side / canvas.width, t[1] - side / canvas.height),
                                 vec2(t[0] - side / canvas.width, t[1] + side / canvas.height),
                                 vec2(t[0] + side / canvas.width, t[1] + side / canvas.height),
@@ -206,7 +208,7 @@
                         }
                     }
                     
-                    for (var i = 0; i < newVertices.length; i++)
+                    for (i = 0; i < newVertices.length; i++)
                         vertices.push(newVertices[i]);
 
                     gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
@@ -267,11 +269,11 @@
     </div>
 
     <Result bind:canvas={canvas} bind:viewIndex={viewIndex} loading={loading} codeSnippets={codeSnippets}>
-        <div slot='controls'>
+        {#snippet controls()}
             <div class="absolute left-0 top-0 flex flex-row justify-evenly items-center gap-4 w-full p-4 bg-gray-900/25 rounded-{viewIndex == 1 ? 'r-' : ''}lg">    
                 <div class="flex flex-col justify-between items-center gap-2">
                     <button id="clear" class="flex w-32 h-8 items-center justify-center px-auto py-4 transition-colors duration-200 text-sm bg-white hover:bg-gray-300 text-black rounded-lg">Clear canvas</button>
-                    <Toggle icons={[Dot, Triangle, Circle]} bind:selected={modeIndex}/>
+                    <!-- <Toggle bind:selected={modeIndex} icons={[Dot, Triangle, Circle]}/> -->
                 </div>
                 
                 <div class="flex flex-row justify-between items-center gap-4">
@@ -293,6 +295,6 @@
                     </div>
                 </div>
             </div>
-        </div>
+        {/snippet}
     </Result>
 </div>

@@ -1,40 +1,18 @@
 <script>
-    import { onMount } from "svelte";
     import { page } from "$app/stores";
     import { contentSequence } from "$lib/data/pages";
     import Toggle from "$lib/components/UI/Toggle.svelte";
     import { Sun, Moon } from "lucide-svelte";
     import { theme } from "$lib/stores";
 
-    let title, subtitle
-    let url, previousPageUrl, nextPageUrl;
-
-    let themeIndex;
-    $: themeIndex = $theme === 'light' ? 0 : 1;
-    $: theme.set(themeIndex === 0 ? 'light' : 'dark');
-
-    onMount(() => {
-        url = $page.url.pathname;
-        previousPageUrl = getPage(-1);
-        nextPageUrl = getPage(1);
-        updateTitle();
-    });
-
-    $: {
-        url = $page.url.pathname;
-        previousPageUrl = getPage(-1);
-        nextPageUrl = getPage(1);
-        updateTitle();
-    }
-
-    function updateTitle() {
-        title = $page.url.pathname.split("/").pop()
+    let [title, subtitle] = $derived.by(() => {
+        let title = $page.url.pathname.split("/").pop();
         title = capitalize(title.replaceAll("%20", " "));
-        subtitle = undefined;
+        let subtitle = undefined;
         
         const parts = title.split('.');
         const count = parts.length - 1;
-
+        
         if (count === 1) {
             subtitle = 'Section ' + parts[0] + '.';
             title = parts[1].trim();
@@ -45,28 +23,42 @@
             subtitle = 'Exercise ' + parts[0] + '.' + parts[1] + '.' + parts[2] + '.';
             title = parts[3].trim();
         }
-    }
+
+        return [title, subtitle];
+    });
+
+    let previousPageUrl = $derived.by(() => getPage(-1));
+    let nextPageUrl = $derived.by(() => getPage(1));
+
+    let themeIndex = $state();
 
     function capitalize(str) {
         return str.charAt(0).toUpperCase() + str.slice(1);
     }
 
     function getPage(off) {
-        if (url == '/home')
+        if ($page.url.pathname == '/home')
             return undefined;
 
-        let item = contentSequence.find(item => item.href?.split('/').pop() == url.split("/").pop().replaceAll("%20", " "))
+        let item = contentSequence.find(it => it.href?.split('/').pop() == $page.url.pathname.split("/").pop().replaceAll("%20", " "))
         let index = contentSequence.indexOf(item);
         if (index + off < 0 || index + off >= contentSequence.length)
             return undefined;
 
         return contentSequence[index + off].href;
     }
+
+    $effect(() => {
+        themeIndex = $theme === 'light' ? 0 : 1;
+    });
+    $effect(() => {
+        theme.set(themeIndex === 0 ? 'light' : 'dark');
+    });
 </script>
 
 <div class="flex flex-row justify-center items-center faded-border mx-16 mb-8 py-4">
-    {#if previousPageUrl && url != "/home"}
-        <a href="{previousPageUrl}">
+    {#if previousPageUrl && $page.url.pathname != "/home"}
+        <a href="{previousPageUrl}" aria-label="Previous page">
             <i class="fa-solid fa-arrow-left text-2xl mx-6 m-auto text-black"></i>
         </a>
     {:else}
@@ -80,8 +72,8 @@
         <p class="text-4xl font-bold">{title}</p>
     </div>
 
-    {#if nextPageUrl && url != "/home"}
-        <a href="{nextPageUrl}">
+    {#if nextPageUrl && $page.url.pathname != "/home"}
+        <a href="{nextPageUrl}" aria-label="Next page">
             <i class="fa-solid fa-arrow-right text-2xl mx-6 m-auto text-black"></i>
         </a>
     {:else}
@@ -89,7 +81,7 @@
     {/if}
 
     <div class="absolute right-8">
-        <Toggle icons={[Sun, Moon]} bind:value={themeIndex}/>
+        <!-- <Toggle bind:selected={themeIndex} icons={[Sun, Moon]}/> -->
     </div>
 </div>
 

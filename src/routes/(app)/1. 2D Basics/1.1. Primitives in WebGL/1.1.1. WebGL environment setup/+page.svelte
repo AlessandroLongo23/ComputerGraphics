@@ -4,10 +4,10 @@
     import { WebGLUtils, fetchCodeSnippets } from '$lib/utils.js';
     import Result from '$lib/components/Result.svelte';
 
-    let viewIndex = 1;
-    let loading = true;
-    let canvas, gl;
-    let codeSnippets = [];
+    let viewIndex = $state(1);
+    let loading = $state(true);
+    let canvas = $state(), gl;
+    let codeSnippets = $state([]);
 
     let vertices = [];
 

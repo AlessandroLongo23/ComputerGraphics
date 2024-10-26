@@ -1,6 +1,6 @@
 <script>
     import { page } from '$app/stores'
-    export let title;
+    let { title } = $props();
 
     let href = $page.url.pathname.replace('/home', '') + "/" + title;
 </script>

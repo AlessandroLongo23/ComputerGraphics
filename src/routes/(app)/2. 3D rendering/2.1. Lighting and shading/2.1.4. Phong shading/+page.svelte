@@ -8,18 +8,18 @@
     import Slider from '$lib/components/UI/Slider.svelte';
     import Admonition from '$lib/components/UI/Admonition.svelte';
 
-    let viewIndex = 1;
-    let loading = true;
-    let canvas, gl, program;
-    let codeSnippets = [];
+    let viewIndex = $state(1);
+    let loading = $state(true);
+    let canvas = $state(), gl, program;
+    let codeSnippets = $state([]);
 
     let vertices, vBuffer;
-    let subdivisions;
+    let subdivisions = $state();
     let v0, v1, v2, v3;
     let thetaY = 30;
     let viewMatrixLoc, modelMatrixLoc, projectionMatrixLoc, eyePosLoc;
     let kLoc, LLoc, ksLoc, sLoc;
-    let k, L, ks, s;
+    let k = $state(), L = $state(), ks = $state(), s = $state();
 
     onMount(async () => {
         if (typeof window !== 'undefined') {
@@ -47,7 +47,7 @@
                 // enabling depth test and culling
                 gl.enable(gl.DEPTH_TEST);
                 gl.enable(gl.CULL_FACE);
-                gl.cullFace(gl.BACK);
+                gl.cullFace(gl.FRONT);
 
                 // set the camera position
                 eyePosLoc = gl.getUniformLocation(program, "eyePos");
@@ -173,27 +173,33 @@
         gl.uniform1f(sLoc, Math.pow(10, s));
     } 
 
-    $: subdivisions != undefined && buildPolyhedron();
+    $effect(() => {
+        subdivisions != undefined && buildPolyhedron();
+    });
 </script>
 
 <div class="flex flex-col justify-center items-start w-4/5 text-xl m-auto">
     <div class="w-4/5 m-auto">
         <p>Implement the full Phong reflection model in the vertex shader and create sliders for material parameters ($k_d$, $k_s$, $s$) and light parameters ($L_e$, $L_a$). Here, $s$ is the shininess called $\alpha$ in the textbook. [Angel 3.6.5, 6.3, 6.7-6.8]</p>
         <Admonition type='tip'>
-            <p slot='textContent' class="m-0">
-                Use the "input" event instead of the onchange function if you prefer immediate response while using a slider (instead of only getting response when the slider is released).
-            </p>
+            {#snippet textContent()}
+                <p class="m-0">
+                    Use the "input" event instead of the onchange function if you prefer immediate response while using a slider (instead of only getting response when the slider is released).
+                </p>
+            {/snippet}
         </Admonition>
         <p>Pick a color for the sphere, use white for the light, use just a single slider for each parameter, and use $L_d = L_s = L_e$ and $k_a = k_d$ in the model.</p>
         <Admonition type='note'>
-            <p slot='textContent' class="m-0">
-                This means that your solution can be significantly simpler than the example in the textbook.
-            </p>
+            {#snippet textContent()}
+                <p class="m-0">
+                    This means that your solution can be significantly simpler than the example in the textbook.
+                </p>
+            {/snippet}
         </Admonition> 
     </div>
       
     <Result bind:canvas={canvas} bind:viewIndex={viewIndex} loading={loading} codeSnippets={codeSnippets}>
-        <div slot='controls'>
+        {#snippet controls()}
             <div class="absolute left-0 top-0 flex flex-col justify-evenly items-center gap-4 w-full p-4 bg-gray-900/25 rounded-{viewIndex == 1 ? 'r-' : ''}lg">    
                 <Counter bind:count={subdivisions} min={0} max={6}/>
             </div>
@@ -209,6 +215,6 @@
                     <Slider min={0} max={3} bind:value={s} step={0.01} id={s} label="s" f={((x) => Math.round(Math.pow(10, x)))}/>
                 </div>
             </div>
-        </div>
+        {/snippet}
     </Result>
 </div>

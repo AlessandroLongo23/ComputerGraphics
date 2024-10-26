@@ -49,11 +49,11 @@
                     if (mode == 'points') {
                         switch(document.getElementById("pointscolor").selectedIndex) {
                             case 0:
-                                for (var i = 0; i < 6; i++)
+                                for (i = 0; i < 6; i++)
                                     colors.push(vec4(0.0, 0.0, 0.0, 1.0));
                                 break;
                             case 1:
-                                for (var i = 0; i < 6; i++)
+                                for (i = 0; i < 6; i++)
                                     colors.push(vec4(1.0, 1.0, 1.0, 1.0));
                                 break;
                         }
@@ -76,11 +76,11 @@
                         } else {
                             switch(document.getElementById("pointscolor").selectedIndex) {
                                 case 0:
-                                    for (var i = 0; i < 6; i++)
+                                    for (i = 0; i < 6; i++)
                                         colors.push(vec4(0.0, 0.0, 0.0, 1.0));
                                     break;
                                 case 1:
-                                    for (var i = 0; i < 6; i++)
+                                    for (i = 0; i < 6; i++)
                                         colors.push(vec4(1.0, 1.0, 1.0, 1.0));
                                     break;
                             }
@@ -99,8 +99,9 @@
                         -1 + 2 * (event.clientX - canvas.getBoundingClientRect().x) / canvas.width,
                         1 - 2 * (event.clientY - canvas.getBoundingClientRect().y) / canvas.height
                     );
+                    var newVertices = [];
                     if (mode == 'points') {
-                        var newVertices = [
+                        newVertices = [
                             vec2(t[0] - side / canvas.width, t[1] - side / canvas.height),
                             vec2(t[0] - side / canvas.width, t[1] + side / canvas.height),
                             vec2(t[0] + side / canvas.width, t[1] + side / canvas.height),
@@ -110,6 +111,7 @@
                             vec2(t[0] + side / canvas.width, t[1] + side / canvas.height),
                         ]
                     } else if (mode == 'triangles') {
+                        newVertices = [];
                         if (count == 3) {
                             var firstVertex = vec2(
                                 (vertices[vertices.length - 1][0] + vertices[vertices.length - 3][0]) / 2, 
@@ -122,14 +124,14 @@
 
                             vertices = vertices.slice(0, vertices.length - 12);
 
-                            var newVertices = [
+                            newVertices = [
                                 firstVertex,
                                 secondVertex,
                                 t
                             ]
                             count = 0;
                         } else {
-                            var newVertices = [
+                            newVertices = [
                                 vec2(t[0] - side / canvas.width, t[1] - side / canvas.height),
                                 vec2(t[0] - side / canvas.width, t[1] + side / canvas.height),
                                 vec2(t[0] + side / canvas.width, t[1] + side / canvas.height),
@@ -198,19 +200,21 @@
     <div class="w-4/5 m-auto">
         <p>We would now like to have two different drawing modes. One where we draw points and one where we interactively build a triangle by placing three points. Add a button for each drawing mode. [Angel 3.6.2]</p>
         <Admonition type='tip'>
-            <p slot='textContent' class="m-0">
-                What we do has some relation to the textbook CAD example [Angel 3.10], where a polygon is built interactively.
-            </p>
+            {#snippet textContent()}
+                <p class="m-0">
+                    What we do has some relation to the textbook CAD example [Angel 3.10], where a polygon is built interactively.
+                </p>
+            {/snippet}
         </Admonition>
-    <p>Let us draw all our shapes as triangles (using gl.TRIANGLES). When a point is drawn, add vertices (positions and colors) for two triangles representing this point to the vertex buffers. In the triangle drawing mode, keep a record (array) of the former points that were clicked and their colors. When the third point is clicked, replace the two points and their colors (four triangles) with the one triangle to be drawn and clear the record.</p>
+        <p>Let us draw all our shapes as triangles (using gl.TRIANGLES). When a point is drawn, add vertices (positions and colors) for two triangles representing this point to the vertex buffers. In the triangle drawing mode, keep a record (array) of the former points that were clicked and their colors. When the third point is clicked, replace the two points and their colors (four triangles) with the one triangle to be drawn and clear the record.</p>
     </div>
 
     <Result bind:canvas={canvas} bind:viewIndex={viewIndex} loading={loading} codeSnippets={codeSnippets}>
-        <div slot='controls'>
+        {#snippet controls()}
             <div class="absolute left-0 top-0 flex flex-row justify-evenly items-center gap-4 w-full p-4 bg-gray-900/25 rounded-{viewIndex == 1 ? 'r-' : ''}lg">    
                 <div class="flex flex-col justify-between items-center gap-2">
                     <button id="clear" class="flex w-32 h-8 items-center justify-center px-auto py-4 transition-colors duration-200 text-sm bg-white hover:bg-gray-300 text-black rounded-lg">Clear canvas</button>
-                    <Toggle icons={[Dot, Triangle]} bind:selected={modeIndex}/>
+                    <!-- <Toggle bind:selected={modeIndex} icons={[Dot, Triangle]}/> -->
                 </div>
                 
                 <div class="flex flex-row justify-between items-center gap-4">
@@ -232,6 +236,6 @@
                     </div>
                 </div>
             </div>
-        </div>
+        {/snippet}
     </Result>
 </div>
