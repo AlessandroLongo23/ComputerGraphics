@@ -14,7 +14,7 @@ window.onload = function init() {
     // enabling depth test and culling
     gl.enable(gl.DEPTH_TEST);
     gl.enable(gl.CULL_FACE);
-    gl.cullFace(gl.BACK);
+    gl.cullFace(gl.FRONT);
 
     // set the camera position
     eyePosLoc = gl.getUniformLocation(program, "eyePos");

@@ -11,7 +11,7 @@ uniform float L;
 uniform float ks;
 uniform float s;
 
-varying vec4 vertex_color;
+varying vec4 vColor;
 
 void main() {
     vec4 pos = modelMatrix * vPosition;
@@ -22,8 +22,8 @@ void main() {
     vec3 ambient_color = k * vec3(L);
     
     // diffuse lighting
-    float diffuse = max(dot(n, w_i), 0.0);
-    vec3 diffuse_color = k * diffuse * vec3(L);
+    float diffuse = max(dot(n, -w_i), 0.0);
+    vec3 diffuseColor = k * diffuse * vec3(L);
 
     // specular lighting
     vec3 w_r = reflect(w_i, n);
@@ -32,6 +32,6 @@ void main() {
     vec3 specular_color = ks * specular * vec3(L);
 
     // final color and position
-    vertex_color = vec4(ambient_color + diffuse_color + specular_color, 1.0);
+    vColor = vec4(ambient_color + diffuseColor + specular_color, 1.0);
     gl_Position = projectionMatrix * viewMatrix * pos;
 }

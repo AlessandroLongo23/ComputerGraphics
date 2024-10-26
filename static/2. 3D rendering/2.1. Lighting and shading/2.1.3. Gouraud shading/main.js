@@ -4,7 +4,7 @@ window.onload = function init() {
     // enabling depth test and culling
     gl.enable(gl.DEPTH_TEST);
     gl.enable(gl.CULL_FACE);
-    gl.cullFace(gl.BACK);
+    gl.cullFace(gl.FRONT);
 
     // Set the light direction
     var lightDirection = vec3(0.0, 0.0, -1.0);

@@ -8,7 +8,7 @@
 
         <div class="flex flex-row justify-center items-center me-9">
             <p class="text-8xl">Computer</p>
-            <img src="/images/favicon-{ $theme }.png" alt="icon" class="w-16 h-16 mx-4">
+            <img src="./images/favicon-{ $theme }.png" alt="icon" class="w-16 h-16 mx-4">
             <p class="text-8xl">Graphics</p>
         </div>
     </div>

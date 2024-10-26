@@ -17,7 +17,7 @@ void main() {
 
     // diffuse    
     float diffuse = max(dot(n, w_i), 0.0);
-    vec3 diffuse_color = k * diffuse * vec3(L);
+    vec3 diffuseColor = k * diffuse * vec3(L);
     
     // specular
     float ks = 0.2;
@@ -27,5 +27,5 @@ void main() {
     float specular = pow(max(dot(w_r, w_o), 0.0), s);
     vec3 specular_color = ks * specular * vec3(L);
     
-    gl_FragColor = vec4(ambient_color + diffuse_color + specular_color, 1.0);
+    gl_FragColor = vec4(ambient_color + diffuseColor + specular_color, 1.0);
 }

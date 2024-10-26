@@ -120,15 +120,18 @@ export const contentTree = {
         },
         { 
             icon: chapterIcons[2], 
-            href: '/3. Advanced rendering' 
+            href: '/3. Advanced rendering',
+            children: []
         },
         { 
             icon: chapterIcons[3], 
             href: '/4. Advanced techniques', 
+            children: []
         },
         {
             icon: chapterIcons[4],
             href: '/E. Extras',
+            children: []
         }
     ]
 };
