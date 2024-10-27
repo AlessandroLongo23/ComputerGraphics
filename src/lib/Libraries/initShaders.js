@@ -2,8 +2,7 @@
 //  initShaders.js
 //
 
-function initShaders( gl, vertexShaderId, fragmentShaderId )
-{
+function initShaders(gl, vertexShaderId, fragmentShaderId) {
     var vertShdr;
     var fragShdr;
 

@@ -1,9 +1,10 @@
 <script>
     import { ChevronDown, Menu, GripVertical, X } from 'lucide-svelte';
-    import { theme } from "$lib/stores";
+    import { theme } from "$lib/stores.svelte.js";
     import { page } from '$app/stores';
-    import { contentTree } from '$lib/data/pages';
+    import { contentTree } from '$lib/data/pages.svelte.js';
     import { onMount } from 'svelte';
+
     let { children } = $props();
     
     let isCollapsed = $state(true);
@@ -33,16 +34,18 @@
     //     document.removeEventListener('mouseup', stopResize);
     // }
 
-    let expandedItems = $state(new Set());
+    let expandedItems = $state([]);
 
-    $effect(() => {
+    onMount(() => {
         contentTree.children.forEach(item => {
             if (isParentRouteActive(item)) {
-                expandedItems.add(item.href);
+                if (!expandedItems.find(it => it == item.href))
+                    expandedItems.push(item.href);
+
                 if (item.children) {
                     item.children.forEach(child => {
-                        if (isParentRouteActive(child))
-                            expandedItems.add(child.href);
+                        if (isParentRouteActive(child) && !expandedItems.find(it => it == child.href))
+                            expandedItems.push(child.href);
                     });
                 }
             }
@@ -50,7 +53,7 @@
     });
 
     function isRouteActive(href) {
-        return $page.url.pathname.replaceAll('%20', ' ') === href;
+        return $page.url.pathname === href;
     }
 
     function isParentRouteActive(item) {
@@ -72,13 +75,12 @@
     }
 
     function toggleExpanded(href) {
-        if (expandedItems.has(href))
-            expandedItems.delete(href);
-        else
-            expandedItems.add(href);
-
-        expandedItems = expandedItems;
-    }
+        if (expandedItems.find(it => it == href)) {
+            expandedItems.splice(expandedItems.findIndex(it => it == href), 1);
+        } else {
+            expandedItems.push(href);
+        }
+    }   
 </script>
 
 <div class="flex min-h-screen">
@@ -113,12 +115,12 @@
 
                                 {#if hasChildren}
                                     <button onclick={() => toggleExpanded(item.href)} class="p-1 rounded hover:bg-gray-500/20">
-                                        <ChevronDown size={16} class="transition-transform duration-200 {expandedItems.has(item.href) ? 'text-red-500' : 'rotate-90'}"/>
+                                        <ChevronDown size={16} class="transition-transform duration-200 {expandedItems.find(it => it == item.href) ? 'text-red-500' : 'rotate-90'}"/>
                                     </button>
                                 {/if}
                             </div>
 
-                            {#if hasChildren && expandedItems.has(item.href)}
+                            {#if hasChildren && expandedItems.find(it => it == item.href)}
                                 <div class="ms-4 border-l-2 border-gray-300 pl-2">
                                     {#each item.children as child}
                                         {@const hasGrandchildren = child.children}
@@ -131,12 +133,12 @@
 
                                                 {#if hasGrandchildren}
                                                     <button onclick={() => toggleExpanded(child.href)} class="p-1 rounded hover:bg-gray-500/20">
-                                                        <ChevronDown size={16} class="transition-transform duration-200 {expandedItems.has(child.href) ? 'text-red-500' : 'rotate-90'}"/>
+                                                        <ChevronDown size={16} class="transition-transform duration-200 {expandedItems.find(it => it == child.href) ? 'text-red-500' : 'rotate-90'}"/>
                                                     </button>
                                                 {/if}
                                             </div>
 
-                                            {#if hasGrandchildren && expandedItems.has(child.href)}
+                                            {#if hasGrandchildren && expandedItems.find(it => it == child.href)}
                                                 <div class="pl-2 border-l-2 ml-4 border-gray-300">
                                                     {#each child.children as grandchild}
                                                         <a href={grandchild.href} class="flex items-center gap-4 ps-2 p-1 mb-1 ms-4 rounded-lg hover:no-underline text-black transition-colors hover:bg-gray-300 {isRouteActive(grandchild.href) && 'bg-gray-300'}">

@@ -1,5 +1,5 @@
 <script>
-    import { theme } from "$lib/stores";
+    import { theme } from "$lib/stores.svelte.js";
 </script>
 
 <div class="flex flex-col justify-center items-center h-screen">

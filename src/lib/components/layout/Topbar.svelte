@@ -1,13 +1,13 @@
 <script>
     import { page } from "$app/stores";
-    import { contentSequence } from "$lib/data/pages";
+    import { contentSequence } from "$lib/data/pages.svelte.js";
     import Toggle from "$lib/components/UI/Toggle.svelte";
     import { Sun, Moon } from "lucide-svelte";
-    import { theme } from "$lib/stores";
+    import { theme } from "$lib/stores.svelte.js";
 
     let [title, subtitle] = $derived.by(() => {
         let title = $page.url.pathname.split("/").pop();
-        title = capitalize(title.replaceAll("%20", " "));
+        title = capitalize(title.replaceAll("-", " "));
         let subtitle = undefined;
         
         const parts = title.split('.');
@@ -30,7 +30,7 @@
     let previousPageUrl = $derived.by(() => getPage(-1));
     let nextPageUrl = $derived.by(() => getPage(1));
 
-    let themeIndex = $state();
+    let themeIndex = $state(0);
 
     function capitalize(str) {
         return str.charAt(0).toUpperCase() + str.slice(1);
@@ -40,7 +40,7 @@
         if ($page.url.pathname == '/home')
             return undefined;
 
-        let item = contentSequence.find(it => it.href?.split('/').pop() == $page.url.pathname.split("/").pop().replaceAll("%20", " "))
+        let item = contentSequence.find(it => it.href?.split('/').pop() == $page.url.pathname.split("/").pop())
         let index = contentSequence.indexOf(item);
         if (index + off < 0 || index + off >= contentSequence.length)
             return undefined;
@@ -81,7 +81,7 @@
     {/if}
 
     <div class="absolute right-8">
-        <!-- <Toggle bind:selected={themeIndex} icons={[Sun, Moon]}/> -->
+        <Toggle bind:selected={themeIndex} icons={[Sun, Moon]}/>
     </div>
 </div>
 

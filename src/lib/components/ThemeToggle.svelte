@@ -1,5 +1,5 @@
 <script>
-	import { theme } from "$lib/stores";
+	import { theme } from "$lib/stores.svelte.js";
 
 	const lightSwitches = document.querySelectorAll('.light-switch');
 

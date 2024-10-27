@@ -16,7 +16,7 @@
 </script>
 
 <div class="mx-auto my-4">
-    <!-- <Toggle bind:selected={viewIndex} icons={[Code, Columns2, Play]}/> -->
+    <Toggle bind:selected={viewIndex} icons={[Code, Columns2, Play]}/>
 </div>
 
 <div class="flex flex-row justify-evenly items-center m-auto">
