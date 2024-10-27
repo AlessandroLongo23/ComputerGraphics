@@ -1,4 +1,5 @@
 <script>
+    import { inject } from '@vercel/analytics'
     import "../style/app.css";
     let { children } = $props();
 </script>
