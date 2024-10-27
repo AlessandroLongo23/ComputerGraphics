@@ -20,7 +20,7 @@
     let subdivisions = $state();
     let v0, v1, v2, v3;
     let thetaY = 30;
-    let culling = $state();
+    let culling = $state(0);
 
     onMount(async () => {
         if (typeof window !== 'undefined') {
@@ -45,7 +45,7 @@
             try {
                 [gl, program] = await initShaders(gl, program, $page.url.pathname + '/vshader.glsl', $page.url.pathname + '/fshader.glsl');
 
-                culling = 1;
+                culling = 0;
 
                 // Set the light direction
                 var lightDirection = mv.vec3(0.0, 0.0, -1.0);

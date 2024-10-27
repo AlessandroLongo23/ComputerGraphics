@@ -20,7 +20,7 @@
     let subdivisions = $state();
     let v0, v1, v2, v3;
     let thetaY = 30;
-    let culling = $state();
+    let culling = $state(0);
 
     onMount(async () => {
         if (typeof window !== 'undefined') {
