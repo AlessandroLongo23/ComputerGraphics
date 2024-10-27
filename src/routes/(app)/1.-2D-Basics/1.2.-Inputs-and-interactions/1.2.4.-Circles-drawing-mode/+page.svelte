@@ -9,10 +9,10 @@
     import Admonition from '$lib/components/UI/Admonition.svelte';
     import { Dot, Triangle, Circle } from 'lucide-svelte'
 
-    let viewIndex = 1;
-    let isLoading = true;
-    let canvas, gl, program;
-    let codeSnippets = [];
+    let viewIndex = $state(1);
+    let isLoading = $state(true);
+    let canvas = $state(), gl, program;
+    let codeSnippets = $state([]);
 
     let cBuffer, vColor;
     let mode = 'points';
@@ -20,7 +20,7 @@
     let count = 0;
     let maxPoints = 1000;
     let numTriangles = 32;
-    let modeIndex = 0;
+    let modeIndex = $state(0);
     let colors;
     let vertices;
 
@@ -92,11 +92,11 @@
                         } else {
                             switch(document.getElementById("pointscolor").selectedIndex) {
                                 case 0:
-                                    for (i = 0; i < 6; i++)
+                                    for (let i = 0; i < 6; i++)
                                         colors.push(vec4(0.0, 0.0, 0.0, 1.0));
                                     break;
                                 case 1:
-                                    for (i = 0; i < 6; i++)
+                                    for (let i = 0; i < 6; i++)
                                         colors.push(vec4(1.0, 1.0, 1.0, 1.0));
                                     break;
                             }

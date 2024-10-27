@@ -17,7 +17,7 @@
     let mode = 'points';
     let side = 20;
     let count = 0;
-    let modeIndex = 0;
+    let modeIndex = $state(0);
     let colors;
     let vertices;
 
@@ -63,11 +63,11 @@
                     if (mode == 'points') {
                         switch(document.getElementById("pointscolor").selectedIndex) {
                             case 0:
-                                for (i = 0; i < 6; i++)
+                                for (let i = 0; i < 6; i++)
                                     colors.push(vec4(0.0, 0.0, 0.0, 1.0));
                                 break;
                             case 1:
-                                for (i = 0; i < 6; i++)
+                                for (let i = 0; i < 6; i++)
                                     colors.push(vec4(1.0, 1.0, 1.0, 1.0));
                                 break;
                         }
@@ -90,11 +90,11 @@
                         } else {
                             switch(document.getElementById("pointscolor").selectedIndex) {
                                 case 0:
-                                    for (i = 0; i < 6; i++)
+                                    for (let i = 0; i < 6; i++)
                                         colors.push(vec4(0.0, 0.0, 0.0, 1.0));
                                     break;
                                 case 1:
-                                    for (i = 0; i < 6; i++)
+                                    for (let i = 0; i < 6; i++)
                                         colors.push(vec4(1.0, 1.0, 1.0, 1.0));
                                     break;
                             }
