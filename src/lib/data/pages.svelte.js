@@ -147,6 +147,28 @@ export const contentTree = {
                             href: '/2.-3D-Rendering/2.3.-Texture-mapping/2.3.4.-Earth-model'
                         }
                     ]
+                },
+                {
+                    icon: chapterIcons[2],
+                    href: '/2.-3D-Rendering/2.4.-Environment-and-normal-mapping',
+                    children: [
+                        {
+                            icon: chapterIcons[1],
+                            href: '/2.-3D-Rendering/2.4.-Environment-and-normal-mapping/2.4.1.-Cube-map'
+                        },
+                        {
+                            icon: chapterIcons[1],
+                            href: '/2.-3D-Rendering/2.4.-Environment-and-normal-mapping/2.4.2.-Environment'
+                        },
+                        {
+                            icon: chapterIcons[1],
+                            href: '/2.-3D-Rendering/2.4.-Environment-and-normal-mapping/2.4.3.-Reflection'
+                        },
+                        {
+                            icon: chapterIcons[1],
+                            href: '/2.-3D-Rendering/2.4.-Environment-and-normal-mapping/2.4.4.-Bump-mapping'
+                        }
+                    ]
                 }
             ] 
         },

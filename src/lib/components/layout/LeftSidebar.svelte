@@ -110,7 +110,7 @@
                             <div class="flex items-center gap-4 ps-2 p-1 mb-1 ms-4 rounded-lg transition-colors hover:bg-gray-300 { isRouteActive(item.href) && 'bg-gray-300'}">
                                 <a href={item.href} class="flex items-center gap-4 flex-1 hover:no-underline text-black">
                                     <item.icon size={18}/>
-                                    <span class="flex-1 truncate">{item.href.split("/").pop()}</span>
+                                    <span class="flex-1 truncate">{item.href.split("/").pop().replaceAll('-', ' ')}</span>
                                 </a>
 
                                 {#if hasChildren}
@@ -128,7 +128,7 @@
                                             <div class="flex items-center gap-4 ps-2 p-1 mb-1 ms-4 rounded-lg transition-colors hover:bg-gray-300 {isRouteActive(child.href) && 'bg-gray-300'}">
                                                 <a href={child.href} class="flex items-center gap-4 flex-1 hover:no-underline text-black">
                                                     <child.icon size={18}/>
-                                                    <span class="flex-1 truncate">{child.href.split("/").pop()}</span>
+                                                    <span class="flex-1 truncate">{child.href.split("/").pop().replaceAll('-', ' ')}</span>
                                                 </a>
 
                                                 {#if hasGrandchildren}
@@ -143,7 +143,7 @@
                                                     {#each child.children as grandchild}
                                                         <a href={grandchild.href} class="flex items-center gap-4 ps-2 p-1 mb-1 ms-4 rounded-lg hover:no-underline text-black transition-colors hover:bg-gray-300 {isRouteActive(grandchild.href) && 'bg-gray-300'}">
                                                             <grandchild.icon size={18}/>
-                                                            <span class="flex-1 truncate">{grandchild.href.split("/").pop()}</span>
+                                                            <span class="flex-1 truncate">{grandchild.href.split("/").pop().replaceAll('-', ' ')}</span>
                                                         </a>
                                                     {/each}
                                                 </div>
