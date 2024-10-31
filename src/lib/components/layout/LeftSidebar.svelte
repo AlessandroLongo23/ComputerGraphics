@@ -8,7 +8,7 @@
     let { children } = $props();
     
     let isCollapsed = $state(true);
-    let sidebarWidth = 420;
+    let sidebarWidth = 435;
     // let minWidth = 450;
     // let maxWidth = 450;
     let isDragging = false;

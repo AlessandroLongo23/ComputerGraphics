@@ -149,7 +149,7 @@ export const contentTree = {
                     ]
                 },
                 {
-                    icon: chapterIcons[2],
+                    icon: chapterIcons[1],
                     href: '/2.-3D-Rendering/2.4.-Environment-and-normal-mapping',
                     children: [
                         {
