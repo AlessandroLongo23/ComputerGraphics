@@ -92,6 +92,7 @@
     code { 
         font-family: 'Fira Code', monospace;
         white-space: pre;
+        line-height: 1.2rem;
     }
 
     button {

@@ -84,7 +84,7 @@
                     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, myTexels);
                     gl.generateMipmap(gl.TEXTURE_2D);
                 }
-                myTexels.src = "/textures/earth.jpg";
+                myTexels.src = "/assets/textures/earth.jpg";
 
                 subdivisions = 6;
                 thetaY = 0;

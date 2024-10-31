@@ -3,22 +3,19 @@ window.onload = function init() {
         return;
 
     configureWebGL();
-
     initializeUniforms();
-
+    
     initCubeMap();
     initBumpMap();
-
+    
     initializeBackgroundQuad();
     initializeSphere();
-
+    
     render();
 };
 
 function setupWebGL() {
     canvas = document.getElementById("gl-canvas");
-    canvas.width = window.innerWidth
-    canvas.height = window.innerHeight;
     gl = WebGLUtils.setupWebGL(canvas);
     if (!gl) {
         alert("WebGL isn't available");
@@ -67,7 +64,7 @@ function initCubeMap() {
 
     let loadedImages = 0;
     faces.forEach(face => {
-        gl.texImage2D(face.target, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([0, 0, 255, 255]));
+        gl.texImage2D(face.target, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([0, 0, 0, 0]));
 
         const image = new Image();
         image.onload = function() {
@@ -103,7 +100,7 @@ function initBumpMap() {
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, myTexels);
         gl.generateMipmap(gl.TEXTURE_2D);
     }
-    myTexels.src = "../bumpMap2.png";
+    myTexels.src = "../bumpmaps/bumpMap2.png";
 }
 
 function initializeBackgroundQuad() {
@@ -125,7 +122,6 @@ function initializeSphere() {
     sphereVertices = [];
     sphereNormals = [];
 
-    subdivisions = 9;
     thetaY = 0;
 
     const v0 = vec4(0.0, 0.0, -1.0, 1);
@@ -133,7 +129,7 @@ function initializeSphere() {
     const v2 = vec4(-0.816497, -0.471405, 0.333333, 1);
     const v3 = vec4(0.816497, -0.471405, 0.333333, 1);
 
-    tetrahedron(v0, v1, v2, v3, subdivisions);
+    tetrahedron(v0, v1, v2, v3, 9);
 
     vertexBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
@@ -182,12 +178,12 @@ function render() {
     thetaY += 0.001;
 
     projectionMatrix = perspective(45, canvas.width / canvas.height, 0.1, 100.0);
-
     const dist = 5.0;
     const eye = vec3(dist * Math.cos(thetaY), 0.0, dist * Math.sin(thetaY));
     const target = vec3(0.0, 0.0, 0.0);
     const up = vec3(0.0, 1.0, 0.0);
     viewMatrix = lookAt(eye, target, up);
+    modelMatrix = mat4();
 
     gl.uniform3fv(eyeLoc, eye);
 
@@ -225,15 +221,12 @@ function drawSphere() {
     gl.vertexAttribPointer(vNormal, 4, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(vNormal);
     
-    gl.uniformMatrix4fv(texMatrixLoc, false, flatten(mat4()));
-
-    gl.uniform1i(reflectiveLoc, true);
-
-    const modelMatrix = mat4();
-
     gl.uniformMatrix4fv(projectionMatrixLoc, false, flatten(projectionMatrix));
     gl.uniformMatrix4fv(viewMatrixLoc, false, flatten(viewMatrix));
     gl.uniformMatrix4fv(modelMatrixLoc, false, flatten(modelMatrix));
+    gl.uniformMatrix4fv(texMatrixLoc, false, flatten(mat4()));
     
+    gl.uniform1i(reflectiveLoc, true);
+
     gl.drawArrays(gl.TRIANGLES, 0, sphereVertices.length);
 }

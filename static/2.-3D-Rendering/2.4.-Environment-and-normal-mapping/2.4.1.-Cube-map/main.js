@@ -1,5 +1,6 @@
 window.onload = function init() {
-    if (!setupWebGL()) return;
+    if (!setupWebGL()) 
+        return;
 
     configureWebGL();
 
@@ -59,7 +60,7 @@ function initCubeMap() {
 
     let loadedImages = 0;
     faces.forEach(face => {
-        gl.texImage2D(face.target, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([0, 0, 255, 255]));
+        gl.texImage2D(face.target, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([0, 0, 0, 0]));
 
         const image = new Image();
         image.onload = function() {

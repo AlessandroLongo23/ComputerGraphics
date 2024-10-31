@@ -76,7 +76,7 @@
                 projectionMatrixLoc = gl.getUniformLocation(program, "projectionMatrix");
 
                 // Load the OBJ file and buffer its data
-                readOBJFile('/models/suzanne.obj', 0.75, false)
+                readOBJFile('/assets/models/suzanne.obj', 0.75, false)
                     .then(objInfo => {
                         obj = objInfo;
 

@@ -21,14 +21,14 @@ window.onload = function init() {
     // normals
     normals = [];
     textures = [
-        "textures/earth/base.jpg", 
-        "textures/earth/night.jpg", 
-        "textures/earth/clouds.jpg", 
-        "textures/earth/height.jpg",
-        "textures/moon/base.jpg",
-        "textures/moon/height.jpg",
-        "textures/moon/normal.jpg",
-        "textures/space.jpg"
+        "/assets/textures/earth/base.jpg", 
+        "/assets/textures/earth/night.jpg", 
+        "/assets/textures/earth/clouds.jpg", 
+        "/assets/textures/earth/height.jpg",
+        "/assets/textures/moon/base.jpg",
+        "/assets/textures/moon/height.jpg",
+        "/assets/textures/moon/normal.jpg",
+        "/assets/textures/space.jpg"
     ];
     loadImages(textures, function(images) {
         var textures = [];

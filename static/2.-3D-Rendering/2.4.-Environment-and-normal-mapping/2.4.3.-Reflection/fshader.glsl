@@ -8,11 +8,14 @@ uniform vec3 eye;
 uniform bool reflective;
 
 void main() {
+    vec4 fColor;
     if (reflective) {
         vec3 incidentDirection = fPosition.xyz - eye;
         vec3 reflectionDirection = reflect(incidentDirection, fPosition.xyz);
-        gl_FragColor = textureCube(cubeMap, reflectionDirection);
+        fColor = textureCube(cubeMap, reflectionDirection);
     } else {
-        gl_FragColor = textureCube(cubeMap, texCoords);
+        fColor = textureCube(cubeMap, texCoords);
     }
+
+    gl_FragColor = fColor;
 }

@@ -93,7 +93,7 @@
             <div>
                 <div class="flex flex-row justify-between items-center p-6 mb-6">
                     <a href="/home" class="relative w-12 h-12 me-4">
-                        <img src="/images/favicon-{ $theme }.png" alt="logo"/>
+                        <img src="/assets/images/favicon-{ $theme }.png" alt="logo"/>
                     </a>
                     
                     <div class="flex items-center">
@@ -159,7 +159,7 @@
 
             <div class="flex flex-row justify-center items-center mt-8 mb-4">
                 <p class="text-xl m-0">Computer</p>
-                <img src="/images/favicon-{$theme}.png" alt="icon" class="w-8 h-8 mx-2">
+                <img src="/assets/images/favicon-{$theme}.png" alt="icon" class="w-8 h-8 mx-2">
                 <p class="text-xl m-0">Graphics</p>
             </div>
 
