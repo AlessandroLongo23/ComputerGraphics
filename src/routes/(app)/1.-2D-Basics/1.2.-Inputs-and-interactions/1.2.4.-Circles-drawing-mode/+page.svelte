@@ -2,7 +2,7 @@
 <script>
     import { onMount } from 'svelte';
     import { page } from '$app/stores'
-    import { WebGLUtils, fetchCodeSnippets, initShaders } from '$lib/utils.svelte.js';
+    import { WebGLUtils, fetchCodeSnippets, initShaders, convertToLatex } from '$lib/utils.svelte.js';
     import { vec2, vec4, flatten, sizeof } from '$lib/Libraries/MV.js';
     import Result from '$lib/components/Result.svelte';
     import Toggle from '$lib/components/UI/Toggle.svelte';
@@ -26,19 +26,7 @@
 
     onMount(async () => {
         if (typeof window !== 'undefined') {
-            if (window.MathJax) {
-                window.MathJax.typesetPromise && window.MathJax.typesetPromise();
-
-                document.querySelectorAll("[class*='mjx']").forEach(function(el) {
-                    el.style.fontSize = '20px';
-                });
-
-                document.querySelectorAll("[size='s']").forEach(function(parent) {
-                    parent.querySelectorAll('*').forEach(function(el) {
-                        el.style.fontSize = '16px';
-                    });
-                });
-            }
+            convertToLatex();
 
             gl = WebGLUtils.setupWebGL(canvas);
             gl.viewport(0, 0, canvas.width, canvas.height);

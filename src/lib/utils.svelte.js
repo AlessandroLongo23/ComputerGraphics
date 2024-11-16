@@ -44,18 +44,18 @@ export const WebGLUtils = function() {
     };
 }();
 
-if (typeof window !== 'undefined') {
-    window.requestAnimFrame = (function() {
-        return window.requestAnimationFrame ||
-            window.webkitRequestAnimationFrame ||
-            window.mozRequestAnimationFrame ||
-            window.oRequestAnimationFrame ||
-            window.msRequestAnimationFrame ||
-            function(callback, _) {
-                window.setTimeout(callback, 1000 / 60);
-            };
-    })();
-}
+// if (typeof window !== 'undefined') {
+//     window.requestAnimFrame = (function() {
+//         return window.requestAnimationFrame ||
+//             window.webkitRequestAnimationFrame ||
+//             window.mozRequestAnimationFrame ||
+//             window.oRequestAnimationFrame ||
+//             window.msRequestAnimationFrame ||
+//             function(callback, _) {
+//                 window.setTimeout(callback, 1000 / 60);
+//             };
+//     })();
+// }
 
 export async function fetchCodeSnippets(codeSnippets_url) {
     try {
@@ -137,4 +137,20 @@ export function capitalize(str) {
         return '';
 
     return str[0].toUpperCase() + str.slice(1);
+}
+
+export function convertToLatex() {
+    if (window.MathJax) {
+        window.MathJax.typesetPromise && window.MathJax.typesetPromise();
+
+        document.querySelectorAll("[class*='mjx']").forEach(function(el) {
+            el.style.fontSize = '20px';
+        });
+
+        document.querySelectorAll("[size='s']").forEach(function(parent) {
+            parent.querySelectorAll('*').forEach(function(el) {
+                el.style.fontSize = '16px';
+            });
+        });
+    }
 }
