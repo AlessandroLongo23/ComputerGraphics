@@ -1,5 +1,5 @@
 var vertices, vBuffer;
-var subdivisions, min_sub, max_sub;
+var subdivisions, minSubdivisions, maxSubdivisions;
 var v0, v1, v2, v3;
 var thetaY = 30;
 var gl, canvas, program;
@@ -35,9 +35,9 @@ window.onload = () => {
     v2 = vec4(-0.816497, -0.471405, 0.333333, 1);
     v3 = vec4(0.816497, -0.471405, 0.333333, 1);
 
-    min_sub = 0;
-    max_sub = 8;
-    subdivisions = max_sub;
+    minSubdivisions = 0;
+    maxSubdivisions = 8;
+    subdivisions = maxSubdivisions;
     
     buildPolyhedron();
     render();
@@ -113,7 +113,7 @@ const triangle = (a, b, c) => {
 }
 
 document.getElementById("increment-subdivision-level").addEventListener("click", () => {
-    if (subdivisions == max_sub)
+    if (subdivisions == maxSubdivisions)
         alert("Maximum subdivision level reached!");
     else
         subdivisions++;
@@ -122,7 +122,7 @@ document.getElementById("increment-subdivision-level").addEventListener("click",
 });
 
 document.getElementById("decrement-subdivision-level").addEventListener("click", () => {
-    if (subdivisions == min_sub)
+    if (subdivisions == minSubdivisions)
         alert("subdivision level is already 0!");
     else
         subdivisions--;

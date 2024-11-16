@@ -7,7 +7,7 @@ window.onload = () => {
     side = 20;
     count = 0;
     maxPoints = 1000;
-    n_triangles = 32;
+    numTriangles = 32;
     
     colors = []
     vertices = [];
@@ -63,20 +63,20 @@ window.onload = () => {
         } else if (mode == 'circles') {
             count++;
             if (count == 2) {
-                var center_color = colors[colors.length - 1];
+                var centerColor = colors[colors.length - 1];
                 switch(document.getElementById("pointscolor").selectedIndex) {
                     case 0:
-                        for (let i = 0; i < n_triangles; i++) {
+                        for (let i = 0; i < numTriangles; i++) {
                             colors.push(vec4(0.0, 0.0, 0.0, 1.0));
                             colors.push(vec4(0.0, 0.0, 0.0, 1.0));
-                            colors.push(center_color);
+                            colors.push(centerColor);
                         }
                         break;
                     case 1:
-                        for (let i = 0; i < n_triangles; i++) {
+                        for (let i = 0; i < numTriangles; i++) {
                             colors.push(vec4(1.0, 1.0, 1.0, 1.0));
                             colors.push(vec4(1.0, 1.0, 1.0, 1.0));
-                            colors.push(center_color);
+                            colors.push(centerColor);
                         }
                         break;
                 }
@@ -117,11 +117,11 @@ window.onload = () => {
             ]
         } else if (mode == 'triangles') {
             if (count == 3) {
-                var first_vertex = vec2(
+                var firstVertex = vec2(
                     (vertices[vertices.length - 1][0] + vertices[vertices.length - 3][0]) / 2, 
                     (vertices[vertices.length - 1][1] + vertices[vertices.length - 3][1]) / 2
                 );
-                var second_vertex = vec2(
+                var secondVertex = vec2(
                     (vertices[vertices.length - 7][0] + vertices[vertices.length - 9][0]) / 2, 
                     (vertices[vertices.length - 7][1] + vertices[vertices.length - 9][1]) / 2
                 );
@@ -129,8 +129,8 @@ window.onload = () => {
                 vertices = vertices.slice(0, vertices.length - 12);
 
                 var newVertices = [
-                    first_vertex,
-                    second_vertex,
+                    firstVertex,
+                    secondVertex,
                     t
                 ]
                 count = 0;
@@ -154,14 +154,14 @@ window.onload = () => {
                 var rad = Math.sqrt(Math.pow(center[0] - t[0], 2) + Math.pow(center[1] - t[1], 2));
 
                 var newVertices = [];
-                for (let angle = 0; angle < Math.PI * 2; angle += Math.PI * 2 / n_triangles) {
+                for (let angle = 0; angle < Math.PI * 2; angle += Math.PI * 2 / numTriangles) {
                     newVertices.push(vec2(
                         center[0] + rad * Math.cos(angle),
                         center[1] + rad * Math.sin(angle)
                     ));
                     newVertices.push(vec2(
-                        center[0] + rad * Math.cos(angle + Math.PI * 2 / n_triangles),
-                        center[1] + rad * Math.sin(angle + Math.PI * 2 / n_triangles)
+                        center[0] + rad * Math.cos(angle + Math.PI * 2 / numTriangles),
+                        center[1] + rad * Math.sin(angle + Math.PI * 2 / numTriangles)
                     ));
                     newVertices.push(center);
                 }

@@ -90,11 +90,11 @@ window.onload = () => {
             ]
         } else if (mode == 'triangles') {
             if (count == 3) {
-                var first_vertex = vec2(
+                var firstVertex = vec2(
                     (vertices[vertices.length - 1][0] + vertices[vertices.length - 3][0]) / 2, 
                     (vertices[vertices.length - 1][1] + vertices[vertices.length - 3][1]) / 2
                 );
-                var second_vertex = vec2(
+                var secondVertex = vec2(
                     (vertices[vertices.length - 7][0] + vertices[vertices.length - 9][0]) / 2, 
                     (vertices[vertices.length - 7][1] + vertices[vertices.length - 9][1]) / 2
                 );
@@ -102,8 +102,8 @@ window.onload = () => {
                 vertices = vertices.slice(0, vertices.length - 12);
 
                 var newVertices = [
-                    first_vertex,
-                    second_vertex,
+                    firstVertex,
+                    secondVertex,
                     t
                 ]
                 count = 0;

@@ -8,5 +8,5 @@ uniform int isGround;
 uniform vec3 fColor;
 
 void main() {
-    gl_FragColor = isGround == 1 ? texture2D(groundTex, fTexCoord) : vec4(fColor, 1.0);;
+    gl_FragColor = isGround == 1 ? texture2D(groundTex, fTexCoord) : vec4(fColor, 1.0);
 }

@@ -299,7 +299,7 @@ export function rotate(angle, axis) {
         vec4(x * y * omc + z * s, y * y * omc + c,  y * z * omc - x * s, 0.0),
         vec4(x * z * omc - y * s, y * z * omc + x * s, z * z * omc + c, 0.0),
         vec4()
-   );
+  );
 
     return result;
 }
@@ -312,7 +312,7 @@ export function rotateX(theta) {
         0.0, c, s, 0.0,
         0.0, -s, c, 0.0,
         0.0, 0.0, 0.0, 1.0
-    );
+   );
 }
 
 export function rotateY(theta) {
@@ -323,7 +323,7 @@ export function rotateY(theta) {
         0.0, 1.0, 0.0, 0.0,
         s, 0.0, c, 0.0,
         0.0, 0.0, 0.0, 1.0
-    );
+   );
 }
 
 export function rotateZ(theta) {
@@ -334,7 +334,7 @@ export function rotateZ(theta) {
         -s, c, 0.0, 0.0,
         0.0, 0.0, 1.0, 0.0,
         0.0, 0.0, 0.0, 1.0
-    );
+   );
 }
 
 
@@ -377,7 +377,7 @@ export function lookAt(eye, at, up) {
         vec4(u, -dot(u, eye)),
         vec4(v, -dot(v, eye)),
         vec4()
-    );;
+   );
 }
 
 export function ortho(left, right, bottom, top, near, far) {
@@ -465,7 +465,7 @@ export function cross(u, v) {
         u[1] * v[2] - u[2] * v[1],
         u[2] * v[0] - u[0] * v[2],
         u[0] * v[1] - u[1] * v[0]
-    ];;
+    ];
 }
 
 export function length(u) {

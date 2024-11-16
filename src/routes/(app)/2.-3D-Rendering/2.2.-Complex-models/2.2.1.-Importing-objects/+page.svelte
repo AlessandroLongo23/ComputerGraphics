@@ -35,11 +35,11 @@
                 eyeLoc = gl.getUniformLocation(program, "eye");
 
                 var leftLightDirection = mv.vec3(-1.0, 0.0, 0.0);
-                var leftLightDirectionLoc = gl.getUniformLocation(program, "left_light");
+                var leftLightDirectionLoc = gl.getUniformLocation(program, "leftLight");
                 gl.uniform3fv(leftLightDirectionLoc, mv.flatten(leftLightDirection));
 
                 var rightLightDirection = mv.vec3(1.0, 0.0, 0.0);
-                var rightLightDirectionLoc = gl.getUniformLocation(program, "right_light");
+                var rightLightDirectionLoc = gl.getUniformLocation(program, "rightLight");
                 gl.uniform3fv(rightLightDirectionLoc, mv.flatten(rightLightDirection));
 
                 viewMatrixLoc = gl.getUniformLocation(program, "viewMatrix");
