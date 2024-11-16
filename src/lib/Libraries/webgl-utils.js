@@ -1,4 +1,4 @@
-WebGLUtils = function() {
+WebGLUtils = () => {
 
 /**
  * Creates the HTLM for a failure message
@@ -73,7 +73,7 @@ return {
 }();
 
 
-window.requestAnimFrame = (function() {
+window.requestAnimFrame = (() => {
   return window.requestAnimationFrame ||
          window.webkitRequestAnimationFrame ||
          window.mozRequestAnimationFrame ||

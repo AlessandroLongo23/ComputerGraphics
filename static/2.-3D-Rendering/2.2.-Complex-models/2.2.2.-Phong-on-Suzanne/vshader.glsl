@@ -1,4 +1,5 @@
 attribute vec4 vPosition;
+attribute vec4 vNormal;
 
 uniform mat4 projectionMatrix;
 uniform mat4 viewMatrix;
@@ -11,7 +12,8 @@ void main() {
     vec4 worldPos = modelMatrix * vPosition;
     
     fPosition = worldPos.xyz;
-    fNormal = normalize((modelMatrix * vec4(normalize(vPosition.xyz), 0.0)).xyz);
+    fNormal = vNormal.xyz;
+    // fNormal = normalize((modelMatrix * vec4(normalize(vPosition.xyz), 0.0)).xyz);
     
     gl_Position = projectionMatrix * viewMatrix * worldPos;
 }

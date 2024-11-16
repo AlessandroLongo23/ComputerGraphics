@@ -64,7 +64,7 @@
         }
     });
 
-    function render() {
+    const render = () => {
         gl.clear(gl.COLOR_BUFFER_BIT);
         gl.uniform1f(thetaLoc, theta += 0.025);
         gl.drawArrays(gl.TRIANGLE_STRIP, 0, vertices.length);
@@ -79,5 +79,5 @@
         <p>Add a rotation so the quad rotates around its center. Animate the rotation angle over time. Use requestAnimationFrame to continuously call your render function. [Angel 3.1]</p>
     </div>
 
-    <Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets}/>
+    <Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets} folderPath={$page.url.pathname}/>
 </div>

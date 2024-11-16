@@ -58,7 +58,7 @@
         }
     });
 
-    function render() {
+    const render = () => {
         gl.clear(gl.COLOR_BUFFER_BIT);
         gl.drawArrays(gl.POINTS, 0, vertices.length);
     }
@@ -70,5 +70,5 @@
         <p>Setup a vertex buffer with the corresponding attribute pointer. Add the coordinates and draw three points of size 20 pixels, like in the figure. [Angel 2.4, 2.8, and 2.5.3] [If using WebGPU, note that points can only be of size 1. These points then need to be drawn as two triangles forming a square.] Shaders and buffers.</p>
     </div>
 
-    <Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets}/>
+    <Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets} folderPath={$page.url.pathname}/>
 </div>

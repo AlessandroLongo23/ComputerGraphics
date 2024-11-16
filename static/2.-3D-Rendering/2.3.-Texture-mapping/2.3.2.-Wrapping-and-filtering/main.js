@@ -1,4 +1,4 @@
-window.onload = function init() {
+window.onload = () => {
     setupWebGL();
 
     // vertices
@@ -65,7 +65,7 @@ window.onload = function init() {
     render();
 }
 
-function render() {
+const render = () => {
     gl.clear(gl.COLOR_BUFFER_BIT);
 
     var projectionMatrix = perspective(90, canvas.width / canvas.height, .1, 30.0);
@@ -79,7 +79,7 @@ function render() {
     requestAnimFrame(render);
 }
 
-document.getElementById("wrapping").addEventListener("change", function() {
+document.getElementById("wrapping").addEventListener("change", () => {
     switch(parseInt(document.getElementById("wrapping").value)) {
         case 0:
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
@@ -92,7 +92,7 @@ document.getElementById("wrapping").addEventListener("change", function() {
     }
 });
 
-document.getElementById("filtering").addEventListener("change", function() {
+document.getElementById("filtering").addEventListener("change", () => {
     switch(parseInt(document.getElementById("filtering").value)) {
         case 0:
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
@@ -121,7 +121,7 @@ document.getElementById("filtering").addEventListener("change", function() {
     }
 });
 
-function setupWebGL() {
+const setupWebGL = () => {
     canvas = document.getElementById("gl-canvas");
     gl = WebGLUtils.setupWebGL(canvas);
     if (!gl) {

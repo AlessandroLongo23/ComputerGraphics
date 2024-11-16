@@ -1,6 +1,4 @@
 <script>
-    import { run } from 'svelte/legacy';
-
     import { onMount } from 'svelte';
     import { page } from '$app/stores'
     import { WebGLUtils, fetchCodeSnippets, initShaders } from '$lib/utils.svelte.js';
@@ -76,7 +74,7 @@
         }
     });
 
-    function render() {
+    const render = () => {
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
         // enabling depth test and culling
@@ -98,9 +96,9 @@
         // view matrix
         var dist = 4.0;
         var eye = mv.vec3(dist * Math.cos(thetaY), 0.0, dist * Math.sin(thetaY));
-        var target = mv.vec3(0.0, 0.0, 0.0);
+        var at = mv.vec3(0.0, 0.0, 0.0);
         var up = mv.vec3(0.0, 1.0, 0.0);
-        var viewMatrix = mv.lookAt(eye, target, up);
+        var viewMatrix = mv.lookAt(eye, at, up);
 
         // model matrix
         var modelMatrix = mv.mat4();
@@ -119,7 +117,7 @@
         requestAnimFrame(render);
     }
 
-    function buildPolyhedron() {
+    const buildPolyhedron = () => {
         vertices = [];
         tetrahedron(v0, v1, v2, v3, subdivisions);
 
@@ -132,14 +130,14 @@
         gl.enableVertexAttribArray(vPosition);
     }
 
-    function tetrahedron(a, b, c, d, n) {
+    const tetrahedron = (a, b, c, d, n) => {
         divideTriangle(a, b, c, n, 0);
         divideTriangle(d, c, b, n, 1);
         divideTriangle(a, d, b, n, 2);
         divideTriangle(a, c, d, n, 3);
     }
 
-    function divideTriangle(a, b, c, count) {
+    const divideTriangle = (a, b, c, count) => {
         if (count == 0) {
             triangle(a, b, c);
             return;
@@ -155,13 +153,13 @@
         divideTriangle(ab, bc, ac, count - 1);
     }
 
-    function triangle(a, b, c) {
+    const triangle = (a, b, c) => {
         vertices.push(a);
         vertices.push(b);
         vertices.push(c);
     }
 
-    run(() => {
+    $effect(() => {
         subdivisions != undefined && buildPolyhedron();
     });
 </script>
@@ -174,7 +172,7 @@
         <p>Let the camera orbit the sphere over time. [Angel 3.1]</p>
     </div>
 
-    <Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets}>
+    <Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets} folderPath={$page.url.pathname}>
         {#snippet controls()}
             <div class="absolute left-0 top-0 flex flex-row justify-evenly items-center gap-4 w-full p-4 bg-gray-900/25 rounded-{viewIndex == 1 && 'r-'}lg">    
                 <Toggle bind:selected={culling} icons={[X, SendToBack, BringToFront]}/>

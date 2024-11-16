@@ -1,4 +1,4 @@
-window.onload = function init() {
+window.onload = () => {
     setupWebGL();
 
     // vertices
@@ -29,7 +29,7 @@ window.onload = function init() {
     render();
 };
 
-function render() {
+const render = () => {
     gl.clear(gl.COLOR_BUFFER_BIT);
 
     var projectionMatrix = perspective(45, canvas.width / canvas.height, .001, 10.0);
@@ -47,7 +47,7 @@ function render() {
     requestAnimFrame(render);
 }
 
-function buildPolyhedron() {
+const buildPolyhedron = () => {
     vertices = [];
     colors = [];
     tetrahedron(baseVertices[0], baseVertices[1], baseVertices[2], baseVertices[3], subdivisions);
@@ -71,14 +71,14 @@ function buildPolyhedron() {
     gl.enableVertexAttribArray(vColor);
 }
 
-function tetrahedron(a, b, c, d, n) {
+const tetrahedron = (a, b, c, d, n) => {
     divideTriangle(a, b, c, n, 0);
     divideTriangle(d, c, b, n, 1);
     divideTriangle(a, d, b, n, 2);
     divideTriangle(a, c, d, n, 3);
 }
 
-function divideTriangle(a, b, c, count, colorIndex) {
+const divideTriangle = (a, b, c, count, colorIndex) => {
     if (count == 0) {
         triangle(a, b, c, colorIndex);
         return;
@@ -94,7 +94,7 @@ function divideTriangle(a, b, c, count, colorIndex) {
     divideTriangle(ab, bc, ac, count - 1);
 }
 
-function triangle(a, b, c, colorIndex) {
+const triangle = (a, b, c, colorIndex) => {
     colors.push(baseColors[colorIndex]);
     vertices.push(a);
     colors.push(baseColors[colorIndex]);
@@ -103,7 +103,7 @@ function triangle(a, b, c, colorIndex) {
     vertices.push(c);
 }
 
-document.getElementById("increment-subdivision-level").addEventListener("click", function() {
+document.getElementById("increment-subdivision-level").addEventListener("click", () => {
     if (subdivisions > 6)
         alert("Maximum subdivision level reached!");
     else
@@ -112,7 +112,7 @@ document.getElementById("increment-subdivision-level").addEventListener("click",
     buildPolyhedron();
 });
 
-document.getElementById("decrement-subdivision-level").addEventListener("click", function() {
+document.getElementById("decrement-subdivision-level").addEventListener("click", () => {
     if (subdivisions == 0)
         alert("subdivision level is already 0!");
     else
@@ -121,7 +121,7 @@ document.getElementById("decrement-subdivision-level").addEventListener("click",
     buildPolyhedron();
 });
 
-function setupWebGL() {
+const setupWebGL = () => {
     canvas = document.getElementById("gl-canvas");
 
     gl = WebGLUtils.setupWebGL(canvas);

@@ -1,11 +1,10 @@
 import * as ls from 'lucide-svelte';
 
-let chapterIcons = [
+const chapterIcons = [
     ls.Spline,
     ls.Box,
     ls.Boxes,
     ls.Orbit,
-    ls.BadgePlus
 ];
 
 export const contentTree = {
@@ -175,24 +174,40 @@ export const contentTree = {
         { 
             icon: chapterIcons[2], 
             href: '/3.-Advanced-rendering',
-            children: []
+            children: [
+                {
+                    icon: chapterIcons[2],
+                    href: '/3.-Advanced-rendering/3.1.-Projection-shadows',
+                    children: [
+                        {
+                            icon: chapterIcons[2],
+                            href: '/3.-Advanced-rendering/3.1.-Projection-shadows/3.1.1.-Scene-setup'
+                        },
+                        {
+                            icon: chapterIcons[2],
+                            href: '/3.-Advanced-rendering/3.1.-Projection-shadows/3.1.2.-Shadow-mapping'
+                        },
+                        {
+                            icon: chapterIcons[2],
+                            href: '/3.-Advanced-rendering/3.1.-Projection-shadows/3.1.3.-Shadow-culling'
+                        },
+                        {
+                            icon: chapterIcons[2],
+                            href: '/3.-Advanced-rendering/3.1.-Projection-shadows/3.1.4.-Color-and-alpha'
+                        }
+                    ]
+                }
+            ]
         },
         { 
             icon: chapterIcons[3], 
             href: '/4.-Advanced-techniques',  
             children: []
-        },
-        {
-            icon: chapterIcons[4],
-            href: '/E.-Extras',
-            children: []
         }
     ]
 };
 
-export const contentSequence = getAllNodes(contentTree);
-
-function getAllNodes(node) {
+const getAllNodes = (node) => {
     const nodes = [node];
     if (node.children)
         for (let child of node.children)
@@ -201,11 +216,13 @@ function getAllNodes(node) {
     return nodes;
 }
 
-export function getChildren(url) {
+export const contentSequence = getAllNodes(contentTree);
+
+export const getChildren = (url) => {
     if (url == '/home')
         return contentTree.children.map(child => child.href.split("/").pop());
     
-    function findByUrl(node, url) {
+    const findByUrl = (node, url) => {
         if (node.href === url)
             return node;
 

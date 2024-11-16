@@ -4,7 +4,7 @@
     import { WebGLUtils, fetchCodeSnippets, initShaders } from '$lib/utils.svelte.js';
     import * as mv from '$lib/Libraries/MV.js';
     import Result from '$lib/components/Result.svelte';
-    // import Admonition from '$lib/components/UI/Admonition.svelte';
+    import Admonition from '$lib/components/UI/Admonition.svelte';
 
     let viewIndex = $state(1);
     let isLoading = $state(true);
@@ -63,7 +63,7 @@
         }
     });
 
-    function configureWebGL() {
+    const configureWebGL = () => {
         gl.enable(gl.DEPTH_TEST);
         gl.enable(gl.CULL_FACE);
         gl.cullFace(gl.FRONT);
@@ -71,7 +71,7 @@
         gl.clearColor(1.0, 1.0, 1.0, 1.0);
     }
 
-    function initializeUniforms() {
+    const initializeUniforms = () => {
         viewMatrixLoc = gl.getUniformLocation(program, "viewMatrix");
         modelMatrixLoc = gl.getUniformLocation(program, "modelMatrix");
         projectionMatrixLoc = gl.getUniformLocation(program, "projectionMatrix");
@@ -81,7 +81,7 @@
         reflectiveLoc = gl.getUniformLocation(program, "reflective");
     }
 
-    function initCubeMap() {
+    const initCubeMap = () => {
         const cubeTexture = gl.createTexture();
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_CUBE_MAP, cubeTexture);
@@ -103,7 +103,7 @@
             gl.texImage2D(face.target, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([0, 0, 0, 0]));
 
             const image = new Image();
-            image.onload = function() {
+            image.onload = () => {
                 gl.bindTexture(gl.TEXTURE_CUBE_MAP, cubeTexture);
                 gl.texImage2D(face.target, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
                 loadedImages++;
@@ -119,7 +119,7 @@
         gl.uniform1i(cubeMapLoc, 0);
     }
 
-    function initBumpMap() {
+    const initBumpMap = () => {
         gl.activeTexture(gl.TEXTURE1);
         bumpTexture = gl.createTexture();
         gl.bindTexture(gl.TEXTURE_2D, bumpTexture);
@@ -130,7 +130,7 @@
         gl.uniform1i(bumpTextureLoc, 1);
 
         var myTexels = new Image();
-        myTexels.onload = function() {
+        myTexels.onload = () => {
             gl.bindTexture(gl.TEXTURE_2D, bumpTexture);
             gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
             gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, myTexels);
@@ -139,7 +139,7 @@
         myTexels.src = "/assets/textures/bumpmaps/bumpMap2.png";
     }
 
-    function initializeBackgroundQuad() {
+    const initializeBackgroundQuad = () => {
         const backgroundVertices = [
             mv.vec4(-1.0, -1.0, 0.999, 1.0),
             mv.vec4(1.0, 1.0, 0.999, 1.0),
@@ -154,7 +154,7 @@
         gl.bufferData(gl.ARRAY_BUFFER, mv.flatten(backgroundVertices), gl.STATIC_DRAW);
     }
 
-    function initializeSphere() {
+    const initializeSphere = () => {
         sphereVertices = [];
         sphereNormals = [];
 
@@ -176,14 +176,14 @@
         gl.bufferData(gl.ARRAY_BUFFER, mv.flatten(sphereNormals), gl.STATIC_DRAW);
     }
 
-    function tetrahedron(a, b, c, d, n) {
+    const tetrahedron = (a, b, c, d, n) => {
         divideTriangle(a, b, c, n);
         divideTriangle(d, c, b, n);
         divideTriangle(a, d, b, n);
         divideTriangle(a, c, d, n);
     }
 
-    function divideTriangle(a, b, c, count) {
+    const divideTriangle = (a, b, c, count) => {
         if (count === 0) {
             triangle(a, b, c);
             return;
@@ -199,7 +199,7 @@
         divideTriangle(ab, bc, ac, count - 1);
     }
 
-    function triangle(a, b, c) {
+    const triangle = (a, b, c) => {
         sphereVertices.push(a);
         sphereNormals.push(a);
         sphereVertices.push(b);
@@ -208,7 +208,7 @@
         sphereNormals.push(c);
     }
 
-    function render() {
+    const render = () => {
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
         thetaY += 0.001;
@@ -216,9 +216,9 @@
         projectionMatrix = mv.perspective(45, canvas.width / canvas.height, 0.1, 100.0);
         const dist = 5.0;
         const eye = mv.vec3(dist * Math.cos(thetaY), 0.0, dist * Math.sin(thetaY));
-        const target = mv.vec3(0.0, 0.0, 0.0);
+        const at = mv.vec3(0.0, 0.0, 0.0);
         const up = mv.vec3(0.0, 1.0, 0.0);
-        viewMatrix = mv.lookAt(eye, target, up);
+        viewMatrix = mv.lookAt(eye, at, up);
         modelMatrix = mv.mat4();
 
         gl.uniform3fv(eyeLoc, eye);
@@ -229,7 +229,7 @@
         requestAnimationFrame(render);
     }
 
-    function drawBackground() {
+    const drawBackground = () => {
         gl.bindBuffer(gl.ARRAY_BUFFER, backgroundBuffer);
         const vPosition = gl.getAttribLocation(program, "vPosition");
         gl.vertexAttribPointer(vPosition, 4, gl.FLOAT, false, 0, 0);
@@ -247,7 +247,7 @@
         gl.drawArrays(gl.TRIANGLES, 0, 6);
     }
 
-    function drawSphere() {
+    const drawSphere = () => {
         gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
         const vPosition = gl.getAttribLocation(program, "vPosition");
         gl.vertexAttribPointer(vPosition, 4, gl.FLOAT, false, 0, 0);
@@ -271,7 +271,24 @@
 
 <div class="flex flex-col justify-center items-start w-4/5 text-xl m-auto">
     <div class="w-4/5 m-auto">
+        <p>Finally, we will perturb the normal of the mirror ball using a normal map to give the impression that the ball surface is 'bumpy'. [Angel 7.9]</p>
+        <p>Load the normal map texture from the file normalmap.png and map it onto the sphere using the same technique as in Part 3 of Worksheet 6. The first image for this part is the expected result.</p>
+        <p>Bind the normal map to another texture (e.g. TEXTURE1) so that it can be used together with the cube map [Angel 7.5.6].</p>
+        <Admonition type='warning'>
+            {#snippet textContent()}
+                <p class="m-0">
+                    The color found in the normal map is in $[0, 1]$. Transform it to be in $[-1, 1]$ to get the actual normal. 
+                </p>
+            {/snippet}
+        </Admonition>
+        <p>The normal retrieved from the normal map is in tangent space. We need to transform it to world space to use it in place of the sphere normal when calculating the direction of reflection.</p>
+        <Admonition type='tip'>
+            {#snippet textContent()}
+                <!-- <p class="m-0">Use the following function as an efficient way to perform this change of basis transformation:1          vec3 rotate_to_normal(vec3 n, vec3 v) {           float sgn_nz = sign(n.z + 1.0e-16);           float a = -1.0/(1.0 + abs(n.z));           float b = n.x*n.y*a;           return vec3(1.0 + n.x*n.x*a, b, -sgn_nz*n.x)*v.x                + vec3(sgn_nz*b, sgn_nz*(1.0 + n.y*n.y*a), -n.y)*v.y                + n*v.z;  }</p> -->
+                <p class="m-0">The first argument is the surface normal n in world coordinates, the second argument is the tangent space vector to be transformed to world space. In our case, the tangent space vector is the normal retrieved from the normal map. The transformation returns the bump mapped normal to be used in place of the sphere normal when rendering reflective objects.</p>
+            {/snippet}
+        </Admonition>
     </div>
 
-    <Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets}/>
+    <Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets} folderPath={$page.url.pathname}/>
 </div>

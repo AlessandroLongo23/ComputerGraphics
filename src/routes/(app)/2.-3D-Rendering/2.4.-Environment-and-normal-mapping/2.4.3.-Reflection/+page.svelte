@@ -4,7 +4,7 @@
     import { WebGLUtils, fetchCodeSnippets, initShaders } from '$lib/utils.svelte.js';
     import * as mv from '$lib/Libraries/MV.js';
     import Result from '$lib/components/Result.svelte';
-    // import Admonition from '$lib/components/UI/Admonition.svelte';
+    import Admonition from '$lib/components/UI/Admonition.svelte';
 
     let viewIndex = $state(1);
     let isLoading = $state(true);
@@ -61,7 +61,7 @@
         }
     });
 
-    function configureWebGL() {
+    const configureWebGL = () => {
         gl.enable(gl.DEPTH_TEST);
         gl.enable(gl.CULL_FACE);
         gl.cullFace(gl.FRONT);
@@ -69,7 +69,7 @@
         gl.clearColor(1.0, 1.0, 1.0, 1.0);
     }
 
-    function initializeUniforms() {
+    const initializeUniforms = () => {
         viewMatrixLoc = gl.getUniformLocation(program, "viewMatrix");
         modelMatrixLoc = gl.getUniformLocation(program, "modelMatrix");
         projectionMatrixLoc = gl.getUniformLocation(program, "projectionMatrix");
@@ -79,7 +79,7 @@
         reflectiveLoc = gl.getUniformLocation(program, "reflective");
     }
 
-    function initCubeMap() {
+    const initCubeMap = () => {
         const cubeTexture = gl.createTexture();
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_CUBE_MAP, cubeTexture);
@@ -101,7 +101,7 @@
             gl.texImage2D(face.target, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([0, 0, 0, 0]));
 
             const image = new Image();
-            image.onload = function() {
+            image.onload = () => {
                 gl.bindTexture(gl.TEXTURE_CUBE_MAP, cubeTexture);
                 gl.texImage2D(face.target, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
                 loadedImages++;
@@ -117,7 +117,7 @@
         gl.uniform1i(cubeMapLoc, 0);
     }
 
-    function initializeBackgroundQuad() {
+    const initializeBackgroundQuad = () => {
         const backgroundVertices = [
             mv.vec4(-1.0, -1.0, 0.999, 1.0),
             mv.vec4(1.0, 1.0, 0.999, 1.0),
@@ -132,7 +132,7 @@
         gl.bufferData(gl.ARRAY_BUFFER, mv.flatten(backgroundVertices), gl.STATIC_DRAW);
     }
 
-    function initializeSphere() {
+    const initializeSphere = () => {
         sphereVertices = [];
         sphereNormals = [];
 
@@ -154,14 +154,14 @@
         gl.bufferData(gl.ARRAY_BUFFER, mv.flatten(sphereNormals), gl.STATIC_DRAW);
     }
 
-    function tetrahedron(a, b, c, d, n) {
+    const tetrahedron = (a, b, c, d, n) => {
         divideTriangle(a, b, c, n);
         divideTriangle(d, c, b, n);
         divideTriangle(a, d, b, n);
         divideTriangle(a, c, d, n);
     }
 
-    function divideTriangle(a, b, c, count) {
+    const divideTriangle = (a, b, c, count) => {
         if (count === 0) {
             triangle(a, b, c);
             return;
@@ -177,7 +177,7 @@
         divideTriangle(ab, bc, ac, count - 1);
     }
 
-    function triangle(a, b, c) {
+    const triangle = (a, b, c) => {
         sphereVertices.push(a);
         sphereNormals.push(a);
         sphereVertices.push(b);
@@ -186,7 +186,7 @@
         sphereNormals.push(c);
     }
 
-    function render() {
+    const render = () => {
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
         thetaY += 0.001;
@@ -194,9 +194,9 @@
         projectionMatrix = mv.perspective(45, canvas.width / canvas.height, 0.1, 100.0);
         const dist = 5.0;
         const eye = mv.vec3(dist * Math.cos(thetaY), 0.0, dist * Math.sin(thetaY));
-        const target = mv.vec3(0.0, 0.0, 0.0);
+        const at = mv.vec3(0.0, 0.0, 0.0);
         const up = mv.vec3(0.0, 1.0, 0.0);
-        viewMatrix = mv.lookAt(eye, target, up);
+        viewMatrix = mv.lookAt(eye, at, up);
         modelMatrix = mv.mat4();
 
         gl.uniform3fv(eyeLoc, eye);
@@ -207,7 +207,7 @@
         requestAnimationFrame(render);
     }
 
-    function drawBackground() {
+    const drawBackground = () => {
         gl.bindBuffer(gl.ARRAY_BUFFER, backgroundBuffer);
         const vPosition = gl.getAttribLocation(program, "vPosition");
         gl.vertexAttribPointer(vPosition, 4, gl.FLOAT, false, 0, 0);
@@ -225,7 +225,7 @@
         gl.drawArrays(gl.TRIANGLES, 0, 6);
     }
 
-    function drawSphere() {
+    const drawSphere = () => {
         gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
         const vPosition = gl.getAttribLocation(program, "vPosition");
         gl.vertexAttribPointer(vPosition, 4, gl.FLOAT, false, 0, 0);
@@ -249,7 +249,18 @@
 
 <div class="flex flex-col justify-center items-start w-4/5 text-xl m-auto">
     <div class="w-4/5 m-auto">
+        <p>The sphere is not really like a mirror ball. Instead of looking up the environment in the normal direction, we should look up the environment in the direction of reflection. [Angel 7.7]</p>
+        <p>Create a uniform variable (reflective) to distinguish reflective objects (the mirror ball) from other objects (the background quad).</p>
+        <p>Upload the eye position to the fragment shader as a uniform variable and compute the direction of incidence (the view vector, $v$) in world space coordinates.</p>
+        <p>Use a conditional operator (or an if-statement) to choose the direction of reflection as texture coordinates for reflective objects.</p>
+        <Admonition type='tip'>
+            {#snippet textContent()}
+                <p class="m-0">
+                    You can use the built-in GLSL ES function reflect(vec3 incident, vec3 normal).
+                </p>
+            {/snippet}
+        </Admonition>
     </div>
 
-    <Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets}/>
+    <Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets} folderPath={$page.url.pathname}/>
 </div>

@@ -80,7 +80,7 @@
         }
     });
 
-    function render() {
+    const render = () => {
         gl.clear(gl.COLOR_BUFFER_BIT);
         gl.drawArrays(gl.POINTS, 0, index);
         window.requestAnimFrame(render, canvas);
@@ -94,5 +94,5 @@
         <p>Points are offset from the tip of the mouse cursor. This is not as desired. Get the bounding rectangle of the canvas in the client area using event.target.getBoundingClientRect() and correct the mouse position using the left and top coordinates of this rectangle.</p>
     </div>
 
-    <Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets}/>
+    <Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets} zipFolderPath={$page.url.pathname}/>
 </div>

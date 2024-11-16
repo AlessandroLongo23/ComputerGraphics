@@ -1,7 +1,6 @@
-window.onload = function init() {
+window.onload = () => {
     setupWebGL();
 
-    // vertices
     vertices = [ vec2(0.0, 0.0), vec2(1.0, 0.0), vec2(1.0, 1.0) ];
 
     var vBuffer = gl.createBuffer();
@@ -30,12 +29,7 @@ window.onload = function init() {
     render();
 }
 
-function render() {
-    gl.clear(gl.COLOR_BUFFER_BIT);
-    gl.drawArrays(gl.TRIANGLES, 0, vertices.length);
-}
-
-function setupWebGL() {
+const setupWebGL = () => {
     canvas = document.getElementById("gl-canvas");
     gl = WebGLUtils.setupWebGL(canvas);
     if (!gl) {
@@ -48,4 +42,9 @@ function setupWebGL() {
 
     program = initShaders(gl, "vshader.glsl", "fshader.glsl");
     gl.useProgram(program);
+}
+
+const render = () => {
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.drawArrays(gl.TRIANGLES, 0, vertices.length);
 }

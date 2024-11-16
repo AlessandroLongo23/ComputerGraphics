@@ -75,7 +75,7 @@
         }
     });
 
-    function render() {
+    const render = () => {
         gl.clear(gl.COLOR_BUFFER_BIT);
 
         date = new Date;
@@ -91,7 +91,7 @@
         requestAnimFrame(render);
     }
 
-    function update() {
+    const update = () => {
         pos = mv.add(pos, mv.mult(vel, deltaTime));
         if (Math.abs(pos[1] + 0.5) > 0.015 || Math.abs(vel[1]) > 0.015)
             vel = mv.add(vel, mv.mult(acc, deltaTime));
@@ -104,7 +104,7 @@
         vel = mv.mult(vel, airFriction);
     }
 
-    function bounce() {
+    const bounce = () => {
         // floor and ceiling
         if (pos[1] < -0.5 && vel[1] < 0.0) {
             vel[0] = vel[0] * radFriction;
@@ -125,7 +125,7 @@
         }
     }
 
-    function initBall() {
+    const initBall = () => {
         vel = mv.vec2(Math.random() * 20 - 10, Math.random() * 20 - 10);
         pos = mv.vec2(Math.random() - 0.5, Math.random() - 0.5);
     }
@@ -137,7 +137,7 @@
         <p>Make the circle bounce up and down over time.</p>
     </div>
 
-    <Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets}>
+    <Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets} folderPath={$page.url.pathname}>
         {#snippet controls()}
             <button onclick={initBall} class="absolute left-0 top-0 m-4 p-2 bg-gray-100 rounded-lg hover:bg-gray-300 transition-colors">
                 <RotateCw size={20}/>

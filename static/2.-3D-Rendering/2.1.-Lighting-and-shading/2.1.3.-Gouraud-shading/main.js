@@ -1,4 +1,4 @@
-window.onload = function init() {
+window.onload = () => {
     setupWebGL();
 
     // enabling depth test and culling
@@ -30,7 +30,7 @@ window.onload = function init() {
     render();
 };
 
-function render() {
+const render = () => {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     thetaY += 0.005;
@@ -41,9 +41,9 @@ function render() {
     // view matrix
     var dist = 3.0;
     var eye = vec3(dist * Math.cos(thetaY), 0.0, dist * Math.sin(thetaY));
-    var target = vec3(0.0, 0.0, 0.0);
+    var at = vec3(0.0, 0.0, 0.0);
     var up = vec3(0.0, 1.0, 0.0);
-    var viewMatrix = lookAt(eye, target, up);
+    var viewMatrix = lookAt(eye, at, up);
 
     // model matrix
     var modelMatrix = mat4();
@@ -60,7 +60,7 @@ function render() {
     requestAnimFrame(render);
 }
 
-function buildPolyhedron() {
+const buildPolyhedron = () => {
     vertices = [];
     tetrahedron(v0, v1, v2, v3, subdivisions);
 
@@ -73,14 +73,14 @@ function buildPolyhedron() {
     gl.enableVertexAttribArray(vPosition);
 }
 
-function tetrahedron(a, b, c, d, n) {
+const tetrahedron = (a, b, c, d, n) => {
     divideTriangle(a, b, c, n);
     divideTriangle(d, c, b, n);
     divideTriangle(a, d, b, n);
     divideTriangle(a, c, d, n);
 }
 
-function divideTriangle(a, b, c, count) {
+const divideTriangle = (a, b, c, count) => {
     if (count === 0) {
         triangle(a, b, c);
         return;
@@ -96,13 +96,13 @@ function divideTriangle(a, b, c, count) {
     divideTriangle(ab, bc, ac, count - 1);
 }
 
-function triangle(a, b, c) {
+const triangle = (a, b, c) => {
     vertices.push(a);
     vertices.push(b);
     vertices.push(c);
 }
 
-document.getElementById("increment-subdivision-level").addEventListener("click", function() {
+document.getElementById("increment-subdivision-level").addEventListener("click", () => {
     if (subdivisions > 6)
         alert("Maximum subdivision level reached!");
     else
@@ -111,7 +111,7 @@ document.getElementById("increment-subdivision-level").addEventListener("click",
     buildPolyhedron();
 });
 
-document.getElementById("decrement-subdivision-level").addEventListener("click", function() {
+document.getElementById("decrement-subdivision-level").addEventListener("click", () => {
     if (subdivisions == 0)
         alert("subdivision level is already 0!");
     else
@@ -120,7 +120,7 @@ document.getElementById("decrement-subdivision-level").addEventListener("click",
     buildPolyhedron();
 });
 
-function setupWebGL() {
+const setupWebGL = () => {
     canvas = document.getElementById("gl-canvas");
     gl = WebGLUtils.setupWebGL(canvas);
     if (!gl) {

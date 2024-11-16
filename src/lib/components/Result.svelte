@@ -10,6 +10,7 @@
         canvas = $bindable(),
         isLoading,
         codeSnippets,
+        folderPath,
         width = 512,
         controls
     } = $props();
@@ -22,7 +23,7 @@
 <div class="flex flex-row justify-evenly items-center m-auto">
     <div class="{viewIndex !== 2 ? 'visible' : 'hidden'} w-full">
         {#if !isLoading}
-            <CodeBlock codeSnippets={codeSnippets} viewIndex={viewIndex} style="width: {viewIndex == 1 ? '768' : '1024'}px; height: 512px;"/>
+            <CodeBlock codeSnippets={codeSnippets} viewIndex={viewIndex} folderPath={folderPath} style="width: {viewIndex == 1 ? '768' : '1024'}px; height: 512px;"/>
         {:else}
             <p>Loading code snippets...</p>
         {/if}

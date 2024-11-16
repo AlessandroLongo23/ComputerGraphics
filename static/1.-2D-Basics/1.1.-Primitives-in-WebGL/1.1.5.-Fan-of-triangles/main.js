@@ -1,4 +1,4 @@
-window.onload = function init() {
+window.onload = () => {
     setupWebGL();
 
     acc = vec2(0.0, -9.81);
@@ -30,7 +30,7 @@ window.onload = function init() {
     render();
 }
 
-function render() {
+const render = () => {
     gl.clear(gl.COLOR_BUFFER_BIT);
 
     date = new Date;
@@ -46,7 +46,7 @@ function render() {
     requestAnimFrame(render);
 }
 
-function update() {
+const update = () => {
     pos = add(pos, mult(vel, deltatime));
     if (Math.abs(pos[1] + 0.5) > 0.015 || Math.abs(vel[1]) > 0.015)
         vel = add(vel, mult(acc, deltatime));
@@ -58,7 +58,7 @@ function update() {
     vel = mult(vel, airFriction);
 }
 
-function bounce() {
+const bounce = () => {
     // floor and ceiling
     if (pos[1] < -0.5 && vel[1] < 0.0) {
         vel[0] = vel[0] * radFriction;
@@ -79,12 +79,12 @@ function bounce() {
     }
 }
 
-function initBall() {
+const initBall = () => {
     vel = mv.vec2(Math.random() * 20 - 10, Math.random() * 20 - 10);
     pos = mv.vec2(Math.random() - 0.5, Math.random() - 0.5);
 }
 
-function setupWebGL() {
+const setupWebGL = () => {
     canvas = document.getElementById("gl-canvas");
     gl = WebGLUtils.setupWebGL(canvas);
     if (!gl) {

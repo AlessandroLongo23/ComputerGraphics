@@ -3,12 +3,12 @@
     
     let { count = $bindable(), min, max } = $props();
     
-    function decrement() {
+    const decrement = () => {
         if (count > min)
             count--;
     }
 
-    function increment() {
+    const increment = () => {
         if (count < max)
             count++;
     }

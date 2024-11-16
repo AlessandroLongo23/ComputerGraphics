@@ -3,7 +3,23 @@
     import { contentSequence } from "$lib/data/pages.svelte.js";
     import Toggle from "$lib/components/UI/Toggle.svelte";
     import { Sun, Moon } from "lucide-svelte";
-    import { theme } from "$lib/stores.svelte.js";
+    import { themeIndex } from "$lib/stores.svelte.js";
+
+    const capitalize = (str) => {
+        return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+
+    const getPage = (off) => {
+        if ($page.url.pathname == '/home')
+            return undefined;
+
+        let item = contentSequence.find(it => it.href?.split('/').pop() == $page.url.pathname.split("/").pop())
+        let index = contentSequence.indexOf(item);
+        if (index + off < 0 || index + off >= contentSequence.length)
+            return undefined;
+
+        return contentSequence[index + off].href;
+    }
 
     let [title, subtitle] = $derived.by(() => {
         let title = $page.url.pathname.split("/").pop();
@@ -29,31 +45,6 @@
 
     let previousPageUrl = $derived.by(() => getPage(-1));
     let nextPageUrl = $derived.by(() => getPage(1));
-
-    let themeIndex = $state(0);
-
-    function capitalize(str) {
-        return str.charAt(0).toUpperCase() + str.slice(1);
-    }
-
-    function getPage(off) {
-        if ($page.url.pathname == '/home')
-            return undefined;
-
-        let item = contentSequence.find(it => it.href?.split('/').pop() == $page.url.pathname.split("/").pop())
-        let index = contentSequence.indexOf(item);
-        if (index + off < 0 || index + off >= contentSequence.length)
-            return undefined;
-
-        return contentSequence[index + off].href;
-    }
-
-    $effect(() => {
-        themeIndex = $theme === 'light' ? 0 : 1;
-    });
-    $effect(() => {
-        theme.set(themeIndex === 0 ? 'light' : 'dark');
-    });
 </script>
 
 <div class="flex flex-row justify-center items-center faded-border mx-16 mb-8 py-4">
@@ -81,11 +72,15 @@
     {/if}
 
     <div class="absolute right-8">
-        <Toggle bind:selected={themeIndex} icons={[Sun, Moon]}/>
+        <Toggle bind:selected={$themeIndex} icons={[Sun, Moon]}/>
     </div>
 </div>
 
 <style>
+    /* :root {
+        --color: {$themeIndex ? '#000' : '#fff'};
+    } */
+
     .faded-border {
         position: relative;
     }

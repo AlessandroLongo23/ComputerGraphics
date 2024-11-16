@@ -71,8 +71,8 @@
             isLoading = false;
         }
     });
-
-    function render() {
+    
+    const render = () => {
         gl.clear(gl.COLOR_BUFFER_BIT);
         gl.drawArrays(gl.TRIANGLES, 0, vertices.length);
     }
@@ -84,5 +84,5 @@
         <p>Extend the application to include a second buffer for vertex colors and draw the triangle with a red, a green, and a blue vertex color. [Angel 2.5.1 and 2.10]</p>
     </div>
 
-    <Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets}/>
+    <Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets} folderPath={$page.url.pathname}/>
 </div>

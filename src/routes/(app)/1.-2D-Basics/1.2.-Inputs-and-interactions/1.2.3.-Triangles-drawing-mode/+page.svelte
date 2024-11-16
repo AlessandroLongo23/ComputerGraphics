@@ -44,7 +44,6 @@
             try {
                 [gl, program] = await initShaders(gl, program, $page.url.pathname + '/vshader.glsl', $page.url.pathname + '/fshader.glsl');
 
-                // points
                 colors = [];
                 vertices = [];
                 
@@ -169,7 +168,7 @@
                 console.error(error);
             }
 
-            document.getElementById("clear").addEventListener("click", function() {
+            document.getElementById("clear").addEventListener("click", () => {
                 switch(document.getElementById("mymenu").selectedIndex) {
                     case 0:
                         gl.clearColor(0.3921, 0.5843, 0.9294, 1.0);
@@ -202,7 +201,7 @@
         }
     });
 
-    function render() {
+    const render = () => {
         mode = modeIndex == 0 ? 'points' : 'triangles';
         gl.clear(gl.COLOR_BUFFER_BIT);
         gl.drawArrays(gl.TRIANGLES, 0, vertices.length);
@@ -223,7 +222,7 @@
         <p>Let us draw all our shapes as triangles (using gl.TRIANGLES). When a point is drawn, add vertices (positions and colors) for two triangles representing this point to the vertex buffers. In the triangle drawing mode, keep a record (array) of the former points that were clicked and their colors. When the third point is clicked, replace the two points and their colors (four triangles) with the one triangle to be drawn and clear the record.</p>
     </div>
 
-    <Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets}>
+    <Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets} folderPath={$page.url.pathname}>
         {#snippet controls()}
             <div class="absolute left-0 top-0 flex flex-row justify-evenly items-center gap-4 w-full p-4 bg-gray-900/25 rounded-{viewIndex == 1 && 'r-'}lg">    
                 <div class="flex flex-col justify-between items-center gap-2">

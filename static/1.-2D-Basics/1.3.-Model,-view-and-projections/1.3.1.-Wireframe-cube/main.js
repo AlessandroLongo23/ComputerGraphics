@@ -1,6 +1,6 @@
 var indices, vertices;
 
-window.onload = function init() {
+window.onload = () => {
     setupWebGL();
 
     // vertices
@@ -74,7 +74,7 @@ window.onload = function init() {
     render();
 }
 
-function render() {
+const render = () => {
     gl.clear(gl.COLOR_BUFFER_BIT);
     rot[0] += 0.025;
     rot[1] += 0.010;
@@ -92,7 +92,7 @@ function render() {
     requestAnimFrame(render);
 }
 
-function setupWebGL() {
+const setupWebGL = () => {
     canvas = document.getElementById("gl-canvas");
 
     gl = WebGLUtils.setupWebGL(canvas);

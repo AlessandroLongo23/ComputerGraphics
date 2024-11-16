@@ -1,6 +1,6 @@
 var vertices;
 
-window.onload = function init() {
+window.onload = () => {
     setupWebGL();
 
     mode = 'points';
@@ -193,13 +193,13 @@ window.onload = function init() {
     render();
 }
 
-function render() {
+const render = () => {
     gl.clear(gl.COLOR_BUFFER_BIT);
     gl.drawArrays(gl.TRIANGLES, 0, vertices.length);
     window.requestAnimFrame(render, canvas);
 }
 
-document.getElementById("clear").addEventListener("click", function() {
+document.getElementById("clear").addEventListener("click", () => {
     switch(document.getElementById("mymenu").selectedIndex) {
         case 0:
             gl.clearColor(218 / 255, 98 / 255, 87 / 255, 1.0);
@@ -227,19 +227,19 @@ document.getElementById("clear").addEventListener("click", function() {
     gl.bufferSubData(gl.ARRAY_BUFFER, 0, new Float32Array(vertices));
 });
 
-document.getElementById("pointsMode").addEventListener("click", function() {
+document.getElementById("pointsMode").addEventListener("click", () => {
     mode = 'points';
 });
 
-document.getElementById("trianglesMode").addEventListener("click", function() {
+document.getElementById("trianglesMode").addEventListener("click", () => {
     mode = 'triangles';
 });
 
-document.getElementById("circlesMode").addEventListener("click", function() {
+document.getElementById("circlesMode").addEventListener("click", () => {
     mode = 'circles';
 });
 
-function setupWebGL() {
+const setupWebGL = () => {
     canvas = document.getElementById("gl-canvas");
 
     gl = WebGLUtils.setupWebGL(canvas);

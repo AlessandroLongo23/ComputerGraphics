@@ -60,7 +60,7 @@
         }
     });
 
-    function configureWebGL() {
+    const configureWebGL = () => {
         gl.enable(gl.DEPTH_TEST);
         gl.enable(gl.CULL_FACE);
         gl.cullFace(gl.FRONT);
@@ -68,14 +68,14 @@
         gl.clearColor(1.0, 1.0, 1.0, 1.0);
     }
 
-    function initializeUniforms() {
+    const initializeUniforms = () => {
         viewMatrixLoc = gl.getUniformLocation(program, "viewMatrix");
         modelMatrixLoc = gl.getUniformLocation(program, "modelMatrix");
         projectionMatrixLoc = gl.getUniformLocation(program, "projectionMatrix");
         texMatrixLoc = gl.getUniformLocation(program, "texMatrix");
     }
 
-    function initCubeMap() {
+    const initCubeMap = () => {
         const cubeTexture = gl.createTexture();
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_CUBE_MAP, cubeTexture);
@@ -97,7 +97,7 @@
             gl.texImage2D(face.target, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([0, 0, 0, 0]));
 
             const image = new Image();
-            image.onload = function() {
+            image.onload = () => {
                 gl.bindTexture(gl.TEXTURE_CUBE_MAP, cubeTexture);
                 gl.texImage2D(face.target, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
                 loadedImages++;
@@ -113,7 +113,7 @@
         gl.uniform1i(cubeMapLoc, 0);
     }
 
-    function initializeBackgroundQuad() {
+    const initializeBackgroundQuad = () => {
         const backgroundVertices = [
             mv.vec4(-1.0, -1.0, 0.999, 1.0),
             mv.vec4(1.0, 1.0, 0.999, 1.0),
@@ -128,7 +128,7 @@
         gl.bufferData(gl.ARRAY_BUFFER, mv.flatten(backgroundVertices), gl.STATIC_DRAW);
     }
 
-    function initializeSphere() {
+    const initializeSphere = () => {
         sphereVertices = [];
         sphereNormals = [];
 
@@ -150,14 +150,14 @@
         gl.bufferData(gl.ARRAY_BUFFER, mv.flatten(sphereNormals), gl.STATIC_DRAW);
     }
 
-    function tetrahedron(a, b, c, d, n) {
+    const tetrahedron = (a, b, c, d, n) => {
         divideTriangle(a, b, c, n);
         divideTriangle(d, c, b, n);
         divideTriangle(a, d, b, n);
         divideTriangle(a, c, d, n);
     }
 
-    function divideTriangle(a, b, c, count) {
+    const divideTriangle = (a, b, c, count) => {
         if (count === 0) {
             triangle(a, b, c);
             return;
@@ -173,7 +173,7 @@
         divideTriangle(ab, bc, ac, count - 1);
     }
 
-    function triangle(a, b, c) {
+    const triangle = (a, b, c) => {
         sphereVertices.push(a);
         sphereNormals.push(a);
         sphereVertices.push(b);
@@ -182,7 +182,7 @@
         sphereNormals.push(c);
     }
 
-    function render() {
+    const render = () => {
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
         thetaY += 0.001;
@@ -190,9 +190,9 @@
         projectionMatrix = mv.perspective(45, canvas.width / canvas.height, 0.1, 100.0);
         const dist = 5.0;
         const eye = mv.vec3(dist * Math.cos(thetaY), 0.0, dist * Math.sin(thetaY));
-        const target = mv.vec3(0.0, 0.0, 0.0);
+        const at = mv.vec3(0.0, 0.0, 0.0);
         const up = mv.vec3(0.0, 1.0, 0.0);
-        viewMatrix = mv.lookAt(eye, target, up);
+        viewMatrix = mv.lookAt(eye, at, up);
         modelMatrix = mv.mat4();
 
         drawBackground();
@@ -201,7 +201,7 @@
         requestAnimationFrame(render);
     }
 
-    function drawBackground() {
+    const drawBackground = () => {
         gl.bindBuffer(gl.ARRAY_BUFFER, backgroundBuffer);
         const vPosition = gl.getAttribLocation(program, "vPosition");
         gl.vertexAttribPointer(vPosition, 4, gl.FLOAT, false, 0, 0);
@@ -217,7 +217,7 @@
         gl.drawArrays(gl.TRIANGLES, 0, 6);
     }
 
-    function drawSphere() {
+    const drawSphere = () => {
         gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
         const vPosition = gl.getAttribLocation(program, "vPosition");
         gl.vertexAttribPointer(vPosition, 4, gl.FLOAT, false, 0, 0);
@@ -239,7 +239,11 @@
 
 <div class="flex flex-col justify-center items-start w-4/5 text-xl m-auto">
     <div class="w-4/5 m-auto">
+        <p>The next step is to also draw the environment in the background. To do this, we draw a screen-filling quad very close to the far plane of the view frustum and texture it using the cube map.</p>
+        <p>A screen-filling quad close to the far plane is most easily drawn using clip coordinates, where the diagonal goes from (-1,-1,0.999, 1) to (1,1, 0.999,1). Insert this background quad into your scene.</p>
+        <p>Draw the background quad using the same shaders as in Part 1 but introduce a uniform matrix $M$ in the vertex shader that transforms the vertex position to texture coordinates.</p>
+        <p>For the sphere, $M$ is an identity matrix. The vertices of the background quad are however in clip space, so its model-view-projection matrix is an identity matrix, but its $M$ should transform from clip space positions to world space directions. Create $M$ for the background quad using (a) the inverse of the projection matrix to go from clip coordinates to camera coordinates and (b) the inverse of the rotational part of the view matrix (no translation) to get direction vectors in world coordinates. Explain the transformation.</p>
     </div>
 
-    <Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets}/>
+    <Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets} folderPath={$page.url.pathname}/>
 </div>

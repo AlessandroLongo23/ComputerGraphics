@@ -1,4 +1,4 @@
-window.onload = function init() {
+window.onload = () => {
     setupWebGL();
 
     // enabling depth test and culling
@@ -80,11 +80,11 @@ window.onload = function init() {
     }
 };
 
-function loadImages(urls, callback) {
+const loadImages = (urls, callback) => {
     var images = [];
     var imagesToLoad = urls.length;
 
-    function onImageLoad() {
+    const onImageLoad = () => {
         imagesToLoad--;
         imagesToLoad === 0 && callback(images);
     }
@@ -96,7 +96,7 @@ function loadImages(urls, callback) {
     }
 }
 
-function render() {
+const render = () => {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     lightAngle += 0.005;
@@ -115,9 +115,9 @@ function render() {
         dist * Math.sin(cameraPos.y), 
         dist * Math.sin(cameraPos.x) * Math.cos(cameraPos.y)
     );
-    var target = vec3(0.0, 0.0, 0.0);
+    var at = vec3(0.0, 0.0, 0.0);
     var up = vec3(0.0, 1.0, 0.0);
-    var viewMatrix = lookAt(eye, target, up);
+    var viewMatrix = lookAt(eye, at, up);
 
     // model matrix
     var modelMatrix = mat4();
@@ -134,13 +134,13 @@ function render() {
     requestAnimFrame(render);
 }
 
-function mouseDown(event) {
+const mouseDown = (event) => {
     isDragging = true;
     mousePrev.x = event.clientX;
     mousePrev.y = event.clientY;
 }
 
-function mouseMove(event) {
+const mouseMove = (event) => {
     if (!isDragging) 
         return;
     
@@ -152,11 +152,11 @@ function mouseMove(event) {
     mousePrev.y = event.clientY;
 }
 
-function mouseUp() {
+const mouseUp = () => {
     isDragging = false;
 }
 
-function mouseWheel(event) {
+const mouseWheel = (event) => {
     dist += event.deltaY / 1000;
     dist = Math.min(5.0, Math.max(dist, 1.25));
 }
@@ -166,7 +166,7 @@ window.addEventListener("mousemove", mouseMove, false);
 window.addEventListener("mouseup", mouseUp, false);
 window.addEventListener("mousewheel", mouseWheel, false);
 
-function buildPolyhedron() {
+const buildPolyhedron = () => {
     vertices = [];
     normals = [];
     tetrahedron(v0, v1, v2, v3, subdivisions);
@@ -188,14 +188,14 @@ function buildPolyhedron() {
     gl.enableVertexAttribArray(vNormal);
 }
 
-function tetrahedron(a, b, c, d, n) {
+const tetrahedron = (a, b, c, d, n) => {
     divideTriangle(a, b, c, n);
     divideTriangle(d, c, b, n);
     divideTriangle(a, d, b, n);
     divideTriangle(a, c, d, n);
 }
 
-function divideTriangle(a, b, c, count) {
+const divideTriangle = (a, b, c, count) => {
     if (count === 0) {
         triangle(a, b, c);
         return;
@@ -211,7 +211,7 @@ function divideTriangle(a, b, c, count) {
     divideTriangle(ab, bc, ac, count - 1);
 }
 
-function triangle(a, b, c) {
+const triangle = (a, b, c) => {
     vertices.push(a);
     normals.push(a);
     vertices.push(b);
@@ -220,7 +220,7 @@ function triangle(a, b, c) {
     normals.push(c);
 }
 
-function setupWebGL() {
+const setupWebGL = () => {
     canvas = document.getElementById("gl-canvas");
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
@@ -238,7 +238,7 @@ function setupWebGL() {
     gl.useProgram(program);
 }
 
-function resize() {
+const resize = () => {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
     gl.viewport(0, 0, canvas.width, canvas.height);

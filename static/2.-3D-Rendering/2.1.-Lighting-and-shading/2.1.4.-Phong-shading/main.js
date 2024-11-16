@@ -3,11 +3,11 @@ var subdivisions, min_sub, max_sub;
 var v0, v1, v2, v3;
 var thetaY = 30;
 var gl, canvas, program;
-var viewMatrixLoc, modelMatrixLoc, projectionMatrixLoc, eyePosLoc;
+var viewMatrixLoc, modelMatrixLoc, projectionMatrixLoc, eyeLoc;
 var kLoc, LLoc, ksLoc, sLoc;
 var k, L, ks, s;
 
-window.onload = function init() {
+window.onload = () => {
     setupWebGL();
     
     // enabling depth test and culling
@@ -16,7 +16,7 @@ window.onload = function init() {
     gl.cullFace(gl.FRONT);
 
     // set the camera position
-    eyePosLoc = gl.getUniformLocation(program, "eyePos");
+    eyeLoc = gl.getUniformLocation(program, "eye");
 
     // set the light direction
     var lightDirection = vec3(0.0, 0.0, -1.0);
@@ -49,7 +49,7 @@ window.onload = function init() {
     render();
 };
 
-function render() {
+const render = () => {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     thetaY += 0.005;
@@ -59,10 +59,10 @@ function render() {
 
     // view matrix
     var dist = 3.0;
-    var eyePos = vec3(dist * Math.cos(thetaY), 0.0, dist * Math.sin(thetaY));
-    var target = vec3(0.0, 0.0, 0.0);
+    var eye = vec3(dist * Math.cos(thetaY), 0.0, dist * Math.sin(thetaY));
+    var at = vec3(0.0, 0.0, 0.0);
     var up = vec3(0.0, 1.0, 0.0);
-    var viewMatrix = lookAt(eyePos, target, up);
+    var viewMatrix = lookAt(eye, at, up);
 
     // model matrix
     var modelMatrix = mat4();
@@ -74,7 +74,7 @@ function render() {
     gl.uniformMatrix4fv(modelMatrixLoc, false, flatten(modelMatrix));
     gl.uniformMatrix4fv(viewMatrixLoc, false, flatten(viewMatrix));
     gl.uniformMatrix4fv(projectionMatrixLoc, false, flatten(projectionMatrix));
-    gl.uniform3fv(eyePosLoc, flatten(eyePos));
+    gl.uniform3fv(eyeLoc, flatten(eye));
 
     // draw the model using triangles
     gl.drawArrays(gl.TRIANGLES, 0, vertices.length);
@@ -83,7 +83,7 @@ function render() {
     requestAnimFrame(render);
 }
 
-function buildPolyhedron() {
+const buildPolyhedron = () => {
     vertices = [];
     tetrahedron(v0, v1, v2, v3, subdivisions);
 
@@ -96,14 +96,14 @@ function buildPolyhedron() {
     gl.enableVertexAttribArray(vPosition);
 }
 
-function tetrahedron(a, b, c, d, n) {
+const tetrahedron = (a, b, c, d, n) => {
     divideTriangle(a, b, c, n);
     divideTriangle(d, c, b, n);
     divideTriangle(a, d, b, n);
     divideTriangle(a, c, d, n);
 }
 
-function divideTriangle(a, b, c, count) {
+const divideTriangle = (a, b, c, count) => {
     if (count === 0) {
         triangle(a, b, c);
         return;
@@ -120,13 +120,13 @@ function divideTriangle(a, b, c, count) {
     divideTriangle(ab, bc, ac, count - 1);
 }
 
-function triangle(a, b, c) {
+const triangle = (a, b, c) => {
     vertices.push(a);
     vertices.push(b);
     vertices.push(c);
 }
 
-document.getElementById("increment-subdivision-level").addEventListener("click", function() {
+document.getElementById("increment-subdivision-level").addEventListener("click", () => {
     if (subdivisions == max_sub)
         alert("Maximum subdivision level reached!");
     else
@@ -135,7 +135,7 @@ document.getElementById("increment-subdivision-level").addEventListener("click",
     buildPolyhedron();
 });
 
-document.getElementById("decrement-subdivision-level").addEventListener("click", function() {
+document.getElementById("decrement-subdivision-level").addEventListener("click", () => {
     if (subdivisions == min_sub)
         alert("subdivision level is already 0!");
     else
@@ -144,7 +144,7 @@ document.getElementById("decrement-subdivision-level").addEventListener("click",
     buildPolyhedron();
 });
 
-function updateLighting() {
+const updateLighting = () => {
     k = document.getElementById("k").value;
     L = document.getElementById("L").value;
     ks = document.getElementById("ks").value;
@@ -156,7 +156,7 @@ function updateLighting() {
     gl.uniform1f(sLoc, Math.pow(10, s));
 } 
 
-function setupWebGL() {
+const setupWebGL = () => {
     canvas = document.getElementById("gl-canvas");
     gl = WebGLUtils.setupWebGL(canvas);
     if (!gl) {

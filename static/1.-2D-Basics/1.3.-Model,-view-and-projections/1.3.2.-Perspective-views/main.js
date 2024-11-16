@@ -1,6 +1,6 @@
 var indices, vertices;
 
-window.onload = function init() {
+window.onload = () => {
     setupWebGL();
 
     // vertices
@@ -70,7 +70,7 @@ window.onload = function init() {
     render();
 }
 
-function render() {
+const render = () => {
     gl.clear(gl.COLOR_BUFFER_BIT);
 
     // Cube 1 - One-point perspective (front view)
@@ -101,7 +101,7 @@ function render() {
     requestAnimFrame(render);
 }
 
-function setupWebGL() {
+const setupWebGL = () => {
     canvas = document.getElementById("gl-canvas");
 
     gl = WebGLUtils.setupWebGL(canvas);

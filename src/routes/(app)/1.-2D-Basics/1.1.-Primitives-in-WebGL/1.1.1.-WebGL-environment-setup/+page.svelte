@@ -38,7 +38,7 @@
         }
     });
 
-    function render() {
+    const render = () => {
         gl.clear(gl.COLOR_BUFFER_BIT);
         gl.drawArrays(gl.POINTS, 0, vertices.length);
     }
@@ -52,5 +52,5 @@
         <p>Setup the WebGL context using Angel’s “setupWebGL”. You can use the window.onload event to initialize and setup the application. [Angel 2.8]</p>
     </div>
 
-    <Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets}/>
+    <Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets} folderPath={$page.url.pathname}/>
 </div>

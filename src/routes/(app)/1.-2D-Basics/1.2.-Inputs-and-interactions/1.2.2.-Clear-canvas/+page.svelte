@@ -87,7 +87,7 @@
                 console.error(error);
             }
 
-            document.getElementById("clear").addEventListener("click", function() {
+            document.getElementById("clear").addEventListener("click", () => {
                 switch(document.getElementById("mymenu").selectedIndex) {
                     case 0:
                         gl.clearColor(0.3921, 0.5843, 0.9294, 1.0);
@@ -118,7 +118,7 @@
         }
     });
 
-    function render() {
+    const render = () => {
         gl.clear(gl.COLOR_BUFFER_BIT);
         gl.drawArrays(gl.POINTS, 0, index);
         window.requestAnimFrame(render, canvas);
@@ -132,7 +132,7 @@
         <p>Add a rotation so the quad rotates around its center. Animate the rotation angle over time. Use requestAnimationFrame to continuously call your render function. [Angel 3.1]</p>
     </div>
 
-    <Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets}>
+    <Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets} folderPath={$page.url.pathname}>
         {#snippet controls()}
             <div class="absolute left-0 top-0 flex flex-row justify-evenly items-center gap-4 w-full p-4 bg-gray-900/25">    
                 <button id="clear" class="flex w-32 h-8 items-center justify-center px-auto py-4 transition-colors duration-200 text-sm bg-white hover:bg-gray-300 text-black rounded-lg">

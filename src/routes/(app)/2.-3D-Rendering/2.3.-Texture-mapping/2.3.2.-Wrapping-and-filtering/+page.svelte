@@ -99,7 +99,7 @@
                 modelViewMatrixLoc = gl.getUniformLocation(program, "modelViewMatrix");
                 projectionMatrixLoc = gl.getUniformLocation(program, "projectionMatrix");
 
-                document.getElementById("wrapping").addEventListener("change", function() {
+                document.getElementById("wrapping").addEventListener("change", () => {
                     switch(parseInt(document.getElementById("wrapping").value)) {
                         case 0:
                             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
@@ -112,7 +112,7 @@
                     }
                 });
 
-                document.getElementById("filtering").addEventListener("change", function() {
+                document.getElementById("filtering").addEventListener("change", () => {
                     switch(parseInt(document.getElementById("filtering").value)) {
                         case 0:
                             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
@@ -151,7 +151,7 @@
         }
     });
 
-    function render() {
+    const render = () => {
         gl.clear(gl.COLOR_BUFFER_BIT);
 
         var projectionMatrix = mv.perspective(90, canvas.width / canvas.height, .1, 30.0);
@@ -172,7 +172,7 @@
         <p>Explain the effect of the different filtering modes and their influence on texture magnification and minification issues.</p>
     </div>
 
-    <Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets}>
+    <Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets} folderPath={$page.url.pathname}>
         {#snippet controls()}
             <div class="absolute left-0 top-0 flex flex-row justify-evenly items-center gap-4 w-full p-4 bg-gray-900/25 rounded-{viewIndex == 1 && 'r-'}lg">    
                 <div class="flex flex-row justify-evenly w-full">

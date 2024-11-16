@@ -1,6 +1,6 @@
 <script>
     import { ChevronDown, Menu, GripVertical, X } from 'lucide-svelte';
-    import { theme } from "$lib/stores.svelte.js";
+    import { themeIndex } from "$lib/stores.svelte.js";
     import { page } from '$app/stores';
     import { contentTree } from '$lib/data/pages.svelte.js';
     import { onMount } from 'svelte';
@@ -13,22 +13,22 @@
     // let maxWidth = 450;
     let isDragging = false;
     
-    function toggleSidebar() {
+    const toggleSidebar = () => {
         isCollapsed = !isCollapsed;
     }
 
-    // function startResize() {
+    // const startResize = () => {
     //     isDragging = true;
     //     document.addEventListener('mousemove', handleMouseMove);
     //     document.addEventListener('mouseup', stopResize);
     // }
 
-    // function handleMouseMove(event) {
+    // const handleMouseMove = (event) => {
     //     if (isDragging)
     //         sidebarWidth = Math.max(minWidth, Math.min(maxWidth, event.clientX));
     // }
 
-    // function stopResize() {
+    // const stopResize = () => {
     //     isDragging = false;
     //     document.removeEventListener('mousemove', handleMouseMove);
     //     document.removeEventListener('mouseup', stopResize);
@@ -52,11 +52,11 @@
         });
     });
 
-    function isRouteActive(href) {
+    const isRouteActive = (href) => {
         return $page.url.pathname === href;
     }
 
-    function isParentRouteActive(item) {
+    const isParentRouteActive = (item) => {
         if (isRouteActive(item.href)) 
             return true;
         
@@ -74,13 +74,12 @@
         return false;
     }
 
-    function toggleExpanded(href) {
-        if (expandedItems.find(it => it == href)) {
+    const toggleExpanded = (href) => {
+        if (expandedItems.find(it => it == href))
             expandedItems.splice(expandedItems.findIndex(it => it == href), 1);
-        } else {
+        else
             expandedItems.push(href);
-        }
-    }   
+    }
 </script>
 
 <div class="flex min-h-screen">
@@ -89,15 +88,15 @@
     {/if}
 
     <div class="relative">
-        <aside class="z-50 h-screen flex flex-col justify-between { $theme == 'light' ? 'bg-gray-100 text-black' : 'bg-gray-800 text-white'} transition-transform duration-300 fixed transform {isCollapsed ? '-translate-x-full' : 'translate-x-0'} overflow-y-auto" style="width: {sidebarWidth}px">
+        <aside class="z-50 h-screen flex flex-col justify-between { $themeIndex == 0 ? 'bg-gray-100 text-black' : 'bg-gray-800 text-white'} transition-transform duration-300 fixed transform {isCollapsed ? '-translate-x-full' : 'translate-x-0'} overflow-y-auto" style="width: {sidebarWidth}px">
             <div>
                 <div class="flex flex-row justify-between items-center p-6 mb-6">
                     <a href="/home" class="relative w-12 h-12 me-4">
-                        <img src="/assets/images/favicon-{ $theme }.png" alt="logo"/>
+                        <img src="/assets/images/favicon-{ $themeIndex == 0 ? 'light' : 'dark' }.png" alt="logo"/>
                     </a>
                     
                     <div class="flex items-center">
-                        <button onclick={toggleSidebar} class="p-1 rounded-lg { $theme == 'light' ? 'hover:bg-gray-300' : 'hover:bg-gray-700' } transition-colors" aria-label="Collapse sidebar">
+                        <button onclick={toggleSidebar} class="p-1 rounded-lg { $themeIndex == 0 ? 'hover:bg-gray-300' : 'hover:bg-gray-700' } transition-colors" aria-label="Collapse sidebar">
                             <X size={18}/>
                         </button>
                     </div>
@@ -107,36 +106,32 @@
                     {#each contentTree.children as item}
                         {@const hasChildren = item.children}
                         <div class="flex flex-col">
-                            <div class="flex items-center gap-4 ps-2 p-1 mb-1 ms-4 rounded-lg transition-colors hover:bg-gray-300 { isRouteActive(item.href) && 'bg-gray-300'}">
+                            <button onclick={() => toggleExpanded(item.href)} class="flex items-center gap-4 ps-2 p-1 mb-1 ms-4 rounded-lg transition-colors hover:bg-gray-300 { isRouteActive(item.href) && 'bg-gray-300'}">
                                 <a href={item.href} class="flex items-center gap-4 flex-1 hover:no-underline text-black">
                                     <item.icon size={18}/>
-                                    <span class="flex-1 truncate">{item.href.split("/").pop().replaceAll('-', ' ')}</span>
+                                    <span class="truncate">{item.href.split("/").pop().replaceAll('-', ' ')}</span>
                                 </a>
 
                                 {#if hasChildren}
-                                    <button onclick={() => toggleExpanded(item.href)} class="p-1 rounded hover:bg-gray-500/20">
-                                        <ChevronDown size={16} class="transition-transform duration-200 {expandedItems.find(it => it == item.href) ? 'text-red-500' : 'rotate-90'}"/>
-                                    </button>
+                                    <ChevronDown size={16} class="transition-transform me-2 duration-200 {expandedItems.find(it => it == item.href) ? 'text-red-500' : 'rotate-90'}"/>
                                 {/if}
-                            </div>
+                            </button>
 
                             {#if hasChildren && expandedItems.find(it => it == item.href)}
                                 <div class="ms-4 border-l-2 border-gray-300 pl-2">
                                     {#each item.children as child}
                                         {@const hasGrandchildren = child.children}
                                         <div class="flex flex-col">
-                                            <div class="flex items-center gap-4 ps-2 p-1 mb-1 ms-4 rounded-lg transition-colors hover:bg-gray-300 {isRouteActive(child.href) && 'bg-gray-300'}">
+                                            <button onclick={() => toggleExpanded(child.href)} class="flex items-center gap-4 ps-2 p-1 mb-1 ms-4 rounded-lg transition-colors hover:bg-gray-300 {isRouteActive(child.href) && 'bg-gray-300'}">
                                                 <a href={child.href} class="flex items-center gap-4 flex-1 hover:no-underline text-black">
                                                     <child.icon size={18}/>
-                                                    <span class="flex-1 truncate">{child.href.split("/").pop().replaceAll('-', ' ')}</span>
+                                                    <span class="truncate">{child.href.split("/").pop().replaceAll('-', ' ')}</span>
                                                 </a>
 
                                                 {#if hasGrandchildren}
-                                                    <button onclick={() => toggleExpanded(child.href)} class="p-1 rounded hover:bg-gray-500/20">
-                                                        <ChevronDown size={16} class="transition-transform duration-200 {expandedItems.find(it => it == child.href) ? 'text-red-500' : 'rotate-90'}"/>
-                                                    </button>
+                                                    <ChevronDown size={16} class="transition-transform duration-200 me-2 {expandedItems.find(it => it == child.href) ? 'text-red-500' : 'rotate-90'}"/>
                                                 {/if}
-                                            </div>
+                                            </button>
 
                                             {#if hasGrandchildren && expandedItems.find(it => it == child.href)}
                                                 <div class="pl-2 border-l-2 ml-4 border-gray-300">
@@ -159,12 +154,12 @@
 
             <div class="flex flex-row justify-center items-center mt-8 mb-4">
                 <p class="text-xl m-0">Computer</p>
-                <img src="/assets/images/favicon-{$theme}.png" alt="icon" class="w-8 h-8 mx-2">
+                <img src="/assets/images/favicon-{ $themeIndex == 0 ? 'light' : 'dark' }.png" alt="icon" class="w-8 h-8 mx-2">
                 <p class="text-xl m-0">Graphics</p>
             </div>
 
             <!-- <div on:mousedown={startResize} class="absolute top-0 right-0 w-4 h-full cursor-col-resize flex items-center justify-center hover:bg-gray-500/20 transition-colors">
-                <div class="p-1 rounded-md { $theme == 'light' ? 'text-gray-400' : 'text-gray-500' }">
+                <div class="p-1 rounded-md { $themeIndex == 0 ? 'text-gray-400' : 'text-gray-500' }">
                     <GripVertical size={16} />
                 </div>
             </div> -->

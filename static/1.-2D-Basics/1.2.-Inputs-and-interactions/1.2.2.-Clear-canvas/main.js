@@ -1,4 +1,4 @@
-window.onload = function init() {
+window.onload = () => {
     setupWebGL();
 
     // points
@@ -52,13 +52,13 @@ window.onload = function init() {
     render();
 }
 
-function render() {
+const render = () => {
     gl.clear(gl.COLOR_BUFFER_BIT);
     gl.drawArrays(gl.POINTS, 0, index);
     window.requestAnimFrame(render, canvas);
 }
 
-document.getElementById("clear").addEventListener("click", function() {
+document.getElementById("clear").addEventListener("click", () => {
     switch(document.getElementById("mymenu").selectedIndex) {
         case 0:
             gl.clearColor(218 / 255, 98 / 255, 87 / 255, 1.0);
@@ -84,7 +84,7 @@ document.getElementById("clear").addEventListener("click", function() {
     index = 0;
 });
 
-function setupWebGL() {
+const setupWebGL = () => {
     canvas = document.getElementById("gl-canvas");
 
     gl = WebGLUtils.setupWebGL(canvas);

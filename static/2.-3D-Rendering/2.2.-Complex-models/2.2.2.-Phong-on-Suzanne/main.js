@@ -1,4 +1,4 @@
-window.onload = function init() {
+window.onload = () => {
     setupWebGL();
 
     // enabling depth test and culling
@@ -7,7 +7,7 @@ window.onload = function init() {
     gl.cullFace(gl.BACK);
 
     // set the camera position
-    eyePosLoc = gl.getUniformLocation(program, "eyePos");
+    eyeLoc = gl.getUniformLocation(program, "eye");
 
     // set the light direction
     var lightDirection = vec3(0.0, 0.0, -1.0);
@@ -25,17 +25,14 @@ window.onload = function init() {
             obj = objInfo;
 
             var newVertices = [];
-            var newColors = [];
             var newNormals = [];
             for (let i = 0; i < obj.vertices.length; i++) {
                 if (i % 4 != 3) {
                     newVertices.push(obj.vertices[i]);
-                    newColors.push(obj.colors[i]);
                     newNormals.push(obj.normals[i]);
                 }
             }
             obj.vertices = newVertices;
-            obj.colors = newColors;
             obj.normals = newNormals;
             
             // Create and bind the vertex buffer for vertices
@@ -46,13 +43,13 @@ window.onload = function init() {
             gl.vertexAttribPointer(vPosition, 3, gl.FLOAT, false, 0, 0);
             gl.enableVertexAttribArray(vPosition);
 
-            // Create and bind the color buffer for colors
-            var cBuffer = gl.createBuffer();
-            gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
-            gl.bufferData(gl.ARRAY_BUFFER, flatten(obj.colors), gl.STATIC_DRAW);
-            var vColor = gl.getAttribLocation(program, "vColor");
-            gl.vertexAttribPointer(vColor, 3, gl.FLOAT, false, 0, 0);
-            gl.enableVertexAttribArray(vColor);
+            // Create and bind the normal buffer for normals
+            var nBuffer = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, nBuffer);
+            gl.bufferData(gl.ARRAY_BUFFER, flatten(obj.normals), gl.STATIC_DRAW);
+            var vNormal = gl.getAttribLocation(program, "vNormal");
+            gl.vertexAttribPointer(vNormal, 3, gl.FLOAT, false, 0, 0);
+            gl.enableVertexAttribArray(vNormal);
 
             // Create and bind the index buffer
             var indices = new Uint16Array(obj.indices);
@@ -70,7 +67,7 @@ window.onload = function init() {
         });
 };
 
-function render() {
+const render = () => {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     thetaY += 0.005;
@@ -80,10 +77,10 @@ function render() {
 
     // view matrix
     var dist = 3.0;
-    var eyePos = vec3(dist * Math.cos(thetaY), 0.0, dist * Math.sin(thetaY));
-    var target = vec3(0.0, 0.0, 0.0);
+    var eye = vec3(dist * Math.cos(thetaY), 0.0, dist * Math.sin(thetaY));
+    var at = vec3(0.0, 0.0, 0.0);
     var up = vec3(0.0, 1.0, 0.0);
-    var viewMatrix = lookAt(eyePos, target, up);
+    var viewMatrix = lookAt(eye, at, up);
 
     // model matrix
     var modelMatrix = mat4();
@@ -92,7 +89,7 @@ function render() {
     gl.uniformMatrix4fv(modelMatrixLoc, false, flatten(modelMatrix));
     gl.uniformMatrix4fv(viewMatrixLoc, false, flatten(viewMatrix));
     gl.uniformMatrix4fv(projectionMatrixLoc, false, flatten(projectionMatrix));
-    gl.uniform3fv(eyePosLoc, flatten(eyePos));
+    gl.uniform3fv(eyeLoc, flatten(eye));
 
     // Draw the object using the index buffer
     gl.drawElements(gl.TRIANGLES, obj.indices.length, gl.UNSIGNED_SHORT, 0);
@@ -101,7 +98,7 @@ function render() {
     requestAnimFrame(render);
 }
 
-function setupWebGL() {
+const setupWebGL = () => {
     canvas = document.getElementById("gl-canvas");
 
     gl = WebGLUtils.setupWebGL(canvas);

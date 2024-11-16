@@ -4,7 +4,7 @@ uniform mat4 projectionMatrix;
 uniform mat4 viewMatrix;
 uniform mat4 modelMatrix;
 
-uniform vec3 eyePos;
+uniform vec3 eye;
 uniform vec3 lightDirection;
 uniform float k;
 uniform float L;
@@ -27,7 +27,7 @@ void main() {
 
     // specular lighting
     vec3 w_r = reflect(w_i, n);
-    vec3 w_o = normalize(eyePos - pos.xyz);
+    vec3 w_o = normalize(eye - pos.xyz);
     float specular = pow(max(dot(w_r, w_o), 0.0), s);
     vec3 specular_color = ks * specular * vec3(L);
 

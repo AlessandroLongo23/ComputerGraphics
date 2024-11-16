@@ -1,6 +1,6 @@
 let vertices = [];
 
-window.onload = function init() {
+window.onload = () => {
     canvas = document.getElementById("gl-canvas");
     gl = WebGLUtils.setupWebGL(canvas);
     if (!gl) {
@@ -14,7 +14,7 @@ window.onload = function init() {
     render();
 }
 
-function render() {
+const render = () => {
     gl.clear(gl.COLOR_BUFFER_BIT);
     gl.drawArrays(gl.POINTS, 0, vertices.length);
 }

@@ -1,11 +1,9 @@
-window.onload = function init() {
+window.onload = () => {
     setupWebGL();
 
-    // theta
     theta = 0.0;
     thetaLoc = gl.getUniformLocation(program, "theta");
 
-    // vertices
     vertices = [ 
         vec2(-0.5, 0.5), 
         vec2(0.5, 0.5), 
@@ -24,18 +22,7 @@ window.onload = function init() {
     render();
 }
 
-function render() {
-    gl.clear(gl.COLOR_BUFFER_BIT);
-
-    theta += 0.025;
-    gl.uniform1f(thetaLoc, theta);
-
-    gl.drawArrays(gl.TRIANGLE_STRIP, 0, vertices.length);
-
-    requestAnimFrame(render);
-}
-
-function setupWebGL() {
+const setupWebGL = () => {
     canvas = document.getElementById("gl-canvas");
     gl = WebGLUtils.setupWebGL(canvas);
     if (!gl) {
@@ -48,4 +35,15 @@ function setupWebGL() {
 
     program = initShaders(gl, "vshader.glsl", "fshader.glsl");
     gl.useProgram(program);
+}
+
+const render = () => {
+    gl.clear(gl.COLOR_BUFFER_BIT);
+
+    theta += 0.025;
+    gl.uniform1f(thetaLoc, theta);
+
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, vertices.length);
+
+    requestAnimFrame(render);
 }

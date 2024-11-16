@@ -1,6 +1,4 @@
 <script>
-    import { run } from 'svelte/legacy';
-
     import { onMount } from 'svelte';
     import { page } from '$app/stores'
     import { WebGLUtils, fetchCodeSnippets, initShaders } from '$lib/utils.svelte.js';
@@ -82,7 +80,7 @@
         }
     });
 
-    function render() {
+    const render = () => {
         gl.clear(gl.COLOR_BUFFER_BIT);
 
         var ctm = mv.mat4();
@@ -100,7 +98,7 @@
         requestAnimFrame(render);
     }
 
-    function buildPolyhedron() {
+    const buildPolyhedron = () => {
         vertices = [];
         tetrahedron(v0, v1, v2, v3, subdivisions);
 
@@ -113,14 +111,14 @@
         gl.enableVertexAttribArray(vPosition);
     }
 
-    function tetrahedron(a, b, c, d, n) {
+    const tetrahedron = (a, b, c, d, n) => {
         divideTriangle(a, b, c, n, 0);
         divideTriangle(d, c, b, n, 1);
         divideTriangle(a, d, b, n, 2);
         divideTriangle(a, c, d, n, 3);
     }
 
-    function divideTriangle(a, b, c, count, colorIndex) {
+    const divideTriangle = (a, b, c, count, colorIndex) => {
         if (count == 0) {
             triangle(a, b, c, colorIndex);
             return;
@@ -136,7 +134,7 @@
         divideTriangle(ab, bc, ac, count - 1);
     }
 
-    function triangle(a, b, c, colorIndex) {
+    const triangle = (a, b, c, colorIndex) => {
         colors.push(baseColors[colorIndex]);
         vertices.push(a);
         colors.push(baseColors[colorIndex]);
@@ -145,7 +143,7 @@
         vertices.push(c);
     }
 
-    run(() => {
+    $effect(() => {
         subdivisions != undefined && buildPolyhedron();
     });
 </script>
@@ -158,7 +156,7 @@
         <p>Insert two buttons: one which increments the subdivision level and one which decrements the subdivision level. [Angel 3.6.2]</p>
     </div>
 
-    <Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets}>
+    <Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets} folderPath={$page.url.pathname}>
         {#snippet controls()}
             <div class="absolute left-0 top-0 flex flex-row justify-evenly items-center gap-4 w-full p-4 bg-gray-900/25 rounded-{viewIndex == 1 && 'r-'}lg">    
                 <Counter bind:count={subdivisions} min={0} max={6}/>

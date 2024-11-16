@@ -1,6 +1,4 @@
 <script>
-    import { run } from 'svelte/legacy';
-
     import { onMount } from 'svelte';
     import { page } from '$app/stores'
     import { WebGLUtils, fetchCodeSnippets, initShaders } from '$lib/utils.svelte.js';
@@ -19,7 +17,7 @@
     let subdivisions = $state();
     let v0, v1, v2, v3;
     let thetaY = 30;
-    let viewMatrixLoc, modelMatrixLoc, projectionMatrixLoc, eyePosLoc;
+    let viewMatrixLoc, modelMatrixLoc, projectionMatrixLoc, eyeLoc;
     let kLoc, LLoc, ksLoc, sLoc;
     let k = $state(), L = $state(), ks = $state(), s = $state();
 
@@ -52,7 +50,7 @@
                 gl.cullFace(gl.FRONT);
 
                 // set the camera position
-                eyePosLoc = gl.getUniformLocation(program, "eyePos");
+                eyeLoc = gl.getUniformLocation(program, "eye");
 
                 // Set the light direction
                 var lightDirection = mv.vec3(0.0, 0.0, -1.0);
@@ -92,7 +90,7 @@
         }
     });
 
-    function render() {
+    const render = () => {
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
         thetaY += 0.005;
@@ -102,10 +100,10 @@
 
         // view matrix
         var dist = 5.0;
-        var eyePos = mv.vec3(dist * Math.cos(thetaY), 0.0, dist * Math.sin(thetaY));
-        var target = mv.vec3(0.0, 0.0, 0.0);
+        var eye = mv.vec3(dist * Math.cos(thetaY), 0.0, dist * Math.sin(thetaY));
+        var at = mv.vec3(0.0, 0.0, 0.0);
         var up = mv.vec3(0.0, 1.0, 0.0);
-        var viewMatrix = mv.lookAt(eyePos, target, up);
+        var viewMatrix = mv.lookAt(eye, at, up);
 
         // model matrix
         var modelMatrix = mv.mat4();
@@ -117,7 +115,7 @@
         gl.uniformMatrix4fv(modelMatrixLoc, false, mv.flatten(modelMatrix));
         gl.uniformMatrix4fv(viewMatrixLoc, false, mv.flatten(viewMatrix));
         gl.uniformMatrix4fv(projectionMatrixLoc, false, mv.flatten(projectionMatrix));
-        gl.uniform3fv(eyePosLoc, mv.flatten(eyePos));
+        gl.uniform3fv(eyeLoc, mv.flatten(eye));
 
         // draw the model using triangles
         gl.drawArrays(gl.TRIANGLES, 0, vertices.length);
@@ -126,7 +124,7 @@
         requestAnimFrame(render);
     }
 
-    function buildPolyhedron() {
+    const buildPolyhedron = () => {
         vertices = [];
         tetrahedron(v0, v1, v2, v3, subdivisions);
 
@@ -139,14 +137,14 @@
         gl.enableVertexAttribArray(vPosition);
     }
 
-    function tetrahedron(a, b, c, d, n) {
+    const tetrahedron = (a, b, c, d, n) => {
         divideTriangle(a, b, c, n, 0);
         divideTriangle(d, c, b, n, 1);
         divideTriangle(a, d, b, n, 2);
         divideTriangle(a, c, d, n, 3);
     }
 
-    function divideTriangle(a, b, c, count) {
+    const divideTriangle = (a, b, c, count) => {
         if (count == 0) {
             triangle(a, b, c);
             return;
@@ -162,20 +160,20 @@
         divideTriangle(ab, bc, ac, count - 1);
     }
 
-    function triangle(a, b, c) {
+    const triangle = (a, b, c) => {
         vertices.push(a);
         vertices.push(b);
         vertices.push(c);
     }
 
-    function updateLighting() {
+    const updateLighting = () => {
         gl.uniform1f(kLoc, k);
         gl.uniform1f(LLoc, L);
         gl.uniform1f(ksLoc, ks);
         gl.uniform1f(sLoc, Math.pow(10, s));
     } 
 
-    run(() => {
+    $effect(() => {
         subdivisions != undefined && buildPolyhedron();
     });
 </script>
@@ -197,7 +195,7 @@
         </Admonition>        
     </div>
 
-    <Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets}>
+    <Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets} folderPath={$page.url.pathname}>
         {#snippet controls()}
             <div class="absolute left-0 top-0 flex flex-col justify-evenly items-center gap-4 w-full p-4 bg-gray-900/25 rounded-{viewIndex == 1 && 'r-'}lg">    
                 <Counter bind:count={subdivisions} min={0} max={6}/>

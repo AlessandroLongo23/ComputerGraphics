@@ -1,7 +1,7 @@
 <script>
     import * as LucideIcons from 'lucide-svelte';
 
-    function selectIcon(index) {
+    const selectIcon = (index) => {
         selected = index;
     }
 

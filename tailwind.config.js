@@ -1,8 +1,8 @@
 export default {
 	content: ['./src/**/*.{html,js,svelte,ts}'],
-	theme: {
-		extend: {}
-	},
+	// theme: {
+	// 	extend: {}
+	// },
 	plugins: [],
 	export: {
 		darkMode: 'selector',

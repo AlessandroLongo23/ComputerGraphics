@@ -44,7 +44,7 @@
  * discouraged. It is recommended you structure your rendering
  * loop like this.
  *
- *       function render() {
+ *       const render = () => {
  *         window.requestAnimFrame(render, canvas);
  *
  *         // do rendering
@@ -57,7 +57,7 @@
  * visible.
  */
 
-WebGLUtils = function() {
+WebGLUtils = () => {
 
 /**
  * Creates the HTLM for a failure message
@@ -150,7 +150,7 @@ return {
 /**
  * Provides requestAnimationFrame in a cross browser way.
  */
-window.requestAnimFrame = (function() {
+window.requestAnimFrame = (() => {
   return window.requestAnimationFrame ||
          window.webkitRequestAnimationFrame ||
          window.mozRequestAnimationFrame ||

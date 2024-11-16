@@ -1,26 +1,28 @@
 <script>
+    import { page } from '$app/stores';
     import { onMount } from 'svelte';
     import hljs from 'highlight.js';
     import 'highlight.js/styles/atom-one-dark.css';
 
-
-    let { style = '', codeSnippets, viewIndex } = $props();
+    let { style = '', codeSnippets, viewIndex, folderPath } = $props();
     let currentSnippetIndex = $state(0);
-    let buttonIcon = $state('copy');
+    let copyIcon = $state('copy');
     let currentCode = $derived(codeSnippets[currentSnippetIndex].code);
     let currentLanguage = $derived(codeSnippets[currentSnippetIndex].language);
 
+    let zipFilePath = $page.url.pathname + '/' + $page.url.pathname.split('/').pop() + '.zip'; 
+    
     onMount(() => {
         highlightCode();
     });
 
-    function unescapeHtml(escapedHtml) {
+    const unescapeHtml = (escapedHtml) => {
         const textarea = document.createElement('textarea');
         textarea.innerHTML = escapedHtml;
         return textarea.value;
     }
 
-    function highlightCode() {
+    const highlightCode = () => {
         setTimeout(() => {
             const block = document.querySelector('pre code');
             if (block) {
@@ -33,20 +35,20 @@
         }, 0);
     }
 
-    function copyToClipboard() {
+    const copyToClipboard = () => {
         const textToCopy = currentCode.includes('&lt;') ? unescapeHtml(currentCode) : currentCode;
             
         navigator.clipboard.writeText(textToCopy).then(() => {
-            buttonIcon = 'check';
+            copyIcon = 'check';
             setTimeout(() => {
-                buttonIcon = 'copy';
+                copyIcon = 'copy';
             }, 2000);
         }).catch(err => {
             console.error('Could not copy text: ', err);
         });
     }
 
-    function selectSnippet(index) {
+    const selectSnippet = (index) => {
         currentSnippetIndex = index;
         highlightCode();
     }
@@ -66,9 +68,15 @@
             {/if}
         </div>
 
-        <button onclick={copyToClipboard} class="flex items-center transition-colors duration-200 text-sm h-8 text-white px-4 py-2 rounded-lg w-auto {buttonIcon == 'check' && 'copied'}" aria-label="Copy code to clipboard">
-            <i class="fa fa-{buttonIcon} ? 'copy' : 'check'}"></i>
-        </button>
+        <div class="flex flex-row justify-end gap-2">
+            <button onclick={copyToClipboard} class="flex items-center transition-colors duration-200 text-sm h-8 text-white px-4 py-2 rounded-lg w-auto {copyIcon == 'check' && 'copied'}" aria-label="Copy code to clipboard">
+                <i class="fa fa-{copyIcon}"></i>
+            </button>
+
+            <a download href="{zipFilePath}" class="flex items-center transition-colors duration-200 text-sm h-8 text-white px-4 py-2 rounded-lg w-auto" aria-label="Download zip folder">
+                <i class="fa-solid fa-download"></i>
+            </a>
+        </div>
     </div>
 
     <pre class="language-{currentLanguage} m-0 rounded-lg {viewIndex == 1 && 'rounded-r-none'}" style={style}>
@@ -95,11 +103,11 @@
         line-height: 1.2rem;
     }
 
-    button {
+    button, a {
         background: rgba(51, 51, 51, 0.8);
     }
 
-    button:hover { 
+    button:hover, a:hover { 
         background-color: rgba(68, 68, 68, 0.9);
     } 
 

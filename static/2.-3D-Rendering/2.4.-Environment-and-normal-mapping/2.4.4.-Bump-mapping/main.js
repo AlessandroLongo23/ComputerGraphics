@@ -1,4 +1,4 @@
-window.onload = function init() {
+window.onload = () => {
     if (!setupWebGL()) 
         return;
 
@@ -14,7 +14,7 @@ window.onload = function init() {
     render();
 };
 
-function setupWebGL() {
+const setupWebGL = () => {
     canvas = document.getElementById("gl-canvas");
     gl = WebGLUtils.setupWebGL(canvas);
     if (!gl) {
@@ -27,7 +27,7 @@ function setupWebGL() {
     return true;
 }
 
-function configureWebGL() {
+const configureWebGL = () => {
     gl.enable(gl.DEPTH_TEST);
     gl.enable(gl.CULL_FACE);
     gl.cullFace(gl.FRONT);
@@ -35,7 +35,7 @@ function configureWebGL() {
     gl.clearColor(0.0, 0.0, 0.0, 0.0);
 }
 
-function initializeUniforms() {
+const initializeUniforms = () => {
     viewMatrixLoc = gl.getUniformLocation(program, "viewMatrix");
     modelMatrixLoc = gl.getUniformLocation(program, "modelMatrix");
     projectionMatrixLoc = gl.getUniformLocation(program, "projectionMatrix");
@@ -45,7 +45,7 @@ function initializeUniforms() {
     reflectiveLoc = gl.getUniformLocation(program, "reflective");
 }
 
-function initCubeMap() {
+const initCubeMap = () => {
     const cubeTexture = gl.createTexture();
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_CUBE_MAP, cubeTexture);
@@ -67,7 +67,7 @@ function initCubeMap() {
         gl.texImage2D(face.target, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([0, 0, 0, 0]));
 
         const image = new Image();
-        image.onload = function() {
+        image.onload = () => {
             gl.bindTexture(gl.TEXTURE_CUBE_MAP, cubeTexture);
             gl.texImage2D(face.target, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
             loadedImages++;
@@ -83,7 +83,7 @@ function initCubeMap() {
     gl.uniform1i(cubeMapLoc, 0);
 }
 
-function initBumpMap() {
+const initBumpMap = () => {
     gl.activeTexture(gl.TEXTURE1);
     bumpTexture = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, bumpTexture);
@@ -94,7 +94,7 @@ function initBumpMap() {
     gl.uniform1i(bumpTextureLoc, 1);
 
     var myTexels = new Image();
-    myTexels.onload = function() {
+    myTexels.onload = () => {
         gl.bindTexture(gl.TEXTURE_2D, bumpTexture);
         gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, myTexels);
@@ -103,7 +103,7 @@ function initBumpMap() {
     myTexels.src = "../bumpmaps/bumpMap2.png";
 }
 
-function initializeBackgroundQuad() {
+const initializeBackgroundQuad = () => {
     const backgroundVertices = [
         vec4(-1.0, -1.0, 0.999, 1.0),
         vec4(1.0, 1.0, 0.999, 1.0),
@@ -118,7 +118,7 @@ function initializeBackgroundQuad() {
     gl.bufferData(gl.ARRAY_BUFFER, flatten(backgroundVertices), gl.STATIC_DRAW);
 }
 
-function initializeSphere() {
+const initializeSphere = () => {
     sphereVertices = [];
     sphereNormals = [];
 
@@ -140,14 +140,14 @@ function initializeSphere() {
     gl.bufferData(gl.ARRAY_BUFFER, flatten(sphereNormals), gl.STATIC_DRAW);
 }
 
-function tetrahedron(a, b, c, d, n) {
+const tetrahedron = (a, b, c, d, n) => {
     divideTriangle(a, b, c, n);
     divideTriangle(d, c, b, n);
     divideTriangle(a, d, b, n);
     divideTriangle(a, c, d, n);
 }
 
-function divideTriangle(a, b, c, count) {
+const divideTriangle = (a, b, c, count) => {
     if (count === 0) {
         triangle(a, b, c);
         return;
@@ -163,7 +163,7 @@ function divideTriangle(a, b, c, count) {
     divideTriangle(ab, bc, ac, count - 1);
 }
 
-function triangle(a, b, c) {
+const triangle = (a, b, c) => {
     sphereVertices.push(a);
     sphereNormals.push(a);
     sphereVertices.push(b);
@@ -172,7 +172,7 @@ function triangle(a, b, c) {
     sphereNormals.push(c);
 }
 
-function render() {
+const render = () => {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     
     thetaY += 0.001;
@@ -180,9 +180,9 @@ function render() {
     projectionMatrix = perspective(45, canvas.width / canvas.height, 0.1, 100.0);
     const dist = 5.0;
     const eye = vec3(dist * Math.cos(thetaY), 0.0, dist * Math.sin(thetaY));
-    const target = vec3(0.0, 0.0, 0.0);
+    const at = vec3(0.0, 0.0, 0.0);
     const up = vec3(0.0, 1.0, 0.0);
-    viewMatrix = lookAt(eye, target, up);
+    viewMatrix = lookAt(eye, at, up);
     modelMatrix = mat4();
 
     gl.uniform3fv(eyeLoc, eye);
@@ -193,7 +193,7 @@ function render() {
     requestAnimationFrame(render);
 }
 
-function drawBackground() {
+const drawBackground = () => {
     gl.bindBuffer(gl.ARRAY_BUFFER, backgroundBuffer);
     const vPosition = gl.getAttribLocation(program, "vPosition");
     gl.vertexAttribPointer(vPosition, 4, gl.FLOAT, false, 0, 0);
@@ -210,7 +210,7 @@ function drawBackground() {
     gl.drawArrays(gl.TRIANGLES, 0, 6);
 }
 
-function drawSphere() {
+const drawSphere = () => {
     gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
     const vPosition = gl.getAttribLocation(program, "vPosition");
     gl.vertexAttribPointer(vPosition, 4, gl.FLOAT, false, 0, 0);
