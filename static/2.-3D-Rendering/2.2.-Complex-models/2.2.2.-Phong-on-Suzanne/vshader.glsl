@@ -13,7 +13,6 @@ void main() {
     
     fPosition = worldPos.xyz;
     fNormal = vNormal.xyz;
-    // fNormal = normalize((modelMatrix * vec4(normalize(vPosition.xyz), 0.0)).xyz);
     
     gl_Position = projectionMatrix * viewMatrix * worldPos;
 }

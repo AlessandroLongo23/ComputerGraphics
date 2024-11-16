@@ -8,7 +8,8 @@
 
     let viewIndex = $state(1);
     let isLoading = $state(true);
-    let canvas = $state(), gl, program;
+    let canvas = $state();
+    let gl, program;
     let codeSnippets = $state([]);
 
     let vertices, vBuffer, baseColors, colors;
@@ -28,7 +29,6 @@
             try {
                 [gl, program] = await initShaders(gl, program, $page.url.pathname + '/vshader.glsl', $page.url.pathname + '/fshader.glsl');
 
-                // colors
                 baseColors = [
                     mv.vec3(1.0, 0.0, 0.0),
                     mv.vec3(0.0, 1.0, 0.0),
@@ -42,10 +42,9 @@
                 gl.bufferData(gl.ARRAY_BUFFER, mv.flatten(colors), gl.STATIC_DRAW);
 
                 var vColor = gl.getAttribLocation(program, "vColor");
-                gl.vertexAttribPointer(vColor, 4, gl.FLOAT, false, 0, 0);  // 4 components for RGBA
+                gl.vertexAttribPointer(vColor, 4, gl.FLOAT, false, 0, 0);
                 gl.enableVertexAttribArray(vColor);
 
-                // vertices
                 v0 = mv.vec4(0.0, 0.0, -1.0, 1); 
                 v1 = mv.vec4(0.0, 0.942809, 0.333333, 1);
                 v2 = mv.vec4(-0.816497, -0.471405, 0.333333, 1);
@@ -54,7 +53,6 @@
                 
                 buildPolyhedron();
 
-                // Initialize rotation and transformations
                 modelViewMatrixLoc = gl.getUniformLocation(program, "modelViewMatrix");
                 projectionMatrixLoc = gl.getUniformLocation(program, "projectionMatrix");
 

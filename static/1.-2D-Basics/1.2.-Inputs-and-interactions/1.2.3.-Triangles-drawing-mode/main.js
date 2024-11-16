@@ -14,7 +14,6 @@ window.onload = () => {
     count = 0;
     maxPoints = 100;
     
-    // points
     colors = []
     vertices = [];
 
@@ -26,9 +25,7 @@ window.onload = () => {
     gl.vertexAttribPointer(vPosition, 2, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(vPosition);
 
-    // click event
     canvas.addEventListener("click", function(event) {
-        // colors
         if (mode == 'points') {
             switch(document.getElementById("pointscolor").selectedIndex) {
                 case 0:
@@ -77,7 +74,6 @@ window.onload = () => {
         gl.vertexAttribPointer(vColor, 4, gl.FLOAT, false, 0, 0);
         gl.enableVertexAttribArray(vColor);
 
-        // add vertex/vertices
         var t = vec2(
             -1 + 2 * (event.clientX - canvas.getBoundingClientRect().x) / canvas.width,
             1 - 2 * (event.clientY - canvas.getBoundingClientRect().y) / canvas.height

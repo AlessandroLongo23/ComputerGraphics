@@ -13,25 +13,35 @@ uniform float s;
 
 varying vec4 vColor;
 
+vec3 calcAmbientColor();
+vec3 calcDiffuseColor(vec3 n, vec3 w_i);
+vec3 calcSpecularColor(vec3 n, vec3 w_i, vec4 pos);
+
 void main() {
     vec4 pos = modelMatrix * vPosition;
     vec3 n = normalize(pos.xyz);
     vec3 w_i = normalize(-lightDirection);
 
-    // ambient lighting
-    vec3 ambient_color = k * vec3(L);
-    
-    // diffuse lighting
-    float diffuse = max(dot(n, -w_i), 0.0);
-    vec3 diffuseColor = k * diffuse * vec3(L);
+    vec3 ambientColor = calcAmbientColor();
+    vec3 diffuseColor = calcDiffuseColor(n, w_i);
+    vec3 specularColor = calcSpecularColor(n, w_i, pos);
 
-    // specular lighting
+    vColor = vec4(ambientColor + diffuseColor + specularColor, 1.0);
+    gl_Position = projectionMatrix * viewMatrix * pos;
+}
+
+vec3 calcAmbientColor() {
+    return k * vec3(L);
+}
+
+vec3 calcDiffuseColor(vec3 n, vec3 w_i) {
+    float diffuse = max(dot(n, -w_i), 0.0);
+    return k * diffuse * vec3(L);
+}
+
+vec3 calcSpecularColor(vec3 n, vec3 w_i, vec4 pos) {
     vec3 w_r = reflect(w_i, n);
     vec3 w_o = normalize(eye - pos.xyz);
     float specular = pow(max(dot(w_r, w_o), 0.0), s);
-    vec3 specular_color = ks * specular * vec3(L);
-
-    // final color and position
-    vColor = vec4(ambient_color + diffuseColor + specular_color, 1.0);
-    gl_Position = projectionMatrix * viewMatrix * pos;
+    return ks * specular * vec3(L);
 }

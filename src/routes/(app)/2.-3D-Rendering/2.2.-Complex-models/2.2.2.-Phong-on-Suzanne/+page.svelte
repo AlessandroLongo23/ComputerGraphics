@@ -8,7 +8,8 @@
 
     let viewIndex = $state(1);
     let isLoading = $state(true);
-    let canvas = $state(), gl, program;
+    let canvas = $state();
+    let gl, program;
     let codeSnippets = $state([]);
 
     let thetaY;

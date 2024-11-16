@@ -3,7 +3,6 @@ var indices, vertices;
 window.onload = () => {
     setupWebGL();
 
-    // vertices
     vertices = [
         vec3(-0.5, -0.5, 0.5),
         vec3(-0.5, 0.5, 0.5),
@@ -23,27 +22,25 @@ window.onload = () => {
     gl.vertexAttribPointer(vPosition, 3, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(vPosition);
 
-    // colors
     var colors = [
-        [0.0, 0.0, 0.0, 1.0],  // black
-        [1.0, 0.0, 0.0, 1.0],  // red
-        [1.0, 1.0, 0.0, 1.0],  // yellow
-        [0.0, 1.0, 0.0, 1.0],  // green
-        [0.0, 0.0, 1.0, 1.0],  // blue
-        [1.0, 0.0, 1.0, 1.0],  // magenta
-        [1.0, 1.0, 1.0, 1.0],  // white
-        [0.0, 1.0, 1.0, 1.0]   // cyan
+        [0.0, 0.0, 0.0, 1.0], 
+        [1.0, 0.0, 0.0, 1.0],
+        [1.0, 1.0, 0.0, 1.0],
+        [0.0, 1.0, 0.0, 1.0],
+        [0.0, 0.0, 1.0, 1.0],
+        [1.0, 0.0, 1.0, 1.0],
+        [1.0, 1.0, 1.0, 1.0],
+        [0.0, 1.0, 1.0, 1.0] 
     ];
 
-    var cBuffer = gl.createBuffer();  // Buffer for colors
+    var cBuffer = gl.createBuffer(); 
     gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, flatten(colors), gl.STATIC_DRAW);
 
     var vColor = gl.getAttribLocation(program, "vColor");
-    gl.vertexAttribPointer(vColor, 4, gl.FLOAT, false, 0, 0);  // 4 components for RGBA
+    gl.vertexAttribPointer(vColor, 4, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(vColor);
 
-    // indices
     indices = [
         1, 0, 3,
         3, 2, 1,
@@ -63,10 +60,8 @@ window.onload = () => {
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, iBuffer);
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint8Array(indices), gl.STATIC_DRAW);
 
-    // Initialize rotation and transformations
     var ctm = mat4();
 
-    // Axis rotation setup
     rot = [0.0, 0.0, 0.0];
     modelViewMatrixLoc = gl.getUniformLocation(program, "modelViewMatrix");
     gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(ctm));

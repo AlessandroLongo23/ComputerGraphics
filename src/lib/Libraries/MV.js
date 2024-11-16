@@ -1,28 +1,10 @@
-//////////////////////////////////////////////////////////////////////////////
-//
-//  Angel.js
-//
-//////////////////////////////////////////////////////////////////////////////
-
-//----------------------------------------------------------------------------
-//
-//  Helper functions
-//
-
 function _argumentsToArray(args) {
     return [].concat.apply([], Array.prototype.slice.apply(args));
 }
 
-//----------------------------------------------------------------------------
-
 export function radians(degrees) {
     return degrees * Math.PI / 180.0;
 }
-
-//----------------------------------------------------------------------------
-//
-//  Vector Constructors
-//
 
 export function vec2() {
     var result = _argumentsToArray(arguments);
@@ -60,11 +42,6 @@ export function vec4() {
     return result.splice(0, 4);
 }
 
-//----------------------------------------------------------------------------
-//
-//  Matrix Constructors
-//
-
 export function mat2() {
     var v = _argumentsToArray(arguments);
 
@@ -90,8 +67,6 @@ export function mat2() {
 
     return m;
 }
-
-//----------------------------------------------------------------------------
 
 export function mat3() {
     var v = _argumentsToArray(arguments);
@@ -122,8 +97,6 @@ export function mat3() {
     return m;
 }
 
-//----------------------------------------------------------------------------
-
 export function mat4() {
     var v = _argumentsToArray(arguments);
 
@@ -152,11 +125,6 @@ export function mat4() {
     return m;
 }
 
-//----------------------------------------------------------------------------
-//
-//  Generic Mathematical Operations for Vectors and Matrices
-//
-
 export function equal(u, v) {
     if (u.length != v.length) 
         return false;
@@ -179,8 +147,6 @@ export function equal(u, v) {
 
     return true;
 }
-
-//----------------------------------------------------------------------------
 
 export function add(u, v) {
     var result = [];
@@ -213,8 +179,6 @@ export function add(u, v) {
     }
 }
 
-//----------------------------------------------------------------------------
-
 export function subtract(u, v) {
     var result = [];
 
@@ -246,12 +210,9 @@ export function subtract(u, v) {
     }
 }
 
-//----------------------------------------------------------------------------
-
 export function mult(u, v) {
     var result = [];
 
-    // two matrices
     if (u.matrix && v.matrix) {
         if (u.length != v.length)
             throw "mult(): trying to add matrices of different dimensions";
@@ -276,7 +237,6 @@ export function mult(u, v) {
         return result;
     }
     
-    // matrix and vector
     if (u.matrix && (u.length == v.length)) {
         for (var i = 0; i < v.length; i++) {
             var sum = 0.0;
@@ -289,7 +249,6 @@ export function mult(u, v) {
         return result;
     }
 
-    // two vectors
     if (!u.matrix && !v.matrix && typeof v !== "number") {
         if (u.length != v.length)
             throw "mult(): vectors are not the same dimension";
@@ -300,17 +259,11 @@ export function mult(u, v) {
         return result;
     }
 
-    // vector and scalar
     if (u.length == 2 && typeof v === "number") {
         result = vec2(u[0] * v, u[1] * v)
         return result;
     }
 }
-
-//----------------------------------------------------------------------------
-//
-//  Basic Transformation Matrix Generators
-//
 
 export function translate(x, y, z) {
     if (Array.isArray(x) && x.length == 3) {
@@ -326,8 +279,6 @@ export function translate(x, y, z) {
 
     return result;
 }
-
-//----------------------------------------------------------------------------
 
 export function rotate(angle, axis) {
     if (!Array.isArray(axis))
@@ -387,8 +338,6 @@ export function rotateZ(theta) {
 }
 
 
-//----------------------------------------------------------------------------
-
 export function scalem(x, y, z) {
     if (Array.isArray(x) && x.length == 3) {
         z = x[2];
@@ -404,11 +353,6 @@ export function scalem(x, y, z) {
     return result;
 }
 
-//----------------------------------------------------------------------------
-//
-//  ModelView Matrix Generators
-//
-
 export function lookAt(eye, at, up) {
     if (!Array.isArray(eye) || eye.length != 3)
         throw "lookAt(): first parameter [eye] must be an a vec3";
@@ -422,9 +366,9 @@ export function lookAt(eye, at, up) {
     if (equal(eye, at))
         return mat4();
 
-    var v = normalize(subtract(at, eye));  // view direction vector
-    var n = normalize(cross(v, up));       // perpendicular vector
-    var u = normalize(cross(n, v));        // "new" up vector
+    var v = normalize(subtract(at, eye)); 
+    var n = normalize(cross(v, up));
+    var u = normalize(cross(n, v));
 
     v = negate(v);
 
@@ -435,11 +379,6 @@ export function lookAt(eye, at, up) {
         vec4()
     );;
 }
-
-//----------------------------------------------------------------------------
-//
-//  Projection Matrix Generators
-//
 
 export function ortho(left, right, bottom, top, near, far) {
     if (left == right)
@@ -466,8 +405,6 @@ export function ortho(left, right, bottom, top, near, far) {
     return result;
 }
 
-//----------------------------------------------------------------------------
-
 export function perspective(fovy, aspect, near, far) {
     var f = 1.0 / Math.tan(radians(fovy) / 2);
     var d = far - near;
@@ -482,11 +419,6 @@ export function perspective(fovy, aspect, near, far) {
 
     return result;
 }
-
-//----------------------------------------------------------------------------
-//
-//  Matrix Functions
-//
 
 export function transpose(m) {
     if (!m.matrix)
@@ -503,11 +435,6 @@ export function transpose(m) {
     return result;
 }
 
-//----------------------------------------------------------------------------
-//
-//  Vector Functions
-//
-
 export function dot(u, v) {
     if (u.length != v.length)
         throw "dot(): vectors are not the same dimension";
@@ -519,8 +446,6 @@ export function dot(u, v) {
     return sum;
 }
 
-//----------------------------------------------------------------------------
-
 export function negate(u) {
     var result = [];
     for (var i = 0; i < u.length; ++i)
@@ -528,8 +453,6 @@ export function negate(u) {
 
     return result;
 }
-
-//----------------------------------------------------------------------------
 
 export function cross(u, v) {
     if (!Array.isArray(u) || u.length < 3)
@@ -545,13 +468,9 @@ export function cross(u, v) {
     ];;
 }
 
-//----------------------------------------------------------------------------
-
 export function length(u) {
     return Math.sqrt(dot(u, u));
 }
-
-//----------------------------------------------------------------------------
 
 export function normalize(u, excludeLastComponent) {
     if (excludeLastComponent)
@@ -571,8 +490,6 @@ export function normalize(u, excludeLastComponent) {
     return u;
 }
 
-//----------------------------------------------------------------------------
-
 export function mix(u, v, s) {
     if (typeof s !== "number")
         throw "mix: the last paramter " + s + " must be a number";
@@ -587,11 +504,6 @@ export function mix(u, v, s) {
     return result;
 }
 
-//----------------------------------------------------------------------------
-//
-// Vector and Matrix functions
-//
-
 export function scale(s, u) {
     if (!Array.isArray(u))
         throw "scale: second parameter " + u + " is not a vector";
@@ -602,11 +514,6 @@ export function scale(s, u) {
 
     return result;
 }
-
-//----------------------------------------------------------------------------
-//
-//
-//
 
 export function flatten(v) {
     if (v.matrix === true)
@@ -635,8 +542,6 @@ export function flatten(v) {
     return floats;
 }
 
-//----------------------------------------------------------------------------
-
 export var sizeof = {
     'vec2' : new Float32Array(flatten(vec2())).byteLength,
     'vec3' : new Float32Array(flatten(vec3())).byteLength,
@@ -646,9 +551,6 @@ export var sizeof = {
     'mat4' : new Float32Array(flatten(mat4())).byteLength
 };
 
-// new functions 5/2/2015
-
-// printing
 export function printm(m) {
     if(m.length == 2)
     for(var i=0; i<m.length; i++)
@@ -661,7 +563,6 @@ export function printm(m) {
        console.log(m[i][0], m[i][1], m[i][2], m[i][3]);
 }
 
-// determinants
 export function det2(m) {
     return m[0][0] * m[1][1] - m[0][1] * m[1][0];
 }
@@ -715,9 +616,6 @@ export function det(m) {
     if (m.length == 4) 
         return det4(m);
 }
-
-//---------------------------------------------------------
-// inverses
 
 export function inverse2(m) {
      var a = mat2();

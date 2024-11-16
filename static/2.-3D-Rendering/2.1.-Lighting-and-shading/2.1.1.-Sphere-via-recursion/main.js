@@ -1,7 +1,6 @@
 window.onload = () => {
     setupWebGL();
 
-    // vertices
     baseVertices = [
         vec4(0.0, 0.0, -1.0, 1), 
         vec4(0.0, 0.942809, 0.333333, 1),
@@ -9,7 +8,6 @@ window.onload = () => {
         vec4(0.816497, -0.471405, 0.333333, 1)
     ]
 
-    // colors
     baseColors = [
         vec3(1.0, 0.0, 0.0),
         vec3(0.0, 1.0, 0.0),
@@ -22,7 +20,6 @@ window.onload = () => {
     
     buildPolyhedron();
 
-    // Initialize rotation and transformations
     modelViewMatrixLoc = gl.getUniformLocation(program, "modelViewMatrix");
     projectionMatrixLoc = gl.getUniformLocation(program, "projectionMatrix");
 
@@ -52,7 +49,6 @@ const buildPolyhedron = () => {
     colors = [];
     tetrahedron(baseVertices[0], baseVertices[1], baseVertices[2], baseVertices[3], subdivisions);
 
-    // vertices
     vBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, flatten(vertices), gl.STATIC_DRAW);
@@ -61,7 +57,6 @@ const buildPolyhedron = () => {
     gl.vertexAttribPointer(vPosition, 4, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(vPosition);
 
-    // colors
     cBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, flatten(colors), gl.STATIC_DRAW);

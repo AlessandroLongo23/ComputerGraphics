@@ -10,16 +10,13 @@ void main() {
     vec3 n = normalize(fNormal);
     vec3 w_i = normalize(-lightDirection);
 
-    // ambient
     float k = 0.2;
     float L = 1.0;
     vec3 ambient_color = k * vec3(L);
 
-    // diffuse    
     float diffuse = max(dot(n, w_i), 0.0);
     vec3 diffuseColor = k * diffuse * vec3(L);
-    
-    // specular
+
     float ks = 0.2;
     float s = 100.0;
     vec3 w_r = reflect(-w_i, n);

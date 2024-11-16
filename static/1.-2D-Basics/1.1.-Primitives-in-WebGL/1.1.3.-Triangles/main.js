@@ -1,30 +1,8 @@
 window.onload = () => {
     setupWebGL();
 
-    vertices = [ vec2(0.0, 0.0), vec2(1.0, 0.0), vec2(1.0, 1.0) ];
-
-    var vBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, flatten(vertices), gl.STATIC_DRAW);
-
-    var vPosition = gl.getAttribLocation(program, "vPosition");
-    gl.vertexAttribPointer(vPosition, 2, gl.FLOAT, false, 0, 0);
-    gl.enableVertexAttribArray(vPosition);
-
-    // colors
-    colors = [ 
-        vec4(1.0, 0.0, 0.0, 1.0), 
-        vec4(0.0, 1.0, 0.0, 1.0), 
-        vec4(0.0, 0.0, 1.0, 1.0) 
-    ];
-
-    var cBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, flatten(colors), gl.STATIC_DRAW);
-
-    var vColor = gl.getAttribLocation(program, "vColor");
-    gl.vertexAttribPointer(vColor, 4, gl.FLOAT, false, 0, 0);
-    gl.enableVertexAttribArray(vColor);
+    initializeVertices();
+    initializeColors();
 
     render();
 }
@@ -42,6 +20,34 @@ const setupWebGL = () => {
 
     program = initShaders(gl, "vshader.glsl", "fshader.glsl");
     gl.useProgram(program);
+}
+
+const initializeVertices = () => {
+    vertices = [ vec2(0.0, 0.0), vec2(1.0, 0.0), vec2(1.0, 1.0) ];
+
+    var vBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, flatten(vertices), gl.STATIC_DRAW);
+
+    var vPosition = gl.getAttribLocation(program, "vPosition");
+    gl.vertexAttribPointer(vPosition, 2, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(vPosition);
+}
+
+const initializeColors = () => {
+    colors = [ 
+        vec4(1.0, 0.0, 0.0, 1.0), 
+        vec4(0.0, 1.0, 0.0, 1.0), 
+        vec4(0.0, 0.0, 1.0, 1.0) 
+    ];
+
+    var cBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, flatten(colors), gl.STATIC_DRAW);
+
+    var vColor = gl.getAttribLocation(program, "vColor");
+    gl.vertexAttribPointer(vColor, 4, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(vColor);
 }
 
 const render = () => {

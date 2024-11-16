@@ -1,22 +1,18 @@
 window.onload = () => {
     setupWebGL();
 
-    // enabling depth test and culling
     gl.enable(gl.DEPTH_TEST);
     gl.enable(gl.CULL_FACE);
     gl.cullFace(gl.FRONT);
 
-    // Set the light direction
     var lightDirection = vec3(0.0, 0.0, -1.0);
     var lightDirectionLoc = gl.getUniformLocation(program, "lightDirection");
     gl.uniform3fv(lightDirectionLoc, flatten(lightDirection));
 
-    // Uniform locations for the matrices
     viewMatrixLoc = gl.getUniformLocation(program, "viewMatrix");
     modelMatrixLoc = gl.getUniformLocation(program, "modelMatrix");
     projectionMatrixLoc = gl.getUniformLocation(program, "projectionMatrix");
 
-    // vertices
     vertices = [];
     v0 = vec4(0.0, 0.0, -1.0, 1); 
     v1 = vec4(0.0, 0.942809, 0.333333, 1);
@@ -35,28 +31,22 @@ const render = () => {
 
     thetaY += 0.005;
 
-    // projection matrix
     var projectionMatrix = perspective(45, canvas.width / canvas.height, 0.1, 100.0);
 
-    // view matrix
     var dist = 3.0;
     var eye = vec3(dist * Math.cos(thetaY), 0.0, dist * Math.sin(thetaY));
     var at = vec3(0.0, 0.0, 0.0);
     var up = vec3(0.0, 1.0, 0.0);
     var viewMatrix = lookAt(eye, at, up);
 
-    // model matrix
     var modelMatrix = mat4();
 
-    // Pass matrices to the shader
     gl.uniformMatrix4fv(modelMatrixLoc, false, flatten(modelMatrix));
     gl.uniformMatrix4fv(viewMatrixLoc, false, flatten(viewMatrix));
     gl.uniformMatrix4fv(projectionMatrixLoc, false, flatten(projectionMatrix));
 
-    // draw the model using triangles
     gl.drawArrays(gl.TRIANGLES, 0, vertices.length);
     
-    // call the next frame
     requestAnimFrame(render);
 }
 

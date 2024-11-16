@@ -8,7 +8,8 @@
 
     let viewIndex = $state(1);
     let isLoading = $state(true);
-    let canvas = $state(), gl, program;
+    let canvas = $state();
+    let gl, program;
     let codeSnippets = $state([]);
 
     let vertices = [];
@@ -38,7 +39,6 @@
                 airFriction = 0.99;
                 radFriction = 0.90;
 
-                // vertices
                 num = 100;
                 rad = 0.5;
                 vertices = [mv.vec2(0, 0)];
@@ -93,7 +93,6 @@
     }
 
     const bounce = () => {
-        // floor and ceiling
         if (pos[1] < -0.5 && vel[1] < 0.0) {
             vel[0] = vel[0] * radFriction;
             vel[1] = -vel[1] * damp[1];
@@ -102,7 +101,6 @@
             vel[1] = -vel[1] * damp[1];
         }
 
-        // lateral walls
         if (pos[0] > 0.5 || pos[0] < -0.5) {
             if (pos[0] > 0.5)
                 pos[0] = 1.0 - pos[0];

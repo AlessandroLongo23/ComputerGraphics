@@ -44,18 +44,18 @@ export const WebGLUtils = function() {
     };
 }();
 
-// if (typeof window !== 'undefined') {
-//     window.requestAnimFrame = (function() {
-//         return window.requestAnimationFrame ||
-//             window.webkitRequestAnimationFrame ||
-//             window.mozRequestAnimationFrame ||
-//             window.oRequestAnimationFrame ||
-//             window.msRequestAnimationFrame ||
-//             function(callback, _) {
-//                 window.setTimeout(callback, 1000 / 60);
-//             };
-//     })();
-// }
+if (typeof window !== 'undefined') {
+    window.requestAnimFrame = (function() {
+        return window.requestAnimationFrame ||
+            window.webkitRequestAnimationFrame ||
+            window.mozRequestAnimationFrame ||
+            window.oRequestAnimationFrame ||
+            window.msRequestAnimationFrame ||
+            function(callback, _) {
+                window.setTimeout(callback, 1000 / 60);
+            };
+    })();
+}
 
 export async function fetchCodeSnippets(codeSnippets_url) {
     try {

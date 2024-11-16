@@ -1,24 +1,20 @@
 window.onload = () => {
     setupWebGL();
 
-    // enabling depth test and culling
     gl.enable(gl.DEPTH_TEST);
     gl.enable(gl.CULL_FACE);
     gl.cullFace(gl.FRONT);
 
-    // Uniform locations for the matrices
     viewMatrixLoc = gl.getUniformLocation(program, "viewMatrix");
     modelMatrixLoc = gl.getUniformLocation(program, "modelMatrix");
     projectionMatrixLoc = gl.getUniformLocation(program, "projectionMatrix");
 
-    // vertices
     vertices = [];
     v0 = vec4(0.0, 0.0, -1.0, 1); 
     v1 = vec4(0.0, 0.942809, 0.333333, 1);
     v2 = vec4(-0.816497, -0.471405, 0.333333, 1);
     v3 = vec4(0.816497, -0.471405, 0.333333, 1);
 
-    // normals
     normals = [];
     textures = [
         "/assets/textures/earth/base.jpg", 
@@ -37,20 +33,17 @@ window.onload = () => {
             gl.activeTexture(gl[`TEXTURE${index}`]);
             gl.bindTexture(gl.TEXTURE_2D, texture);
             
-            // Set texture parameters
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
     
-            // Upload the texture image and generate mipmaps
             gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
-            gl.generateMipmap(gl.TEXTURE_2D);  // Generate mipmaps for the texture
+            gl.generateMipmap(gl.TEXTURE_2D);
     
             textures.push(texture);
         });
     
-        // Set texture samplers
         gl.uniform1i(gl.getUniformLocation(program, "earthTexMap"), 0);
         gl.uniform1i(gl.getUniformLocation(program, "nightTexMap"), 1);
         gl.uniform1i(gl.getUniformLocation(program, "cloudTexMap"), 2);
@@ -60,7 +53,6 @@ window.onload = () => {
         gl.uniform1i(gl.getUniformLocation(program, "moonNormalTexMap"), 6);
         gl.uniform1i(gl.getUniformLocation(program, "spaceTexMap"), 7);
     
-        // Initialize model and render after setting up textures
         subdivisions = 9;
         lightAngle = 0;
     
@@ -101,15 +93,12 @@ const render = () => {
 
     lightAngle += 0.005;
 
-    // Set the light direction
     var lightDirection = vec3(Math.cos(lightAngle), 0.0, Math.sin(lightAngle));
     var lightDirectionLoc = gl.getUniformLocation(program, "lightDirection");
     gl.uniform3fv(lightDirectionLoc, flatten(lightDirection));
 
-    // projection matrix
     var projectionMatrix = perspective(45, canvas.width / canvas.height, 0.1, 100.0);
 
-    // view matrix
     var eye = vec3(
         dist * Math.cos(cameraPos.x) * Math.cos(cameraPos.y), 
         dist * Math.sin(cameraPos.y), 
@@ -119,18 +108,14 @@ const render = () => {
     var up = vec3(0.0, 1.0, 0.0);
     var viewMatrix = lookAt(eye, at, up);
 
-    // model matrix
     var modelMatrix = mat4();
 
-    // Pass matrices to the shader
     gl.uniformMatrix4fv(projectionMatrixLoc, false, flatten(projectionMatrix));
     gl.uniformMatrix4fv(viewMatrixLoc, false, flatten(viewMatrix));
     gl.uniformMatrix4fv(modelMatrixLoc, false, flatten(modelMatrix));
 
-    // draw the model using triangles
     gl.drawArrays(gl.TRIANGLES, 0, vertices.length);
     
-    // call the next frame
     requestAnimFrame(render);
 }
 
@@ -171,7 +156,6 @@ const buildPolyhedron = () => {
     normals = [];
     tetrahedron(v0, v1, v2, v3, subdivisions);
 
-    // vertices
     vBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, flatten(vertices), gl.STATIC_DRAW);
@@ -179,7 +163,6 @@ const buildPolyhedron = () => {
     gl.vertexAttribPointer(vPosition, 4, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(vPosition);
 
-    // normals
     nBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, nBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, flatten(normals), gl.STATIC_DRAW);

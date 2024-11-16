@@ -10,7 +10,8 @@
 
     let viewIndex = $state(1);
     let isLoading = $state(true);
-    let canvas = $state(), gl, program;
+    let canvas = $state();
+    let gl, program;
     let codeSnippets = $state([]);
 
     let cBuffer, vColor;
@@ -46,7 +47,6 @@
                 gl.enableVertexAttribArray(vPosition);
 
                 canvas.addEventListener("click", function(event) {
-                    // colors
                     if (mode == 'points') {
                         switch(document.getElementById("pointscolor").selectedIndex) {
                             case 0:
@@ -95,7 +95,6 @@
                     gl.vertexAttribPointer(vColor, 4, gl.FLOAT, false, 0, 0);
                     gl.enableVertexAttribArray(vColor);
 
-                    // add vertex/vertices
                     var t = vec2(
                         -1 + 2 * (event.clientX - canvas.getBoundingClientRect().x) / canvas.width,
                         1 - 2 * (event.clientY - canvas.getBoundingClientRect().y) / canvas.height

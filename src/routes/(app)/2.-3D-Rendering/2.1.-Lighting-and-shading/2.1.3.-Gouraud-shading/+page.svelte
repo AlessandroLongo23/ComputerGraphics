@@ -10,7 +10,8 @@
 
     let viewIndex = $state(1);
     let isLoading = $state(true);
-    let canvas = $state(), gl, program;
+    let canvas = $state();
+    let gl, program;
     let codeSnippets = $state([]);
 
     let vertices, vBuffer;
@@ -33,17 +34,14 @@
 
                 culling = 0;
 
-                // Set the light direction
                 var lightDirection = mv.vec3(0.0, 0.0, -1.0);
                 var lightDirectionLoc = gl.getUniformLocation(program, "lightDirection");
                 gl.uniform3fv(lightDirectionLoc, mv.flatten(lightDirection));
 
-                // Uniform locations for the matrices
                 viewMatrixLoc = gl.getUniformLocation(program, "viewMatrix");
                 modelMatrixLoc = gl.getUniformLocation(program, "modelMatrix");
                 projectionMatrixLoc = gl.getUniformLocation(program, "projectionMatrix");
 
-                // vertices
                 vertices = [];
                 v0 = mv.vec4(0.0, 0.0, -1.0, 1); 
                 v1 = mv.vec4(0.0, 0.942809, 0.333333, 1);
@@ -65,7 +63,6 @@
     const render = () => {
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-        // enabling depth test and culling
         if (culling != 0) {
             gl.enable(gl.DEPTH_TEST);
             gl.enable(gl.CULL_FACE);
@@ -78,30 +75,24 @@
 
         thetaY += 0.005;
 
-        // projection matrix
         var projectionMatrix = mv.perspective(45, canvas.width / canvas.height, 0.1, 100.0);
 
-        // view matrix
         var dist = 4.0;
         var eye = mv.vec3(dist * Math.cos(thetaY), 0.0, dist * Math.sin(thetaY));
         var at = mv.vec3(0.0, 0.0, 0.0);
         var up = mv.vec3(0.0, 1.0, 0.0);
         var viewMatrix = mv.lookAt(eye, at, up);
 
-        // model matrix
         var modelMatrix = mv.mat4();
         var modelPos = mv.vec3(0.0, -0.25, 0.0);
         modelMatrix = mv.mult(modelMatrix, mv.translate(modelPos));
 
-        // Pass matrices to the shader
         gl.uniformMatrix4fv(modelMatrixLoc, false, mv.flatten(modelMatrix));
         gl.uniformMatrix4fv(viewMatrixLoc, false, mv.flatten(viewMatrix));
         gl.uniformMatrix4fv(projectionMatrixLoc, false, mv.flatten(projectionMatrix));
 
-        // draw the model using triangles
         gl.drawArrays(gl.TRIANGLES, 0, vertices.length);
 
-        // call the next frame
         requestAnimFrame(render);
     }
 

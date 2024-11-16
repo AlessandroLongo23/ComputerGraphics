@@ -1,7 +1,6 @@
 window.onload = () => {
     setupWebGL();
 
-    // points
     colors = []
     vertices = [];
     index = vertices.length;
@@ -15,9 +14,7 @@ window.onload = () => {
     gl.vertexAttribPointer(vPosition, 2, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(vPosition);
 
-    // click event
     canvas.addEventListener("click", function(event) {
-        // colors
         switch(document.getElementById("pointscolor").selectedIndex) {
             case 0:
                 colors.push(vec4(0.0, 0.0, 0.0, 1.0));

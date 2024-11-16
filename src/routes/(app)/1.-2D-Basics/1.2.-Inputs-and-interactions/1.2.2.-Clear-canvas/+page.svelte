@@ -7,9 +7,10 @@
 
     let viewIndex = $state(1);
     let isLoading = $state(true);
-    let canvas = $state(), gl, program;
+    let canvas = $state();
+    let gl, program;
     let codeSnippets = $state([]);
-
+    
     let vertices = [];
     let colors = [];
     let cBuffer, vColor;
@@ -26,7 +27,6 @@
             try {
                 [gl, program] = await initShaders(gl, program, $page.url.pathname + '/vshader.glsl', $page.url.pathname + '/fshader.glsl');
 
-                // points
                 colors = []
                 vertices = [];
                 index = vertices.length;

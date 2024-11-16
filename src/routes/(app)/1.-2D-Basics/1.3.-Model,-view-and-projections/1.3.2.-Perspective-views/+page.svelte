@@ -7,7 +7,8 @@
 
     let viewIndex = $state(1);
     let isLoading = $state(true);
-    let canvas = $state(), gl, program;
+    let canvas = $state();
+    let gl, program;
     let codeSnippets = $state([]);
 
     let vertices, indices;
@@ -26,7 +27,6 @@
             try {
                 [gl, program] = await initShaders(gl, program, $page.url.pathname + '/vshader.glsl', $page.url.pathname + '/fshader.glsl');
 
-                // vertices
                 vertices = [
                     mv.vec3(-0.5, -0.5, 0.5),
                     mv.vec3(-0.5, 0.5, 0.5),
@@ -46,27 +46,25 @@
                 gl.vertexAttribPointer(vPosition, 3, gl.FLOAT, false, 0, 0);
                 gl.enableVertexAttribArray(vPosition);
 
-                // colors
                 var colors = [
-                    [0.0, 0.0, 0.0, 1.0],  // black
-                    [1.0, 0.0, 0.0, 1.0],  // red
-                    [1.0, 1.0, 0.0, 1.0],  // yellow
-                    [0.0, 1.0, 0.0, 1.0],  // green
-                    [0.0, 0.0, 1.0, 1.0],  // blue
-                    [1.0, 0.0, 1.0, 1.0],  // magenta
-                    [1.0, 1.0, 1.0, 1.0],  // white
-                    [0.0, 1.0, 1.0, 1.0]   // cyan
+                    [0.0, 0.0, 0.0, 1.0],
+                    [1.0, 0.0, 0.0, 1.0],
+                    [1.0, 1.0, 0.0, 1.0],
+                    [0.0, 1.0, 0.0, 1.0],
+                    [0.0, 0.0, 1.0, 1.0],
+                    [1.0, 0.0, 1.0, 1.0],
+                    [1.0, 1.0, 1.0, 1.0],
+                    [0.0, 1.0, 1.0, 1.0]
                 ];
 
-                var cBuffer = gl.createBuffer();  // Buffer for colors
+                var cBuffer = gl.createBuffer();
                 gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
                 gl.bufferData(gl.ARRAY_BUFFER, mv.flatten(colors), gl.STATIC_DRAW);
 
                 var vColor = gl.getAttribLocation(program, "vColor");
-                gl.vertexAttribPointer(vColor, 4, gl.FLOAT, false, 0, 0);  // 4 components for RGBA
+                gl.vertexAttribPointer(vColor, 4, gl.FLOAT, false, 0, 0);
                 gl.enableVertexAttribArray(vColor);
 
-                // indices
                 indices = [
                     1, 0, 3,
                     3, 2, 1,
@@ -86,7 +84,6 @@
                 gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, iBuffer);
                 gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint8Array(indices), gl.STATIC_DRAW);
 
-                // Initialize rotation and transformations
                 modelViewMatrixLoc = gl.getUniformLocation(program, "modelViewMatrix");
                 projectionMatrixLoc = gl.getUniformLocation(program, "projectionMatrix");
 
@@ -108,14 +105,14 @@
         var projectionMatrix = mv.perspective(45, canvas.width / canvas.height, .001, 10.0);
         gl.uniformMatrix4fv(projectionMatrixLoc, false, mv.flatten(projectionMatrix));
 
-        ctm = mv.mult(ctm, mv.translate(-1.5, 0, -3));  // Move to the left
+        ctm = mv.mult(ctm, mv.translate(-1.5, 0, -3));
         gl.uniformMatrix4fv(modelViewMatrixLoc, false, mv.flatten(ctm));
         gl.drawElements(gl.LINE_STRIP, indices.length, gl.UNSIGNED_BYTE, 0);
 
         // Cube 2 - Two-point perspective (X-axis rotated)
         ctm = mv.mat4();
-        ctm = mv.mult(ctm, mv.translate(0, 0, -3));  // Centered
-        ctm = mv.mult(ctm, mv.rotateY(30));  // Rotate around Y-axis
+        ctm = mv.mult(ctm, mv.translate(0, 0, -3));
+        ctm = mv.mult(ctm, mv.rotateY(30));
         gl.uniformMatrix4fv(modelViewMatrixLoc, false, mv.flatten(ctm));
         gl.drawElements(gl.LINE_STRIP, indices.length, gl.UNSIGNED_BYTE, 0);
 

@@ -1,7 +1,6 @@
 window.onload = () => {
     setupWebGL();
 
-    // vertices
     vertices = [
         vec4(-4.0, -1.0, -1.0, 1.0), 
         vec4(4.0, -1.0, -1.0, 1.0), 
@@ -15,7 +14,6 @@ window.onload = () => {
     gl.vertexAttribPointer(vPosition, 4, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(vPosition);
 
-    // texture
     gl.activeTexture(gl.TEXTURE0);
     texture = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, texture);
@@ -58,7 +56,6 @@ window.onload = () => {
     gl.vertexAttribPointer(vTexCoord, 2, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(vTexCoord);
 
-    // Initialize rotation and transformations
     modelViewMatrixLoc = gl.getUniformLocation(program, "modelViewMatrix");
     projectionMatrixLoc = gl.getUniformLocation(program, "projectionMatrix");
 

@@ -1,16 +1,13 @@
 window.onload = () => {
     setupWebGL();
 
-    // light
     time = 0.0;
     pointLightCenter = vec3(0.0, 2.0, -2.0);
     pointLightRadius = 2.0;
 
-    // Initialize vertices and textures
     initializeVertices();
     initializeGroundTexture();
 
-    // Initialize rotation and transformations
     modelViewMatrixLoc = gl.getUniformLocation(program, "modelViewMatrix");
     projectionMatrixLoc = gl.getUniformLocation(program, "projectionMatrix");
 
@@ -29,7 +26,6 @@ window.onload = () => {
 
 const initializeVertices = () => {
     vertices = [
-        // ground
         vec4(-2.0, -1.0, -1.0, 1.0), 
         vec4(-2.0, -1.0, -5.0, 1.0), 
         vec4(2.0, -1.0, -5.0, 1.0),
@@ -37,7 +33,6 @@ const initializeVertices = () => {
         vec4(2.0, -1.0, -5.0, 1.0),
         vec4(2.0, -1.0, -1.0, 1.0),
 
-        // first rect
         vec4(0.25, -0.5, -1.25, 1.0),
         vec4(0.25, -0.5, -1.75, 1.0),
         vec4(0.75, -0.5, -1.75, 1.0),
@@ -45,7 +40,6 @@ const initializeVertices = () => {
         vec4(0.75, -0.5, -1.75, 1.0),
         vec4(0.75, -0.5, -1.25, 1.0),
 
-        // second rect
         vec4(-1.0, -1.0, -2.5, 1.0),
         vec4(-1.0, -1.0, -3.0, 1.0),
         vec4(-1.0, -0.0, -3.0, 1.0),
@@ -63,7 +57,6 @@ const initializeVertices = () => {
 }
 
 const initializeGroundTexture = () => {
-    // ground texture
     groundTexture = gl.createTexture();
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, groundTexture);
@@ -82,15 +75,9 @@ const initializeGroundTexture = () => {
     }
     myTexels.src = "../texture.png";
 
-    // texture coordinates
     var textCoords = [
-        vec2(-.5, -.5), 
-        vec2(.5, -.5),
-        vec2(.5, .5),
-
-        vec2(-.5, -.5),
-        vec2(.5, .5),
-        vec2(-.5, .5),
+        vec2(-.5, -.5), vec2(.5, -.5), vec2(.5, .5),
+        vec2(-.5, -.5), vec2(.5, .5),vec2(-.5, .5),
     ];
 
     var tBuffer = gl.createBuffer();
@@ -133,7 +120,6 @@ const render = () => {
 }
 
 const renderGround = () => {
-    // Draw ground with ground texture
     var modelViewMatrix = mat4();
     gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
     
@@ -156,7 +142,6 @@ const updateLightPosition = () => {
 const renderRects = () => {    
     modelViewMatrix = lookAt(eye, at, up);
 
-    // Send color and matrix for square
     gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
     gl.uniform1i(visibilityLoc, true);
     gl.drawArrays(gl.TRIANGLES, 6, 18);
@@ -174,12 +159,10 @@ const renderShadow = () => {
     m[3][3] = 0.0;
     m[3][1] = -1.0 / (pointLightPosition[1] + 1.0 + epsilon);
 
-    // Model-view matrix for shadow
     modelViewMatrix = mult(modelViewMatrix, translate(pointLightPosition[0], pointLightPosition[1], pointLightPosition[2]));
     modelViewMatrix = mult(modelViewMatrix, m);
     modelViewMatrix = mult(modelViewMatrix, translate(-pointLightPosition[0], -pointLightPosition[1], -pointLightPosition[2]));
     
-    // Send color and matrix for shadow
     gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
     gl.uniform1i(visibilityLoc, false);
     gl.drawArrays(gl.TRIANGLES, 6, 18);

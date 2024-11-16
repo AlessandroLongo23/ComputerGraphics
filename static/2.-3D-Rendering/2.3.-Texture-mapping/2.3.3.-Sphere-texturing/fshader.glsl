@@ -10,7 +10,6 @@ const float PI = 3.141592653589793;
 void main() {
     vec3 n = normalize(fNormal.xyz);
     
-    // Convert from [-1,1] to [0,1] range for UV coordinates
     float u = 0.5 + (atan(n.x, n.z) / (2.0 * PI));
     float v = 0.5 - (asin(-n.y) / PI);
     

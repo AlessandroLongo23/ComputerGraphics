@@ -19,12 +19,10 @@ void main() {
     float v = 0.5 - asin(n.y) / PI;
     vec2 texCoord = vec2(u, v);
 
-    // earth
     gl_FragColor = 
         fColor * texture2D(earthTexMap, texCoord) + 
         (vec4(1.0) - fColor) * texture2D(nightTexMap, texCoord) + 
         fColor * texture2D(cloudTexMap, texCoord);
 
-    // moon
     // gl_FragColor = fColor * texture2D(moonTexMap, texCoord);
 }

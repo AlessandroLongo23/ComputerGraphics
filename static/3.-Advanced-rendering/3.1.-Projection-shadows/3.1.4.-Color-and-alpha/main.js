@@ -51,7 +51,6 @@ const initializeLight = () => {
 
 const initializeVertices = () => {
     vertices = [
-        // ground
         vec4(-2.0, -1.0, -1.0, 1.0), 
         vec4(-2.0, -1.0, -5.0, 1.0), 
         vec4(2.0, -1.0, -5.0, 1.0),
@@ -59,7 +58,6 @@ const initializeVertices = () => {
         vec4(2.0, -1.0, -5.0, 1.0),
         vec4(2.0, -1.0, -1.0, 1.0),
 
-        // first rect
         vec4(0.25, -0.5, -1.25, 1.0),
         vec4(0.25, -0.5, -1.75, 1.0),
         vec4(0.75, -0.5, -1.75, 1.0),
@@ -67,7 +65,6 @@ const initializeVertices = () => {
         vec4(0.75, -0.5, -1.75, 1.0),
         vec4(0.75, -0.5, -1.25, 1.0),
 
-        // second rect
         vec4(-1.0, -1.0, -2.5, 1.0),
         vec4(-1.0, -1.0, -3.0, 1.0),
         vec4(-1.0, -0.0, -3.0, 1.0),

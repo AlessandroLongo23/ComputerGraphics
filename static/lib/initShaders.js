@@ -1,9 +1,4 @@
-//
-//  initShaders.js
-//
-
-function initShaders( gl, vertexShaderId, fragmentShaderId )
-{
+function initShaders( gl, vertexShaderId, fragmentShaderId ) {
     var vertShdr;
     var fragShdr;
 
@@ -11,8 +6,7 @@ function initShaders( gl, vertexShaderId, fragmentShaderId )
     if ( !vertElem ) { 
         alert( "Unable to load vertex shader " + vertexShaderId );
         return -1;
-    }
-    else {
+    } else {
         vertShdr = gl.createShader( gl.VERTEX_SHADER );
         gl.shaderSource( vertShdr, vertElem.text );
         gl.compileShader( vertShdr );
@@ -28,8 +22,7 @@ function initShaders( gl, vertexShaderId, fragmentShaderId )
     if ( !fragElem ) { 
         alert( "Unable to load vertex shader " + fragmentShaderId );
         return -1;
-    }
-    else {
+    } else {
         fragShdr = gl.createShader( gl.FRAGMENT_SHADER );
         gl.shaderSource( fragShdr, fragElem.text );
         gl.compileShader( fragShdr );

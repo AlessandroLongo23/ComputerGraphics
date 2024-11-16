@@ -18,11 +18,8 @@ const float PI = 3.141592653589793;
 void main() {
     vec4 pos = modelMatrix * vPosition;
     
-    // normal
     vec3 n = normalize(pos.xyz);
-    // vec3 n = normalize()
 
-    // texture
     float u = 0.5 + atan(n.x, n.z) / (2.0 * PI);
     float v = 0.5 - asin(n.y) / PI;
     vec2 texCoord = vec2(u, v);

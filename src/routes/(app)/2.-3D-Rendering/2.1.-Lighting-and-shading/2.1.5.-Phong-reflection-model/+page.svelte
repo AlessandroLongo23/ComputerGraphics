@@ -10,7 +10,8 @@
 
     let viewIndex = $state(1);
     let isLoading = $state(true);
-    let canvas = $state(), gl, program;
+    let canvas = $state();
+    let gl, program;
     let codeSnippets = $state([]);
 
     let vertices, vBuffer;
@@ -32,20 +33,16 @@
             try {
                 [gl, program] = await initShaders(gl, program, $page.url.pathname + '/vshader.glsl', $page.url.pathname + '/fshader.glsl');
 
-                // enabling depth test and culling
                 gl.enable(gl.DEPTH_TEST);
                 gl.enable(gl.CULL_FACE);
                 gl.cullFace(gl.FRONT);
 
-                // set the camera position
                 eyeLoc = gl.getUniformLocation(program, "eye");
 
-                // Set the light direction
                 var lightDirection = mv.vec3(0.0, 0.0, -1.0);
                 var lightDirectionLoc = gl.getUniformLocation(program, "lightDirection");
                 gl.uniform3fv(lightDirectionLoc, mv.flatten(lightDirection));
 
-                // and all the lighting parameters
                 kLoc = gl.getUniformLocation(program, "k");
                 LLoc = gl.getUniformLocation(program, "L");
                 ksLoc = gl.getUniformLocation(program, "ks");
@@ -53,12 +50,10 @@
                 k = L = ks = 0.5;
                 s = 2.0;
 
-                // Uniform locations for the matrices
                 viewMatrixLoc = gl.getUniformLocation(program, "viewMatrix");
                 modelMatrixLoc = gl.getUniformLocation(program, "modelMatrix");
                 projectionMatrixLoc = gl.getUniformLocation(program, "projectionMatrix");
 
-                // vertices
                 vertices = [];
                 v0 = mv.vec4(0.0, 0.0, -1.0, 1); 
                 v1 = mv.vec4(0.0, 0.942809, 0.333333, 1);
@@ -83,32 +78,25 @@
 
         thetaY += 0.005;
 
-        // projection matrix
         var projectionMatrix = mv.perspective(45, canvas.width / canvas.height, 0.1, 100.0);
 
-        // view matrix
         var dist = 5.0;
         var eye = mv.vec3(dist * Math.cos(thetaY), 0.0, dist * Math.sin(thetaY));
         var at = mv.vec3(0.0, 0.0, 0.0);
         var up = mv.vec3(0.0, 1.0, 0.0);
         var viewMatrix = mv.lookAt(eye, at, up);
 
-        // model matrix
         var modelMatrix = mv.mat4();
 
-        // update the lighting parameters
         updateLighting();
 
-        // Pass matrices to the shader
         gl.uniformMatrix4fv(modelMatrixLoc, false, mv.flatten(modelMatrix));
         gl.uniformMatrix4fv(viewMatrixLoc, false, mv.flatten(viewMatrix));
         gl.uniformMatrix4fv(projectionMatrixLoc, false, mv.flatten(projectionMatrix));
         gl.uniform3fv(eyeLoc, mv.flatten(eye));
 
-        // draw the model using triangles
         gl.drawArrays(gl.TRIANGLES, 0, vertices.length);
 
-        // call the next frame
         requestAnimFrame(render);
     }
 

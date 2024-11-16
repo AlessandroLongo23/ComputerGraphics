@@ -10,7 +10,8 @@
 
     let viewIndex = $state(1);
     let isLoading = $state(true);
-    let canvas = $state(), gl, program;
+    let canvas = $state();
+    let gl, program;
     let codeSnippets = $state([]);
 
     let vertices, vBuffer, colors;
@@ -33,7 +34,6 @@
 
                 culling = 0;
 
-                // colors
                 colors = [];
 
                 var cBuffer = gl.createBuffer();
@@ -44,7 +44,6 @@
                 gl.vertexAttribPointer(vColor, 4, gl.FLOAT, false, 0, 0);
                 gl.enableVertexAttribArray(vColor);
 
-                // vertices
                 v0 = mv.vec4(0.0, 0.0, -1.0, 1); 
                 v1 = mv.vec4(0.0, 0.942809, 0.333333, 1);
                 v2 = mv.vec4(-0.816497, -0.471405, 0.333333, 1);
@@ -53,7 +52,6 @@
                 
                 buildPolyhedron();
 
-                // Initialize rotation and transformations
                 modelViewMatrixLoc = gl.getUniformLocation(program, "modelViewMatrix");
                 projectionMatrixLoc = gl.getUniformLocation(program, "projectionMatrix");
 
@@ -70,7 +68,6 @@
     const render = () => {
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
         
-        // enabling depth test and culling
         if (culling != 0) {
             gl.enable(gl.DEPTH_TEST);
             gl.enable(gl.CULL_FACE);
@@ -109,7 +106,6 @@
         gl.vertexAttribPointer(vPosition, 4, gl.FLOAT, false, 0, 0);
         gl.enableVertexAttribArray(vPosition);
 
-        // Bind color buffer
         var cBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
         gl.bufferData(gl.ARRAY_BUFFER, mv.flatten(colors), gl.STATIC_DRAW);
