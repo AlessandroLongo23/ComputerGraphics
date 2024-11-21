@@ -1,15 +1,18 @@
 <script>
     import * as ls from 'lucide-svelte'
+    import { onMount } from 'svelte';
     import { admonitions } from '$lib/data/admonitions.svelte.js';
     import { capitalize } from '$lib/utils.svelte.js';
+    import { convertToLatex } from '$lib/utils.svelte.js';
 
     let { type = 'note', title = '', textContent } = $props();
 
     let ad = $derived(admonitions.find(admonition => admonition.name === type));
 
-    import { convertToLatex } from '$lib/utils.svelte.js';
-
-    convertToLatex();
+    onMount(async () => {
+        if (typeof window !== 'undefined')
+            convertToLatex();
+    });
 </script>
 
 {#if ad}
