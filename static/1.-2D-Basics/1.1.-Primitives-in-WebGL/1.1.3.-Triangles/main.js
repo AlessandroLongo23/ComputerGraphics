@@ -1,8 +1,8 @@
 window.onload = () => {
     setupWebGL();
 
-    initializeVertices();
-    initializeColors();
+    initVertices();
+    initColors();
 
     render();
 }
@@ -11,7 +11,7 @@ const setupWebGL = () => {
     canvas = document.getElementById("gl-canvas");
     gl = WebGLUtils.setupWebGL(canvas);
     if (!gl) {
-        alert("WebGL isn’t available");
+        alert("WebGL isn't available");
         return;
     }
 
@@ -22,7 +22,7 @@ const setupWebGL = () => {
     gl.useProgram(program);
 }
 
-const initializeVertices = () => {
+const initVertices = () => {
     vertices = [ vec2(0.0, 0.0), vec2(1.0, 0.0), vec2(1.0, 1.0) ];
 
     var vBuffer = gl.createBuffer();
@@ -34,7 +34,7 @@ const initializeVertices = () => {
     gl.enableVertexAttribArray(vPosition);
 }
 
-const initializeColors = () => {
+const initColors = () => {
     colors = [ 
         vec4(1.0, 0.0, 0.0, 1.0), 
         vec4(0.0, 1.0, 0.0, 1.0), 

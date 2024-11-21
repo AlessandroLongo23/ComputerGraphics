@@ -1,13 +1,5 @@
-<script>
-    import { page } from '$app/stores'
-    import { getChildren } from '$lib/data/pages.svelte.js';
-    import Section from "$lib/components/Section.svelte";
-
-    let sections = getChildren($page.url.pathname);
-</script>
-
-<div class="flex flex-row justify-evenly items-center w-3/4 m-auto">
-    {#each sections as section}
-        <Section title={section}></Section> 
-    {/each}
+<div class="flex flex-col gap-1 items-start w-1/2 m-auto">
+    <p>The purpose of this set of exercises is to get acquainted with lighting and shading in WebGL and GLSL.</p>
+    <p>We compute the local illumination of an object based on ambient, diffuse and specular material properties, and a light source.</p>
+    <p>When working on the following exercises, please consider the <a href="http://dtu.cnwiki.dk/angel02561/page/3665/chapter-6-worksheet-4">Wiki with clarifications</a> for the textbook.</p>
 </div>

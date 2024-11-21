@@ -16,9 +16,12 @@
 
     let vertices, vBuffer;
     let viewMatrixLoc, modelMatrixLoc, projectionMatrixLoc;
+    let modelMatrix, viewMatrix, projectionMatrix;
+    let eye, at, up;
+    let lightDirection, lightDirectionLoc;
     let subdivisions = $state();
-    let v0, v1, v2, v3;
-    let thetaY = 30;
+    let baseVertices;
+    let thetaY, dist;
     let culling = $state(0);
 
     onMount(async () => {
@@ -34,22 +37,19 @@
 
                 culling = 0;
 
-                var lightDirection = mv.vec3(0.0, 0.0, -1.0);
-                var lightDirectionLoc = gl.getUniformLocation(program, "lightDirection");
-                gl.uniform3fv(lightDirectionLoc, mv.flatten(lightDirection));
+                baseVertices = [
+                    mv.vec4(0.0, 0.0, -1.0, 1), 
+                    mv.vec4(0.0, 0.942809, 0.333333, 1),
+                    mv.vec4(-0.816497, -0.471405, 0.333333, 1),
+                    mv.vec4(0.816497, -0.471405, 0.333333, 1)
+                ];
 
-                viewMatrixLoc = gl.getUniformLocation(program, "viewMatrix");
-                modelMatrixLoc = gl.getUniformLocation(program, "modelMatrix");
-                projectionMatrixLoc = gl.getUniformLocation(program, "projectionMatrix");
+                subdivisions = 1;
 
-                vertices = [];
-                v0 = mv.vec4(0.0, 0.0, -1.0, 1); 
-                v1 = mv.vec4(0.0, 0.942809, 0.333333, 1);
-                v2 = mv.vec4(-0.816497, -0.471405, 0.333333, 1);
-                v3 = mv.vec4(0.816497, -0.471405, 0.333333, 1);
-                subdivisions = 0;
-                
+                initMatrices();
+                initDirectionalLight();
                 buildPolyhedron();
+
                 render();
             } catch (error) {
                 console.error(error);
@@ -60,60 +60,49 @@
         }
     });
 
-    const render = () => {
-        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    const initDirectionalLight = () => {
+        lightDirection = mv.vec3(0.0, 0.0, -1.0);
+        lightDirectionLoc = gl.getUniformLocation(program, "lightDirection");
+        gl.uniform3fv(lightDirectionLoc, mv.flatten(lightDirection));
+    }
 
-        if (culling != 0) {
-            gl.enable(gl.DEPTH_TEST);
-            gl.enable(gl.CULL_FACE);
-
-            culling == 1 ? gl.cullFace(gl.FRONT) : gl.cullFace(gl.BACK);
-        } else {
-            gl.disable(gl.DEPTH_TEST);
-            gl.disable(gl.CULL_FACE);
-        }
-
-        thetaY += 0.005;
-
-        var projectionMatrix = mv.perspective(45, canvas.width / canvas.height, 0.1, 100.0);
-
-        var dist = 4.0;
-        var eye = mv.vec3(dist * Math.cos(thetaY), 0.0, dist * Math.sin(thetaY));
-        var at = mv.vec3(0.0, 0.0, 0.0);
-        var up = mv.vec3(0.0, 1.0, 0.0);
-        var viewMatrix = mv.lookAt(eye, at, up);
-
-        var modelMatrix = mv.mat4();
-        var modelPos = mv.vec3(0.0, -0.25, 0.0);
-        modelMatrix = mv.mult(modelMatrix, mv.translate(modelPos));
-
-        gl.uniformMatrix4fv(modelMatrixLoc, false, mv.flatten(modelMatrix));
-        gl.uniformMatrix4fv(viewMatrixLoc, false, mv.flatten(viewMatrix));
+    const initMatrices = () => {
+        projectionMatrixLoc = gl.getUniformLocation(program, "projectionMatrix");
+        projectionMatrix = mv.perspective(45, canvas.width / canvas.height, .001, 10.0);
         gl.uniformMatrix4fv(projectionMatrixLoc, false, mv.flatten(projectionMatrix));
 
-        gl.drawArrays(gl.TRIANGLES, 0, vertices.length);
+        viewMatrixLoc = gl.getUniformLocation(program, "viewMatrix");
+        dist = 4.0;
+        thetaY = 30;
+        eye = mv.vec3(dist * Math.cos(thetaY), 0.0, dist * Math.sin(thetaY));
+        at = mv.vec3(0.0, 0.0, 0.0);
+        up = mv.vec3(0.0, 1.0, 0.0);
+        viewMatrix = mv.lookAt(eye, at, up);
+        gl.uniformMatrix4fv(viewMatrixLoc, false, mv.flatten(viewMatrix));
 
-        requestAnimFrame(render);
-    }
+        modelMatrixLoc = gl.getUniformLocation(program, "modelMatrix");
+        modelMatrix = mv.mat4();
+        modelMatrix = mv.mult(modelMatrix, mv.translate(mv.vec3(0.0, -0.25, 0.0)));
+        gl.uniformMatrix4fv(modelMatrixLoc, false, mv.flatten(modelMatrix));
+    };
 
     const buildPolyhedron = () => {
         vertices = [];
-        tetrahedron(v0, v1, v2, v3, subdivisions);
+        tetrahedron(baseVertices[0], baseVertices[1], baseVertices[2], baseVertices[3], subdivisions);
 
         vBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
         gl.bufferData(gl.ARRAY_BUFFER, mv.flatten(vertices), gl.STATIC_DRAW);
-
         var vPosition = gl.getAttribLocation(program, "vPosition");
         gl.vertexAttribPointer(vPosition, 4, gl.FLOAT, false, 0, 0);
         gl.enableVertexAttribArray(vPosition);
     }
 
     const tetrahedron = (a, b, c, d, n) => {
-        divideTriangle(a, b, c, n, 0);
-        divideTriangle(d, c, b, n, 1);
-        divideTriangle(a, d, b, n, 2);
-        divideTriangle(a, c, d, n, 3);
+        divideTriangle(a, b, c, n);
+        divideTriangle(d, c, b, n);
+        divideTriangle(a, d, b, n);
+        divideTriangle(a, c, d, n);
     }
 
     const divideTriangle = (a, b, c, count) => {
@@ -137,6 +126,32 @@
         vertices.push(b);
         vertices.push(c);
     }
+
+    const render = () => {
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+        if (culling != 0) {
+            gl.enable(gl.DEPTH_TEST);
+            gl.enable(gl.CULL_FACE);
+
+            culling == 1 ? gl.cullFace(gl.FRONT) : gl.cullFace(gl.BACK);
+        } else {
+            gl.disable(gl.DEPTH_TEST);
+            gl.disable(gl.CULL_FACE);
+        }
+
+        updateCamera();
+        gl.drawArrays(gl.TRIANGLES, 0, vertices.length);
+
+        requestAnimFrame(render);
+    }
+
+    const updateCamera = () => {
+        thetaY += 0.005;
+        eye = mv.vec3(dist * Math.cos(thetaY), 0.0, dist * Math.sin(thetaY));
+        viewMatrix = mv.lookAt(eye, at, up);
+        gl.uniformMatrix4fv(viewMatrixLoc, false, mv.flatten(viewMatrix));
+    };
 
     $effect(() => {
         subdivisions != undefined && buildPolyhedron();

@@ -1,3 +1,14 @@
+<script>
+    import { onMount } from 'svelte';
+    import { convertToLatex } from '$lib/utils.svelte.js';
+
+    onMount(async () => {
+        if (typeof window !== 'undefined') {
+            convertToLatex();
+        }
+    });
+</script>
+
 <div class="flex flex-col justify-center items-start w-4/5 text-xl m-auto">
     <div class="w-4/5 m-auto">
         <p class="text-3xl self-center mx-auto mb-8">Questions</p>
@@ -8,8 +19,8 @@
             <li class="text-black text-lg">b) What is the difference between flat shading, Gouraud shading, and Phong shading? List pros and cons of each. Is Gouraud or Phong shading the best method for simulating highlights? Explain.</li>
             <li class="text-black text-lg">c) What is the difference between a directional light and a point light?</li>
             <li class="text-black text-lg">d) Does the eye position influence the shading of an object in any way?</li>
-            <li class="text-black text-lg">e) What is the effect of setting the specular term to (0, 0, 0)?</li>
-            <li class="text-black text-lg">f) What is the effect of increasing the shininess exponent (𝛼𝛼)?</li>
+            <li class="text-black text-lg">e) What is the effect of setting the specular term to $(0, 0, 0)$?</li>
+            <li class="text-black text-lg">f) What is the effect of increasing the shininess exponent $\alpha$?</li> 
             <li class="text-black text-lg">g) In what coordinate space did you compute the lighting?</li>
         </ul>
 

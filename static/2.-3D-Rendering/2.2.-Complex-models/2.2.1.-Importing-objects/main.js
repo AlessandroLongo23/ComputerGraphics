@@ -3,7 +3,7 @@ window.onload = () => {
 
     eyeLoc = gl.getUniformLocation(program, "eye");
 
-    initializeLights();
+    initLights();
 
     viewMatrixLoc = gl.getUniformLocation(program, "viewMatrix");
     modelMatrixLoc = gl.getUniformLocation(program, "modelMatrix");
@@ -52,7 +52,7 @@ window.onload = () => {
         });
 };
 
-const initializeLights = () => {
+const initLights = () => {
     var leftLightDirection = vec3(-1.0, 0.0, 0.0);
     var leftLightDirectionLoc = gl.getUniformLocation(program, "leftLight");
     gl.uniform3fv(leftLightDirectionLoc, flatten(leftLightDirection));
@@ -92,7 +92,7 @@ const setupWebGL = () => {
 
     gl = WebGLUtils.setupWebGL(canvas);
     if (!gl) {
-        alert("WebGL isn’t available");
+        alert("WebGL isn't available");
         return;
     }
 

@@ -1,9 +1,9 @@
 window.onload = () => {
     setupWebGL();
 
-    initializeBall();
-    initializePhysicsQuantities();
-    initializeTime();
+    initBall();
+    initPhysicsQuantities();
+    initTime();
 
     posLoc = gl.getUniformLocation(program, "pos");
     
@@ -14,7 +14,7 @@ const setupWebGL = () => {
     canvas = document.getElementById("gl-canvas");
     gl = WebGLUtils.setupWebGL(canvas);
     if (!gl) {
-        alert("WebGL isn’t available");
+        alert("WebGL isn't available");
         return;
     }
 
@@ -25,7 +25,7 @@ const setupWebGL = () => {
     gl.useProgram(program);
 }
 
-const initializeBall = () => {
+const initBall = () => {
     num = 100;
     rad = 0.5;
     vertices = [vec2(0, 0)];
@@ -41,7 +41,7 @@ const initializeBall = () => {
     gl.enableVertexAttribArray(vPosition);
 }
 
-const initializePhysicsQuantities = () => {
+const initPhysicsQuantities = () => {
     acc = vec2(0.0, -9.81);
     vel = vec2(Math.random() * 20 - 10, Math.random() * 20 - 10);
     pos = vec2(Math.random() - 0.5, Math.random() - 0.5);
@@ -51,7 +51,7 @@ const initializePhysicsQuantities = () => {
     radFriction = 0.90;
 }
 
-const initializeTime = () => {
+const initTime = () => {
     date = new Date();
     deltaTime = 0.0;
     t1 = date.getTime();

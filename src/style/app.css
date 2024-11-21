@@ -36,7 +36,7 @@ body {
 		linear-gradient(180deg, var(--color-bg-0) 0%, var(--color-bg-1) 15%, var(--color-bg-2) 50%); */
 }
 
-h1, h2, p, li {
+h1, h2, p, li, a {
 	font-weight: 400;
 }
 
@@ -44,6 +44,10 @@ p, li {
 	font-size: 1.125rem;
 	line-height: 1.75rem;
 	margin-bottom: 1rem;
+}
+
+a {
+	font-size: 1.125rem;
 }
 
 li::before {
@@ -66,10 +70,6 @@ li {
 a {
 	color: var(--color-theme-1);
 	text-decoration: none;
-}
-
-a:hover {
-	text-decoration: underline;
 }
 
 h1 {
@@ -126,4 +126,9 @@ button:focus:not(:focus-visible) {
 	position: absolute;
 	width: 1px;
 	white-space: nowrap;
+}
+
+.scroll-hidden {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
 }

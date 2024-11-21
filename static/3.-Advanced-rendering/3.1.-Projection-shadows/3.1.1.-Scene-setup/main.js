@@ -1,12 +1,12 @@
 window.onload = () => {
     setupWebGL();
 
-    initializeVertices();
-    initializeMatrices();
+    initVertices();
+    initMatrices();
 
-    initializeGroundTexture();
-    initializeRectTexture();
-    initializeTextureCoordinates();
+    initGroundTexture();
+    initRectTexture();
+    initTextureCoordinates();
     
     isGroundLoc = gl.getUniformLocation(program, "isGround");
 
@@ -17,7 +17,7 @@ const setupWebGL = () => {
     canvas = document.getElementById("gl-canvas");
     gl = WebGLUtils.setupWebGL(canvas);
     if (!gl) {
-        alert("WebGL isn’t available");
+        alert("WebGL isn't available");
         return;
     }
 
@@ -28,7 +28,7 @@ const setupWebGL = () => {
     gl.useProgram(program);
 }
 
-const initializeVertices = () => {
+const initVertices = () => {
     vertices = [
         vec4(-2.0, -1.0, -1.0, 1.0), 
         vec4(-2.0, -1.0, -5.0, 1.0), 
@@ -59,7 +59,7 @@ const initializeVertices = () => {
     gl.enableVertexAttribArray(vPosition);
 }
 
-const initializeGroundTexture = () => {
+const initGroundTexture = () => {
     groundTexture = gl.createTexture();
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, groundTexture);
@@ -79,7 +79,7 @@ const initializeGroundTexture = () => {
     myTexels.src = "../texture.png";
 }
 
-const initializeRectTexture = () => {
+const initRectTexture = () => {
     var redImg = new Uint8Array([255, 0, 0, 255]);
 
     redTex = gl.createTexture();
@@ -95,7 +95,7 @@ const initializeRectTexture = () => {
     gl.uniform1i(redTexLoc, 1);
 }
 
-const initializeTextureCoordinates = () => {
+const initTextureCoordinates = () => {
     var textCoords = [
         vec2(-.5, -.5), vec2(.5, -.5), vec2(.5, .5),
         vec2(-.5, -.5), vec2(.5, .5), vec2(-.5, .5),
@@ -109,7 +109,7 @@ const initializeTextureCoordinates = () => {
     gl.enableVertexAttribArray(vTexCoord);
 }
 
-const initializeMatrices = () => {
+const initMatrices = () => {
     modelViewMatrixLoc = gl.getUniformLocation(program, "modelViewMatrix");
     var modelViewMatrix = mat4();
     gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));

@@ -56,7 +56,7 @@
 
 <div class="relative w-full">
     <div class="button-container absolute flex flex-row w-full justify-between p-4 rounded-lg {viewIndex == 1 && 'rounded-r-none'}">
-        <div class="flex flex-row justify-start">
+        <div class="flex flex-row justify-start overflow-x-scroll scroll-hidden">
             {#if codeSnippets.length > 1}
                 {#each codeSnippets as codeSnippet, i}
                     <button class="flex me-2 text-sm h-8 transition-colors duration-200 items-center text-white px-4 py-4 rounded-lg w-auto" class:selected={i === currentSnippetIndex} onclick={() => selectSnippet(i)}> 
@@ -68,7 +68,7 @@
             {/if}
         </div>
 
-        <div class="flex flex-row justify-end gap-2">
+        <div class="flex flex-row justify-end gap-2 ps-4">
             <button onclick={copyToClipboard} class="flex items-center transition-colors duration-200 text-sm h-8 text-white px-4 py-2 rounded-lg w-auto {copyIcon == 'check' && 'copied'}" aria-label="Copy code to clipboard">
                 <i class="fa fa-{copyIcon}"></i>
             </button>
@@ -79,8 +79,8 @@
         </div>
     </div>
 
-    <pre class="language-{currentLanguage} m-0 rounded-lg {viewIndex == 1 && 'rounded-r-none'}" style={style}>
-        <code class="language-{currentLanguage}">
+    <pre class="language-{currentLanguage} m-0 rounded-lg {viewIndex == 1 && 'rounded-r-none'} scroll-hidden" style={style}>
+        <code class="language-{currentLanguage} scroll-hidden">
             {currentCode}
         </code>
     </pre>

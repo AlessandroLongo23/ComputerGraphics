@@ -31,11 +31,11 @@
 
                 configureWebGL();
 
-                initializeUniforms();
+                initUniforms();
 
                 initCubeMap();
 
-                initializeSphere();
+                initSphere();
 
                 render();
             } catch (error) {
@@ -55,7 +55,7 @@
         gl.clearColor(1.0, 1.0, 1.0, 1.0);
     }
 
-    const initializeUniforms = () => {
+    const initUniforms = () => {
         viewMatrixLoc = gl.getUniformLocation(program, "viewMatrix");
         modelMatrixLoc = gl.getUniformLocation(program, "modelMatrix");
         projectionMatrixLoc = gl.getUniformLocation(program, "projectionMatrix");
@@ -100,7 +100,7 @@
         gl.uniform1i(cubeMapLoc, 0);
     }
 
-    const initializeSphere = () => {
+    const initSphere = () => {
         sphereVertices = [];
         sphereNormals = [];
 

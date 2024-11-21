@@ -4,23 +4,23 @@ window.onload = () => {
     lightTime = teapotTime = 0.0;
     lightMovement = teapotMovement = true;
 
-    initializeMatrices(groundProgram);
-    initializeGroundVertices();
-    initializeGroundTexture();
+    initMatrices(groundProgram);
+    initGroundVertices();
+    initGroundTexture();
 
     isShadowLoc = gl.getUniformLocation(groundProgram, "isShadow");
 
-    initializeLight();
+    initLight();
 
-    initializeMatrices(teapotProgram);
-    initializeTeapotObject();
+    initMatrices(teapotProgram);
+    initTeapotObject();
 };
 
 const setupWebGL = () => {
     canvas = document.getElementById("gl-canvas");
     gl = WebGLUtils.setupWebGL(canvas);
     if (!gl) {
-        alert("WebGL isn’t available");
+        alert("WebGL isn't available");
         return;
     }
 
@@ -36,7 +36,7 @@ const setupWebGL = () => {
     groundProgram = initShaders(gl, "groundShaders/vshader.glsl", "groundShaders/fshader.glsl");
 };
 
-const initializeGroundVertices = () => {
+const initGroundVertices = () => {
     vertices = [
         vec4(-2.0, -1.0, -1.0, 1.0), 
         vec4(-2.0, -1.0, -5.0, 1.0), 
@@ -56,7 +56,7 @@ const initializeGroundVertices = () => {
     gl.enableVertexAttribArray(groundProgram.vPosition);
 };
 
-const initializeMatrices = (program) => {
+const initMatrices = (program) => {
     gl.useProgram(program);
 
     program.projectionMatrix = perspective(90, canvas.width / canvas.height, 0.1, 10.0);
@@ -72,7 +72,7 @@ const initializeMatrices = (program) => {
     gl.uniformMatrix4fv(program.modelMatrixLoc, false, flatten(program.modelMatrix));
 }
 
-const initializeGroundTexture = () => {
+const initGroundTexture = () => {
     groundTexture = gl.createTexture();
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, groundTexture);
@@ -106,14 +106,14 @@ const initializeGroundTexture = () => {
     gl.enableVertexAttribArray(groundProgram.vTexCoord);
 };
 
-const initializeLight = () => {
+const initLight = () => {
     pointLightCenter = vec3(0.0, 5.0, 0.0);
     pointLightRadius = 2.0;
 
     teapotProgram.pointLightPositionLoc = gl.getUniformLocation(teapotProgram, "light");
 };
 
-const initializeTeapotObject = () => {
+const initTeapotObject = () => {
     readOBJFile(fileName = '../teapot/teapot.obj', scale = 0.25, reverse = false)
         .then(objInfo => {
             obj = objInfo;

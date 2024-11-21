@@ -185,7 +185,7 @@ export const contentTree = {
                         },
                         {
                             icon: chapterIcons[2],
-                            href: '/3.-Advanced-rendering/3.1.-Projection-shadows/3.1.2.-Shadow-mapping'
+                            href: '/3.-Advanced-rendering/3.1.-Projection-shadows/3.1.2.-Projecting-shadows'
                         },
                         {
                             icon: chapterIcons[2],
@@ -196,13 +196,54 @@ export const contentTree = {
                             href: '/3.-Advanced-rendering/3.1.-Projection-shadows/3.1.4.-Color-and-alpha'
                         }
                     ]
+                },
+                {
+                    icon: chapterIcons[2],
+                    href: '/3.-Advanced-rendering/3.2.-Shadow-mapping',
+                    children: [
+                        {
+                            icon: chapterIcons[2],
+                            href: '/3.-Advanced-rendering/3.2.-Shadow-mapping/3.2.1.-Scene-setup'
+                        },
+                        {
+                            icon: chapterIcons[2],
+                            href: '/3.-Advanced-rendering/3.2.-Shadow-mapping/3.2.2.-Black-shadow'
+                        },
+                        {
+                            icon: chapterIcons[2],
+                            href: '/3.-Advanced-rendering/3.2.-Shadow-mapping/3.2.3.-Shadow-mapping'
+                        }
+                    ]
                 }
             ]
         },
         { 
             icon: chapterIcons[3], 
             href: '/4.-Advanced-techniques',  
-            children: []
+            children: [
+                {
+                    icon: chapterIcons[3],
+                    href: '/4.-Advanced-techniques/4.1.-Virtual-trackball',
+                    children: [
+                        {
+                            icon: chapterIcons[3],
+                            href: '/4.-Advanced-techniques/4.1.-Virtual-trackball/4.1.1.-Simple-orbiting',
+                        },
+                        {
+                            icon: chapterIcons[3],
+                            href: '/4.-Advanced-techniques/4.1.-Virtual-trackball/4.1.2.-Quaternion-rotation',
+                        },
+                        {
+                            icon: chapterIcons[3],
+                            href: '/4.-Advanced-techniques/4.1.-Virtual-trackball/4.1.3.-Dolly-and-panning',
+                        },
+                        {
+                            icon: chapterIcons[3],
+                            href: '/4.-Advanced-techniques/4.1.-Virtual-trackball/4.1.4.-Spinning',
+                        }
+                    ]
+                }
+            ]
         }
     ]
 };

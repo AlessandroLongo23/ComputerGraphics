@@ -1,8 +1,8 @@
 window.onload = () => {
     setupWebGL();
 
-    initializeAngle();
-    initializeVertices();
+    initAngle();
+    initVertices();
 
     render();
 }
@@ -11,7 +11,7 @@ const setupWebGL = () => {
     canvas = document.getElementById("gl-canvas");
     gl = WebGLUtils.setupWebGL(canvas);
     if (!gl) {
-        alert("WebGL isn’t available");
+        alert("WebGL isn't available");
         return;
     }
 
@@ -22,12 +22,12 @@ const setupWebGL = () => {
     gl.useProgram(program);
 }
 
-const initializeAngle = () => {
+const initAngle = () => {
     theta = 0.0;
     thetaLoc = gl.getUniformLocation(program, "theta");
 }
 
-const initializeVertices = () => {
+const initVertices = () => {
     vertices = [ 
         vec2(-0.5, 0.5), 
         vec2(0.5, 0.5), 

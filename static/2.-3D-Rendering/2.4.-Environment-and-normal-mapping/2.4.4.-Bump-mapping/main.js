@@ -3,13 +3,13 @@ window.onload = () => {
         return;
 
     configureWebGL();
-    initializeUniforms();
+    initUniforms();
     
     initCubeMap();
     initBumpMap();
     
-    initializeBackgroundQuad();
-    initializeSphere();
+    initBackgroundQuad();
+    initSphere();
     
     render();
 };
@@ -35,7 +35,7 @@ const configureWebGL = () => {
     gl.clearColor(0.0, 0.0, 0.0, 0.0);
 }
 
-const initializeUniforms = () => {
+const initUniforms = () => {
     viewMatrixLoc = gl.getUniformLocation(program, "viewMatrix");
     modelMatrixLoc = gl.getUniformLocation(program, "modelMatrix");
     projectionMatrixLoc = gl.getUniformLocation(program, "projectionMatrix");
@@ -103,7 +103,7 @@ const initBumpMap = () => {
     myTexels.src = "../bumpmaps/bumpMap2.png";
 }
 
-const initializeBackgroundQuad = () => {
+const initBackgroundQuad = () => {
     const backgroundVertices = [
         vec4(-1.0, -1.0, 0.999, 1.0),
         vec4(1.0, 1.0, 0.999, 1.0),
@@ -118,7 +118,7 @@ const initializeBackgroundQuad = () => {
     gl.bufferData(gl.ARRAY_BUFFER, flatten(backgroundVertices), gl.STATIC_DRAW);
 }
 
-const initializeSphere = () => {
+const initSphere = () => {
     sphereVertices = [];
     sphereNormals = [];
 

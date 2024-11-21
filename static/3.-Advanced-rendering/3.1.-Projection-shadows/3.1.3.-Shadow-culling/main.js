@@ -2,21 +2,11 @@ window.onload = () => {
     setupWebGL();
 
     time = 0.0;
-    pointLightCenter = vec3(0.0, 2.0, -2.0);
-    pointLightRadius = 2.0;
-
-    initializeVertices();
-    initializeGroundTexture();
-
-    modelViewMatrixLoc = gl.getUniformLocation(program, "modelViewMatrix");
-    projectionMatrixLoc = gl.getUniformLocation(program, "projectionMatrix");
-
-    at = vec3(0.0, 0.0, 0.0);
-    up = vec3(0.0, 1.0, 0.0);
-    eye = vec3(0.0, 0.0, 0.0);
-
-    var projectionMatrix = perspective(90, canvas.width / canvas.height, .1, 30.0);
-    gl.uniformMatrix4fv(projectionMatrixLoc, false, flatten(projectionMatrix));
+    initPointLight();
+    initVertices();
+    initGroundTexture();
+    initTextureCoordinates();
+    initMatrices();
 
     visibilityLoc = gl.getUniformLocation(program, "visibility");
     isGroundLoc = gl.getUniformLocation(program, "isGround");
@@ -24,7 +14,30 @@ window.onload = () => {
     render();
 }
 
-const initializeVertices = () => {
+const setupWebGL = () => {
+    canvas = document.getElementById("gl-canvas");
+    gl = WebGLUtils.setupWebGL(canvas);
+    if (!gl) {
+        alert("WebGL isn't available");
+        return;
+    }
+
+    gl.viewport(0, 0, canvas.width, canvas.height);
+    gl.clearColor(1.0, 1.0, 1.0, 1.0);
+    
+    gl.enable(gl.DEPTH_TEST);
+    gl.depthFunc(gl.LESS);
+
+    program = initShaders(gl, "vshader.glsl", "fshader.glsl");
+    gl.useProgram(program);
+}
+
+const initPointLight = () => {
+    pointLightCenter = vec3(0.0, 2.0, -2.0);
+    pointLightRadius = 2.0;
+}
+
+const initVertices = () => {
     vertices = [
         vec4(-2.0, -1.0, -1.0, 1.0), 
         vec4(-2.0, -1.0, -5.0, 1.0), 
@@ -56,7 +69,7 @@ const initializeVertices = () => {
     gl.enableVertexAttribArray(vPosition);
 }
 
-const initializeGroundTexture = () => {
+const initGroundTexture = () => {
     groundTexture = gl.createTexture();
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, groundTexture);
@@ -74,10 +87,12 @@ const initializeGroundTexture = () => {
         gl.generateMipmap(gl.TEXTURE_2D);
     }
     myTexels.src = "../texture.png";
+}
 
+const initTextureCoordinates = () => {
     var textCoords = [
         vec2(-.5, -.5), vec2(.5, -.5), vec2(.5, .5),
-        vec2(-.5, -.5), vec2(.5, .5),vec2(-.5, .5),
+        vec2(-.5, -.5), vec2(.5, .5), vec2(-.5, .5),
     ];
 
     var tBuffer = gl.createBuffer();
@@ -88,22 +103,15 @@ const initializeGroundTexture = () => {
     gl.enableVertexAttribArray(vTexCoord);
 }
 
-const setupWebGL = () => {
-    canvas = document.getElementById("gl-canvas");
-    gl = WebGLUtils.setupWebGL(canvas);
-    if (!gl) {
-        alert("WebGL isn’t available");
-        return;
-    }
-
-    gl.viewport(0, 0, canvas.width, canvas.height);
-    gl.clearColor(1.0, 1.0, 1.0, 1.0);
+const initMatrices = () => {
+    projectionMatrixLoc = gl.getUniformLocation(program, "projectionMatrix");
+    projectionMatrix = perspective(90, canvas.width / canvas.height, .1, 30.0);
+    gl.uniformMatrix4fv(projectionMatrixLoc, false, flatten(projectionMatrix));
     
-    gl.enable(gl.DEPTH_TEST);
-    gl.depthFunc(gl.LESS);
-
-    program = initShaders(gl, "vshader.glsl", "fshader.glsl");
-    gl.useProgram(program);
+    at = vec3(0.0, 0.0, 0.0);
+    up = vec3(0.0, 1.0, 0.0);
+    eye = vec3(0.0, 0.0, 0.0);
+    modelViewMatrixLoc = gl.getUniformLocation(program, "modelViewMatrix");
 }
 
 const render = () => {
@@ -120,13 +128,34 @@ const render = () => {
 }
 
 const renderGround = () => {
-    var modelViewMatrix = mat4();
+    modelViewMatrix = mat4();
     gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
     
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, groundTexture);
     gl.uniform1i(groundTexLoc, 0);
     gl.drawArrays(gl.TRIANGLES, 0, 6);
+}
+
+const renderShadow = () => {
+    gl.depthFunc(gl.GREATER);
+
+    updateLightPosition();
+
+    modelViewMatrix = lookAt(eye, at, up);
+    epsilon = 0.001;
+    m = mat4();
+    m[3][3] = 0.0;
+    m[3][1] = -1.0 / (pointLightPosition[1] + 1.0 + epsilon);
+    modelViewMatrix = mult(modelViewMatrix, translate(pointLightPosition));
+    modelViewMatrix = mult(modelViewMatrix, m);
+    modelViewMatrix = mult(modelViewMatrix, translate(-pointLightPosition[0], -pointLightPosition[1], -pointLightPosition[2]));
+    gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
+
+    gl.uniform1i(visibilityLoc, false);
+    gl.drawArrays(gl.TRIANGLES, 6, 18);
+
+    gl.depthFunc(gl.LESS);
 }
 
 const updateLightPosition = () => {
@@ -141,31 +170,8 @@ const updateLightPosition = () => {
 
 const renderRects = () => {    
     modelViewMatrix = lookAt(eye, at, up);
-
     gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
+
     gl.uniform1i(visibilityLoc, true);
     gl.drawArrays(gl.TRIANGLES, 6, 18);
-}
-
-const renderShadow = () => {
-    gl.depthFunc(gl.GREATER);
-
-    updateLightPosition();
-
-    modelViewMatrix = lookAt(eye, at, up);
-
-    epsilon = 0.001;
-    m = mat4();
-    m[3][3] = 0.0;
-    m[3][1] = -1.0 / (pointLightPosition[1] + 1.0 + epsilon);
-
-    modelViewMatrix = mult(modelViewMatrix, translate(pointLightPosition[0], pointLightPosition[1], pointLightPosition[2]));
-    modelViewMatrix = mult(modelViewMatrix, m);
-    modelViewMatrix = mult(modelViewMatrix, translate(-pointLightPosition[0], -pointLightPosition[1], -pointLightPosition[2]));
-    
-    gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
-    gl.uniform1i(visibilityLoc, false);
-    gl.drawArrays(gl.TRIANGLES, 6, 18);
-
-    gl.depthFunc(gl.LESS);
 }

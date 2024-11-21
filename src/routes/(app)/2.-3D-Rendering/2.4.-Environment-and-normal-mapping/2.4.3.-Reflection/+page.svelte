@@ -32,13 +32,13 @@
 
                 configureWebGL();
 
-                initializeUniforms();
+                initUniforms();
                 initCubeMap();
 
-                initializeBackgroundQuad();
+                initBackgroundQuad();
                 initCubeMap();
 
-                initializeSphere();
+                initSphere();
 
                 render();
             } catch (error) {
@@ -58,7 +58,7 @@
         gl.clearColor(1.0, 1.0, 1.0, 1.0);
     }
 
-    const initializeUniforms = () => {
+    const initUniforms = () => {
         viewMatrixLoc = gl.getUniformLocation(program, "viewMatrix");
         modelMatrixLoc = gl.getUniformLocation(program, "modelMatrix");
         projectionMatrixLoc = gl.getUniformLocation(program, "projectionMatrix");
@@ -106,7 +106,7 @@
         gl.uniform1i(cubeMapLoc, 0);
     }
 
-    const initializeBackgroundQuad = () => {
+    const initBackgroundQuad = () => {
         const backgroundVertices = [
             mv.vec4(-1.0, -1.0, 0.999, 1.0),
             mv.vec4(1.0, 1.0, 0.999, 1.0),
@@ -121,7 +121,7 @@
         gl.bufferData(gl.ARRAY_BUFFER, mv.flatten(backgroundVertices), gl.STATIC_DRAW);
     }
 
-    const initializeSphere = () => {
+    const initSphere = () => {
         sphereVertices = [];
         sphereNormals = [];
 

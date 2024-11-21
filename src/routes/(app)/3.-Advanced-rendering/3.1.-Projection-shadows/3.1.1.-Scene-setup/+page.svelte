@@ -4,6 +4,7 @@
     import { WebGLUtils, fetchCodeSnippets, initShaders, convertToLatex } from '$lib/utils.svelte.js';
     import * as mv from '$lib/Libraries/MV.js';
     import Result from '$lib/components/Result.svelte';
+    import Admonition from '$lib/components/UI/Admonition.svelte';
 
     let viewIndex = $state(1);
     let isLoading = $state(true);
@@ -28,12 +29,12 @@
             try {
                 [gl, program] = await initShaders(gl, program, $page.url.pathname + '/vshader.glsl', $page.url.pathname + '/fshader.glsl');
 
-                initializeVertices();
-                initializeMatrices();
+                initVertices();
+                initMatrices();
 
-                initializeGroundTexture();
-                initializeRectTexture();
-                initializeTextureCoordinates();
+                initGroundTexture();
+                initRectTexture();
+                initTextureCoordinates();
                 
                 isGroundLoc = gl.getUniformLocation(program, "isGround");
 
@@ -47,7 +48,7 @@
         }
     });
 
-    const initializeVertices = () => {
+    const initVertices = () => {
         vertices = [
             mv.vec4(-2.0, -1.0, -1.0, 1.0), 
             mv.vec4(-2.0, -1.0, -5.0, 1.0), 
@@ -78,7 +79,7 @@
         gl.enableVertexAttribArray(vPosition);
     }
 
-    const initializeGroundTexture = () => {
+    const initGroundTexture = () => {
         groundTexture = gl.createTexture();
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D, groundTexture);
@@ -98,7 +99,7 @@
         myTexels.src = "/assets/textures/groundTexture.png";
     }
 
-    const initializeRectTexture = () => {
+    const initRectTexture = () => {
         var redImg = new Uint8Array([255, 0, 0, 255]);
 
         redTex = gl.createTexture();
@@ -114,7 +115,7 @@
         gl.uniform1i(redTexLoc, 1);
     }
 
-    const initializeTextureCoordinates = () => {
+    const initTextureCoordinates = () => {
         var textCoords = [
             mv.vec2(-.5, -.5), mv.vec2(.5, -.5), mv.vec2(.5, .5),
             mv.vec2(-.5, -.5), mv.vec2(.5, .5), mv.vec2(-.5, .5),
@@ -128,7 +129,7 @@
         gl.enableVertexAttribArray(vTexCoord);
     }
 
-    const initializeMatrices = () => {
+    const initMatrices = () => {
         modelViewMatrixLoc = gl.getUniformLocation(program, "modelViewMatrix");
         var modelViewMatrix = mv.mat4();
         gl.uniformMatrix4fv(modelViewMatrixLoc, false, mv.flatten(modelViewMatrix));
@@ -166,13 +167,23 @@
 
 <div class="flex flex-col justify-center items-start w-4/5 text-xl m-auto">
     <div class="w-4/5 m-auto">
-        <p>Create a rectangle with vertices (-4, -1, -1), (4, -1, -1), (4, -1, -21), (-4, -1, -21). Set up a perspective camera with a 90° field of view. Use the default view matrix and draw the rectangle in white on a blue background.</p>
-        <p>Map a procedurally generated checkerboard texture to the rectangle using the following steps:</p>
-        <p>1) Create a texture object and bind it as the current 2D texture object. [Angel 7.5.1]</p>
-        <p>2) Generate a 64x64 resolution texture image that forms an 8x8 black-and-white checkerboard, and set it to be used with the currently bound 2D texture. [Angel 7.5.2]</p>
-        <p>3) Create texture coordinates (-1.5, 0.0), (2.5, 0.0), (2.5, 10.0), (-1.5, 10.0) for your rectangle, such that the texture repeats four times along the width and ten times along the length of the rectangle. Set up the texture coordinates to be received as an attribute in the vertex shader. [Angel 7.5.3]</p>
-        <p>4) Set up the texture map as a uniform sampler2D in the fragment shader and link this sampler to the default texture (0). Pass the texture coordinates to the fragment shader and use them to replace the fragment color with a color from the texture map. [Angel 7.5.3]</p>
-        <p>5) Set the texture filtering parameters to use nearest point sampling. This ensures texture completeness. You should now be able to draw the texture mapped rectangle. [Angel 7.5.4]</p>
+        <p>The scene to be rendered consists of three quadrilaterals (quads). One is a large texture mapped quad in the plane $y=-1\ (x\in[-2,2], z\in[-1,-5])$, the others are smaller quads colored red. Let us refer to the large quad as the ground.</p>
+        <p>One of the two smaller quads should be parallel to $y=-1$, but placed above the ground $(y=-0.5,\ x\in[0.25,0.75],\ z\in[-1.25,-1.75])$.</p>
+        <p>The other should be perpendicular to $y=-1$ with two vertices intersecting the ground $(x=-1,\ y\in[-1,0],\ z\in[-2.5,-3])$.</p>
+        <p>Create a WebGL program that draws this scene. Here are some steps:</p> 
+        <ul>
+            <li>Start from Part 1 of Worksheet 6. Use the coordinates given above to set the vertex coordinates of the ground. Adjust the texture coordinates of the ground so that the texture fills out the square without being repeated.</li>
+            <li>Replace the checkerboard texture by the texture image in xamp23.png (available on DTU Learn).</li>
+            <li>In initialization, switch to gl.TEXTURE1 using gl.activeTexture and create a new texture of $1\times1$ resolution, where you store just a single red color: Uint8Array([255, 0, 0]). [Angel 7.5.6]</li>
+            <li>Add the two smaller quads to your vertex and texture coordinate buffers. Draw the ground quad with texture 0 and the smaller red quads with texture 1. [Angel 7.5.6]</li>
+        </ul>
+
+        <Admonition type='tip'>
+            {#snippet textContent()}
+                <p>In WebGPU, create two different bind groups: one using the marble texture loaded from xamp23.png and one using the red texture. In the render pass, set the first bind group when drawing the ground quad and the second bind group when drawing the two red quads.</p>
+                <p>For Part 2, create a third bind group that uses the red texture but a new buffer for uniform matrix variables suitable for the projection shadows. Use the third bind group when drawing the shadow polygons.</p>
+            {/snippet}
+        </Admonition>
     </div>
 
     <Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets} folderPath={$page.url.pathname}/>

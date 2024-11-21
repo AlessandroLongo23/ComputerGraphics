@@ -1,7 +1,7 @@
 window.onload = () => {
     setupWebGL();
 
-    initializeVertices();
+    initVertices();
 
     render();
 }
@@ -10,7 +10,7 @@ const setupWebGL = () => {
     canvas = document.getElementById("gl-canvas");
     gl = WebGLUtils.setupWebGL(canvas);
     if (!gl) {
-        alert("WebGL isn’t available");
+        alert("WebGL isn't available");
         return;
     }
 
@@ -21,7 +21,7 @@ const setupWebGL = () => {
     gl.useProgram(program);
 }
 
-const initializeVertices = () => {
+const initVertices = () => {
     vertices = [ 
         vec2(0.0, 0.0), vec2(1.0, 0.0), vec2(1.0, 1.0)
     ];

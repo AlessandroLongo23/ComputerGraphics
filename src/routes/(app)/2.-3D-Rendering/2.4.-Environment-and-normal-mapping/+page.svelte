@@ -1,13 +1,4 @@
-<script>
-    import { page } from '$app/stores'
-    import { getChildren } from '$lib/data/pages.svelte.js';
-    import Section from "$lib/components/Section.svelte";
-
-    let sections = getChildren($page.url.pathname);
-</script>
-
-<div class="flex flex-row justify-evenly items-center w-3/4 m-auto">
-    {#each sections as section}
-        <Section title={section}></Section> 
-    {/each}
+<div class="flex flex-col gap-1 items-start w-1/2 m-auto">
+    <p>The purpose of this set of exercises is to become familiar with the concepts behind environment mapping and normal mapping.</p>
+    <p>We will use environment mapping to render a curved reflector and, in the process, learn how to use cube maps and the reflection function. We will also use normal mapping to add scale-like surface details.</p>
 </div>

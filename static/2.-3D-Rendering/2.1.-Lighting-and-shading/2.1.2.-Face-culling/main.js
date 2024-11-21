@@ -1,56 +1,64 @@
 window.onload = () => {
     setupWebGL();
 
-    gl.enable(gl.DEPTH_TEST);
-    gl.enable(gl.CULL_FACE);
-    gl.cullFace(gl.BACK);
+    baseVertices = [
+        vec4(0.0, 0.0, -1.0, 1), 
+        vec4(0.0, 0.942809, 0.333333, 1),
+        vec4(-0.816497, -0.471405, 0.333333, 1),
+        vec4(0.816497, -0.471405, 0.333333, 1)
+    ]
 
-    v0 = vec4(0.0, 0.0, -1.0, 1); 
-    v1 = vec4(0.0, 0.942809, 0.333333, 1);
-    v2 = vec4(-0.816497, -0.471405, 0.333333, 1);
-    v3 = vec4(0.816497, -0.471405, 0.333333, 1);
-
-    colors = [];
-    var cBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, flatten(colors), gl.STATIC_DRAW);
-    var vColor = gl.getAttribLocation(program, "vColor");
-    gl.vertexAttribPointer(vColor, 4, gl.FLOAT, false, 0, 0);
-    gl.enableVertexAttribArray(vColor);
-    
     subdivisions = 1;
-    thetaY = 30;
-    
-    buildPolyhedron();
 
-    modelViewMatrixLoc = gl.getUniformLocation(program, "modelViewMatrix");
-    projectionMatrixLoc = gl.getUniformLocation(program, "projectionMatrix");
+    initMatrices();
+    buildPolyhedron();
 
     render();
 };
 
-document.getElementById("increment-subdivision-level").addEventListener("click", () => {
-    if (subdivisions > 6)
-        alert("Maximum subdivision level reached!");
-    else
-        subdivisions++;
+const setupWebGL = () => {
+    canvas = document.getElementById("gl-canvas");
 
-    buildPolyhedron();
-});
+    gl = WebGLUtils.setupWebGL(canvas);
+    if (!gl) {
+        alert("WebGL isn't available");
+        return;
+    }
 
-document.getElementById("decrement-subdivision-level").addEventListener("click", () => {
-    if (subdivisions == 0)
-        alert("subdivision level is already 0!");
-    else
-        subdivisions--;
+    gl.enable(gl.DEPTH_TEST);
+    gl.enable(gl.CULL_FACE);
+    gl.cullFace(gl.FRONT);
 
-    buildPolyhedron();
-});
+    gl.viewport(0, 0, canvas.width, canvas.height);
+    gl.clearColor(0.3921, 0.5843, 0.9294, 1.0);
+
+    program = initShaders(gl, "vshader.glsl", "fshader.glsl");
+    gl.useProgram(program);
+}
+
+const initMatrices = () => {
+    projectionMatrixLoc = gl.getUniformLocation(program, "projectionMatrix");
+    projectionMatrix = perspective(45, canvas.width / canvas.height, .001, 10.0);
+    gl.uniformMatrix4fv(projectionMatrixLoc, false, flatten(projectionMatrix));
+
+    viewMatrixLoc = gl.getUniformLocation(program, "viewMatrix");
+    dist = 4.0;
+    thetaY = 30;
+    eye = vec3(dist * Math.cos(thetaY), 0.0, dist * Math.sin(thetaY));
+    at = vec3(0.0, 0.0, 0.0);
+    up = vec3(0.0, 1.0, 0.0);
+    viewMatrix = lookAt(eye, at, up);
+    gl.uniformMatrix4fv(viewMatrixLoc, false, flatten(viewMatrix));
+
+    modelMatrixLoc = gl.getUniformLocation(program, "modelMatrix");
+    modelMatrix = mat4();
+    gl.uniformMatrix4fv(modelMatrixLoc, false, flatten(modelMatrix));
+};
 
 const buildPolyhedron = () => {
     vertices = [];
     colors = [];
-    tetrahedron(v0, v1, v2, v3, subdivisions);
+    tetrahedron(baseVertices[0], baseVertices[1], baseVertices[2], baseVertices[3], subdivisions);
 
     vBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
@@ -59,37 +67,19 @@ const buildPolyhedron = () => {
     gl.vertexAttribPointer(vPosition, 4, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(vPosition);
 
-    var cBuffer = gl.createBuffer();
+    cBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, flatten(colors), gl.STATIC_DRAW);
     var vColor = gl.getAttribLocation(program, "vColor");
-    gl.vertexAttribPointer(vColor, 3, gl.FLOAT, false, 0, 0);
+    gl.vertexAttribPointer(vColor, 4, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(vColor);
-}
-
-const render = () => {
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
-    var projectionMatrix = perspective(45, canvas.width / canvas.height, .001, 10.0);
-    gl.uniformMatrix4fv(projectionMatrixLoc, false, flatten(projectionMatrix));
-
-    thetaY += 0.025;
-
-    var ctm = mat4();
-    ctm = mult(ctm, translate(0, 0, -3));
-    ctm = mult(ctm, rotateY(thetaY));
-    gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(ctm));
-    
-    gl.drawArrays(gl.TRIANGLES, 0, vertices.length);
-
-    requestAnimFrame(render);
-}
+};
 
 const tetrahedron = (a, b, c, d, n) => {
-    divideTriangle(a, b, c, n, 0);
-    divideTriangle(d, c, b, n, 1);
-    divideTriangle(a, d, b, n, 2);
-    divideTriangle(a, c, d, n, 3);
+    divideTriangle(a, b, c, n);
+    divideTriangle(d, c, b, n);
+    divideTriangle(a, d, b, n);
+    divideTriangle(a, c, d, n);
 }
 
 const divideTriangle = (a, b, c, count) => {
@@ -110,25 +100,43 @@ const divideTriangle = (a, b, c, count) => {
 
 const triangle = (a, b, c) => {
     vertices.push(a);
-    colors.push(vec3(0.5 * a[0] + 0.5, 0.5 * a[1] + 0.5, 0.5 * a[2] + 0.5))
+    colors.push(vec4(0.5 * a[0] + 0.5, 0.5 * a[1] + 0.5, 0.5 * a[2] + 0.5, 1.0))
     vertices.push(b);
-    colors.push(vec3(0.5 * b[0] + 0.5, 0.5 * b[1] + 0.5, 0.5 * b[2] + 0.5))
+    colors.push(vec4(0.5 * b[0] + 0.5, 0.5 * b[1] + 0.5, 0.5 * b[2] + 0.5, 1.0))
     vertices.push(c);
-    colors.push(vec3(0.5 * c[0] + 0.5, 0.5 * c[1] + 0.5, 0.5 * c[2] + 0.5))
+    colors.push(vec4(0.5 * c[0] + 0.5, 0.5 * c[1] + 0.5, 0.5 * c[2] + 0.5, 1.0))
 }
 
-const setupWebGL = () => {
-    canvas = document.getElementById("gl-canvas");
+const render = () => {
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-    gl = WebGLUtils.setupWebGL(canvas);
-    if (!gl) {
-        alert("WebGL isn’t available");
-        return;
-    }
+    updateCamera();
+    gl.drawArrays(gl.TRIANGLES, 0, vertices.length);
 
-    gl.viewport(0, 0, canvas.width, canvas.height);
-    gl.clearColor(0.3921, 0.5843, 0.9294, 1.0);
-
-    program = initShaders(gl, "vshader.glsl", "fshader.glsl");
-    gl.useProgram(program);
+    requestAnimFrame(render);
 }
+
+const updateCamera = () => {
+    thetaY += 0.005;
+    eye = vec3(dist * Math.cos(thetaY), 0.0, dist * Math.sin(thetaY));
+    viewMatrix = lookAt(eye, at, up);
+    gl.uniformMatrix4fv(viewMatrixLoc, false, flatten(viewMatrix));
+}
+
+document.getElementById("increment-subdivision-level").addEventListener("click", () => {
+    if (subdivisions > 6)
+        alert("Maximum subdivision level reached!");
+    else
+        subdivisions++;
+
+    buildPolyhedron();
+});
+
+document.getElementById("decrement-subdivision-level").addEventListener("click", () => {
+    if (subdivisions == 0)
+        alert("subdivision level is already 0!");
+    else
+        subdivisions--;
+
+    buildPolyhedron();
+});

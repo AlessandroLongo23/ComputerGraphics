@@ -83,8 +83,10 @@ function mat3() {
         break;
 
     default:
-        m.push(vec3(v));  v.splice(0, 3);
-        m.push(vec3(v));  v.splice(0, 3);
+        m.push(vec3(v));  
+        v.splice(0, 3);
+        m.push(vec3(v));  
+        v.splice(0, 3);
         m.push(vec3(v));
         break;
     }

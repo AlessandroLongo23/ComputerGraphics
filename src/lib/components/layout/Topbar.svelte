@@ -29,15 +29,19 @@
         const parts = title.split('.');
         const count = parts.length - 1;
         
-        if (count === 1) {
-            subtitle = 'Section ' + parts[0] + '.';
-            title = parts[1].trim();
-        } else if (count === 2) {
-            subtitle = 'Chapter ' + parts[0] + '.' + parts[1] + '.';
-            title = parts[2].trim();
-        } else if (count === 3) {
-            subtitle = 'Exercise ' + parts[0] + '.' + parts[1] + '.' + parts[2] + '.';
-            title = parts[3].trim();
+        switch (count) {
+            case 1:
+                subtitle = 'Section ' + parts[0] + '.';
+                title = parts[1].trim();
+                break;
+            case 2:
+                subtitle = 'Chapter ' + parts[0] + '.' + parts[1] + '.';
+                title = parts[2].trim();
+                break;
+            case 3:
+                subtitle = 'Exercise ' + parts[0] + '.' + parts[1] + '.' + parts[2] + '.';
+                title = parts[3].trim();
+                break;
         }
 
         return [title, subtitle];
@@ -50,10 +54,10 @@
 <div class="flex flex-row justify-center items-center faded-border mx-16 mb-8 py-4">
     {#if previousPageUrl && $page.url.pathname != "/home"}
         <a href="{previousPageUrl}" aria-label="Previous page">
-            <i class="fa-solid fa-arrow-left text-2xl mx-6 m-auto text-black"></i>
+            <i class="fa-solid fa-arrow-left text-2xl mx-6 m-auto {$themeIndex == 0 ? 'text-black' : 'text-white'}"></i>
         </a>
     {:else}
-        <i class="px-6 text-black"></i>
+        <i class="px-6 {$themeIndex == 0 ? 'text-black' : 'text-white'}"></i>
     {/if}
 
     <div class="flex flex-col justify-center items-center {subtitle ? '' : 'my-4'} w-1/2">
@@ -65,10 +69,10 @@
 
     {#if nextPageUrl && $page.url.pathname != "/home"}
         <a href="{nextPageUrl}" aria-label="Next page">
-            <i class="fa-solid fa-arrow-right text-2xl mx-6 m-auto text-black"></i>
+            <i class="fa-solid fa-arrow-right text-2xl mx-6 m-auto {$themeIndex == 0 ? 'text-black' : 'text-white'}"></i>
         </a>
     {:else}
-        <i class="px-6 text-black"></i>
+        <i class="px-6 {$themeIndex == 0 ? 'text-black' : 'text-white'}"></i>
     {/if}
 
     <div class="absolute right-8">
@@ -77,10 +81,6 @@
 </div>
 
 <style>
-    /* :root {
-        --color: {$themeIndex ? '#000' : '#fff'};
-    } */
-
     .faded-border {
         position: relative;
     }
