@@ -2,7 +2,7 @@
     import { onMount } from 'svelte';
     import { page } from '$app/stores'
     import { WebGLUtils, fetchCodeSnippets, initShaders, convertToLatex } from '$lib/utils.svelte.js';
-    import * as mv from '$lib/Libraries/MV.js';
+    import { vec3, vec4, flatten, perspective, lookAt, mat4, normalize, mix } from '$lib/Libraries/MV.js';
     import Result from '$lib/components/Result.svelte';
     import Counter from '$lib/components/UI/Counter.svelte';
     import Slider from '$lib/components/UI/Slider.svelte';
@@ -30,43 +30,39 @@
             gl.viewport(0, 0, canvas.width, canvas.height);
             gl.clearColor(0.3921, 0.5843, 0.9294, 1.0);
 
-            try {
-                [gl, program] = await initShaders(gl, program, $page.url.pathname + '/vshader.glsl', $page.url.pathname + '/fshader.glsl');
+            program = await initShaders(gl, program, $page.url.pathname + '/vshader.glsl', $page.url.pathname + '/fshader.glsl');
 
-                gl.enable(gl.DEPTH_TEST);
-                gl.enable(gl.CULL_FACE);
-                gl.cullFace(gl.FRONT);
+            gl.enable(gl.DEPTH_TEST);
+            gl.enable(gl.CULL_FACE);
+            gl.cullFace(gl.FRONT);
 
-                eyeLoc = gl.getUniformLocation(program, "eye");
+            eyeLoc = gl.getUniformLocation(program, "eye");
 
-                var lightDirection = mv.vec3(0.0, 0.0, -1.0);
-                var lightDirectionLoc = gl.getUniformLocation(program, "lightDirection");
-                gl.uniform3fv(lightDirectionLoc, mv.flatten(lightDirection));
+            var lightDirection = vec3(0.0, 0.0, -1.0);
+            var lightDirectionLoc = gl.getUniformLocation(program, "lightDirection");
+            gl.uniform3fv(lightDirectionLoc, flatten(lightDirection));
 
-                kLoc = gl.getUniformLocation(program, "k");
-                LLoc = gl.getUniformLocation(program, "L");
-                ksLoc = gl.getUniformLocation(program, "ks");
-                sLoc = gl.getUniformLocation(program, "s");
-                k = L = ks = 0.5;
-                s = 2.0;
+            kLoc = gl.getUniformLocation(program, "k");
+            LLoc = gl.getUniformLocation(program, "L");
+            ksLoc = gl.getUniformLocation(program, "ks");
+            sLoc = gl.getUniformLocation(program, "s");
+            k = L = ks = 0.5;
+            s = 2.0;
 
-                viewMatrixLoc = gl.getUniformLocation(program, "viewMatrix");
-                modelMatrixLoc = gl.getUniformLocation(program, "modelMatrix");
-                projectionMatrixLoc = gl.getUniformLocation(program, "projectionMatrix");
+            viewMatrixLoc = gl.getUniformLocation(program, "viewMatrix");
+            modelMatrixLoc = gl.getUniformLocation(program, "modelMatrix");
+            projectionMatrixLoc = gl.getUniformLocation(program, "projectionMatrix");
 
-                vertices = [];
-                v0 = mv.vec4(0.0, 0.0, -1.0, 1); 
-                v1 = mv.vec4(0.0, 0.942809, 0.333333, 1);
-                v2 = mv.vec4(-0.816497, -0.471405, 0.333333, 1);
-                v3 = mv.vec4(0.816497, -0.471405, 0.333333, 1);
+            vertices = [];
+            v0 = vec4(0.0, 0.0, -1.0, 1); 
+            v1 = vec4(0.0, 0.942809, 0.333333, 1);
+            v2 = vec4(-0.816497, -0.471405, 0.333333, 1);
+            v3 = vec4(0.816497, -0.471405, 0.333333, 1);
 
-                subdivisions = 6;
-                
-                buildPolyhedron();
-                render();
-            } catch (error) {
-                console.error(error);
-            }
+            subdivisions = 6;
+            
+            buildPolyhedron();
+            render();
 
             codeSnippets = await fetchCodeSnippets($page.url.pathname);
             isLoading = false;
@@ -78,22 +74,22 @@
 
         thetaY += 0.005;
 
-        var projectionMatrix = mv.perspective(45, canvas.width / canvas.height, 0.1, 100.0);
+        var projectionMatrix = perspective(45, canvas.width / canvas.height, 0.1, 100.0);
 
         var dist = 5.0;
-        var eye = mv.vec3(dist * Math.cos(thetaY), 0.0, dist * Math.sin(thetaY));
-        var at = mv.vec3(0.0, 0.0, 0.0);
-        var up = mv.vec3(0.0, 1.0, 0.0);
-        var viewMatrix = mv.lookAt(eye, at, up);
+        var eye = vec3(dist * Math.cos(thetaY), 0.0, dist * Math.sin(thetaY));
+        var at = vec3(0.0, 0.0, 0.0);
+        var up = vec3(0.0, 1.0, 0.0);
+        var viewMatrix = lookAt(eye, at, up);
 
-        var modelMatrix = mv.mat4();
+        var modelMatrix = mat4();
 
         updateLighting();
 
-        gl.uniformMatrix4fv(modelMatrixLoc, false, mv.flatten(modelMatrix));
-        gl.uniformMatrix4fv(viewMatrixLoc, false, mv.flatten(viewMatrix));
-        gl.uniformMatrix4fv(projectionMatrixLoc, false, mv.flatten(projectionMatrix));
-        gl.uniform3fv(eyeLoc, mv.flatten(eye));
+        gl.uniformMatrix4fv(modelMatrixLoc, false, flatten(modelMatrix));
+        gl.uniformMatrix4fv(viewMatrixLoc, false, flatten(viewMatrix));
+        gl.uniformMatrix4fv(projectionMatrixLoc, false, flatten(projectionMatrix));
+        gl.uniform3fv(eyeLoc, flatten(eye));
 
         gl.drawArrays(gl.TRIANGLES, 0, vertices.length);
 
@@ -106,7 +102,7 @@
 
         vBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, mv.flatten(vertices), gl.STATIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER, flatten(vertices), gl.STATIC_DRAW);
 
         var vPosition = gl.getAttribLocation(program, "vPosition");
         gl.vertexAttribPointer(vPosition, 4, gl.FLOAT, false, 0, 0);
@@ -126,9 +122,9 @@
             return;
         }
 
-        var ab = mv.normalize(mv.mix(a, b, 0.5), true);
-        var ac = mv.normalize(mv.mix(a, c, 0.5), true);
-        var bc = mv.normalize(mv.mix(b, c, 0.5), true);
+        var ab = normalize(mix(a, b, 0.5), true);
+        var ac = normalize(mix(a, c, 0.5), true);
+        var bc = normalize(mix(b, c, 0.5), true);
 
         divideTriangle(a, ab, ac, count - 1);
         divideTriangle(ab, b, bc, count - 1);

@@ -2,7 +2,7 @@
     import { onMount } from 'svelte';
     import { page } from '$app/stores'
     import { WebGLUtils, fetchCodeSnippets, initShaders, convertToLatex } from '$lib/utils.svelte.js';
-    import * as mv from '$lib/Libraries/MV.js';
+    import { vec2, vec4, flatten } from '$lib/Libraries/MV.js';
     import Result from '$lib/components/Result.svelte'
 
     let isLoading = $state(true);
@@ -22,16 +22,12 @@
             gl.viewport(0, 0, canvas.width, canvas.height);
             gl.clearColor(0.3921, 0.5843, 0.9294, 1.0);
 
-            try {
-                [gl, program] = await initShaders(gl, program, $page.url.pathname + '/vshader.glsl', $page.url.pathname + '/fshader.glsl');
+            program = await initShaders(gl, program, $page.url.pathname + '/vshader.glsl', $page.url.pathname + '/fshader.glsl');
 
-                initVertices();
-                initColors();
+            initVertices();
+            initColors();
 
-                render();
-            } catch (error) {
-                console.error(error);
-            }
+            render();
 
             codeSnippets = await fetchCodeSnippets($page.url.pathname);
             isLoading = false;
@@ -39,11 +35,11 @@
     });
 
     const initVertices = () => {
-        vertices = [ mv.vec2(0.0, 0.0), mv.vec2(1.0, 0.0), mv.vec2(1.0, 1.0) ];
+        vertices = [ vec2(0.0, 0.0), vec2(1.0, 0.0), vec2(1.0, 1.0) ];
 
         var vBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, mv.flatten(vertices), gl.STATIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER, flatten(vertices), gl.STATIC_DRAW);
 
         var vPosition = gl.getAttribLocation(program, "vPosition");
         gl.vertexAttribPointer(vPosition, 2, gl.FLOAT, false, 0, 0);
@@ -52,14 +48,14 @@
 
     const initColors = () => {
         colors = [ 
-            mv.vec4(1.0, 0.0, 0.0, 1.0), 
-            mv.vec4(0.0, 1.0, 0.0, 1.0), 
-            mv.vec4(0.0, 0.0, 1.0, 1.0) 
+            vec4(1.0, 0.0, 0.0, 1.0), 
+            vec4(0.0, 1.0, 0.0, 1.0), 
+            vec4(0.0, 0.0, 1.0, 1.0) 
         ];
 
         var cBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, mv.flatten(colors), gl.STATIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER, flatten(colors), gl.STATIC_DRAW);
 
         var vColor = gl.getAttribLocation(program, "vColor");
         gl.vertexAttribPointer(vColor, 4, gl.FLOAT, false, 0, 0);

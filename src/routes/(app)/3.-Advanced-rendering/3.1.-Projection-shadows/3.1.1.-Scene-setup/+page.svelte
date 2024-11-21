@@ -2,7 +2,7 @@
     import { onMount } from 'svelte';
     import { page } from '$app/stores'
     import { WebGLUtils, fetchCodeSnippets, initShaders, convertToLatex } from '$lib/utils.svelte.js';
-    import * as mv from '$lib/Libraries/MV.js';
+    import { vec2, vec4, flatten, perspective, mat4 } from '$lib/Libraries/MV.js';
     import Result from '$lib/components/Result.svelte';
     import Admonition from '$lib/components/UI/Admonition.svelte';
 
@@ -26,22 +26,18 @@
             gl.viewport(0, 0, canvas.width, canvas.height);
             gl.clearColor(0.3921, 0.5843, 0.9294, 1.0);
 
-            try {
-                [gl, program] = await initShaders(gl, program, $page.url.pathname + '/vshader.glsl', $page.url.pathname + '/fshader.glsl');
+            program = await initShaders(gl, program, $page.url.pathname + '/vshader.glsl', $page.url.pathname + '/fshader.glsl');
 
-                initVertices();
-                initMatrices();
+            initVertices();
+            initMatrices();
 
-                initGroundTexture();
-                initRectTexture();
-                initTextureCoordinates();
-                
-                isGroundLoc = gl.getUniformLocation(program, "isGround");
+            initGroundTexture();
+            initRectTexture();
+            initTextureCoordinates();
+            
+            isGroundLoc = gl.getUniformLocation(program, "isGround");
 
-                render();
-            } catch (error) {
-                console.error(error);
-            }
+            render();
 
             codeSnippets = await fetchCodeSnippets($page.url.pathname);
             isLoading = false;
@@ -50,30 +46,30 @@
 
     const initVertices = () => {
         vertices = [
-            mv.vec4(-2.0, -1.0, -1.0, 1.0), 
-            mv.vec4(-2.0, -1.0, -5.0, 1.0), 
-            mv.vec4(2.0, -1.0, -5.0, 1.0),
-            mv.vec4(-2.0, -1.0, -1.0, 1.0), 
-            mv.vec4(2.0, -1.0, -5.0, 1.0),
-            mv.vec4(2.0, -1.0, -1.0, 1.0),
+            vec4(-2.0, -1.0, -1.0, 1.0), 
+            vec4(-2.0, -1.0, -5.0, 1.0), 
+            vec4(2.0, -1.0, -5.0, 1.0),
+            vec4(-2.0, -1.0, -1.0, 1.0), 
+            vec4(2.0, -1.0, -5.0, 1.0),
+            vec4(2.0, -1.0, -1.0, 1.0),
 
-            mv.vec4(0.25, -0.5, -1.25, 1.0),
-            mv.vec4(0.25, -0.5, -1.75, 1.0),
-            mv.vec4(0.75, -0.5, -1.75, 1.0),
-            mv.vec4(0.25, -0.5, -1.25, 1.0),
-            mv.vec4(0.75, -0.5, -1.75, 1.0),
-            mv.vec4(0.75, -0.5, -1.25, 1.0),
+            vec4(0.25, -0.5, -1.25, 1.0),
+            vec4(0.25, -0.5, -1.75, 1.0),
+            vec4(0.75, -0.5, -1.75, 1.0),
+            vec4(0.25, -0.5, -1.25, 1.0),
+            vec4(0.75, -0.5, -1.75, 1.0),
+            vec4(0.75, -0.5, -1.25, 1.0),
 
-            mv.vec4(-1.0, -1.0, -2.5, 1.0),
-            mv.vec4(-1.0, -1.0, -3.0, 1.0),
-            mv.vec4(-1.0, -0.0, -3.0, 1.0),
-            mv.vec4(-1.0, -1.0, -2.5, 1.0),
-            mv.vec4(-1.0, -0.0, -3.0, 1.0),
-            mv.vec4(-1.0, -0.0, -2.5, 1.0),
+            vec4(-1.0, -1.0, -2.5, 1.0),
+            vec4(-1.0, -1.0, -3.0, 1.0),
+            vec4(-1.0, -0.0, -3.0, 1.0),
+            vec4(-1.0, -1.0, -2.5, 1.0),
+            vec4(-1.0, -0.0, -3.0, 1.0),
+            vec4(-1.0, -0.0, -2.5, 1.0),
         ];
         var vBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, mv.flatten(vertices), gl.STATIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER, flatten(vertices), gl.STATIC_DRAW);
         var vPosition = gl.getAttribLocation(program, "vPosition");
         gl.vertexAttribPointer(vPosition, 4, gl.FLOAT, false, 0, 0);
         gl.enableVertexAttribArray(vPosition);
@@ -117,13 +113,13 @@
 
     const initTextureCoordinates = () => {
         var textCoords = [
-            mv.vec2(-.5, -.5), mv.vec2(.5, -.5), mv.vec2(.5, .5),
-            mv.vec2(-.5, -.5), mv.vec2(.5, .5), mv.vec2(-.5, .5),
+            vec2(-.5, -.5), vec2(.5, -.5), vec2(.5, .5),
+            vec2(-.5, -.5), vec2(.5, .5), vec2(-.5, .5),
         ];
 
         var tBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, tBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, mv.flatten(textCoords), gl.STATIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER, flatten(textCoords), gl.STATIC_DRAW);
         var vTexCoord = gl.getAttribLocation(program, "vTexCoord");
         gl.vertexAttribPointer(vTexCoord, 2, gl.FLOAT, false, 0, 0);
         gl.enableVertexAttribArray(vTexCoord);
@@ -131,12 +127,12 @@
 
     const initMatrices = () => {
         modelViewMatrixLoc = gl.getUniformLocation(program, "modelViewMatrix");
-        var modelViewMatrix = mv.mat4();
-        gl.uniformMatrix4fv(modelViewMatrixLoc, false, mv.flatten(modelViewMatrix));
+        var modelViewMatrix = mat4();
+        gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
 
         projectionMatrixLoc = gl.getUniformLocation(program, "projectionMatrix");
-        var projectionMatrix = mv.perspective(90, canvas.width / canvas.height, .1, 30.0);
-        gl.uniformMatrix4fv(projectionMatrixLoc, false, mv.flatten(projectionMatrix));
+        var projectionMatrix = perspective(90, canvas.width / canvas.height, .1, 30.0);
+        gl.uniformMatrix4fv(projectionMatrixLoc, false, flatten(projectionMatrix));
     }
 
     const render = () => {

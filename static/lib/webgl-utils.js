@@ -44,9 +44,9 @@ WebGLUtils = function() {
 			try {
 				context = canvas.getContext(names[ii], opt_attribs);
 			} catch(e) {}
-			if (context) {
+
+			if (context)
 				break;
-			}
 		}
 		return context;
 	}

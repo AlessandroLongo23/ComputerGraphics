@@ -106,7 +106,7 @@ const buildPolyhedron = () => {
     gl.enableVertexAttribArray(vNormal);
 }
 
-const tetrahedron = (a, b, c, d, n) => {
+export const tetrahedron = (a, b, c, d, n) => {
     divideTriangle(a, b, c, n);
     divideTriangle(d, c, b, n);
     divideTriangle(a, d, b, n);

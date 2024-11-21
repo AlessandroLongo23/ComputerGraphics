@@ -3,7 +3,7 @@
     import { page } from '$app/stores'
     import { WebGLUtils, fetchCodeSnippets, initShaders, convertToLatex } from '$lib/utils.svelte.js';
     import { RotateCw } from 'lucide-svelte';
-    import * as mv from '$lib/Libraries/MV.js';
+    import { add, mult, vec2, flatten } from '$lib/Libraries/MV.js';
     import Result from '$lib/components/Result.svelte';
 
     let viewIndex = $state(1);
@@ -14,7 +14,7 @@
 
     let vertices = [];
     let vel, pos, posLoc, date, deltaTime, t1, t2, damp, airFriction, radFriction, num, rad;
-    const acc = mv.vec2(0.0, -9.81);
+    const acc = vec2(0.0, -9.81);
 
     onMount(async () => {
         if (typeof window !== 'undefined') {
@@ -24,39 +24,35 @@
             gl.viewport(0, 0, canvas.width, canvas.height);
             gl.clearColor(0.3921, 0.5843, 0.9294, 1.0);
 
-            try {
-                [gl, program] = await initShaders(gl, program, $page.url.pathname + '/vshader.glsl', $page.url.pathname + '/fshader.glsl');
+            program = await initShaders(gl, program, $page.url.pathname + '/vshader.glsl', $page.url.pathname + '/fshader.glsl');
 
-                initBall();
-                posLoc = gl.getUniformLocation(program, "pos");
+            initBall();
+            posLoc = gl.getUniformLocation(program, "pos");
 
-                gl.useProgram(program);
-                
-                date = new Date;
-                deltaTime = 0.0;
-                t1 = date.getTime();
-                damp = mv.vec2(0.75, 0.5);
-                airFriction = 0.99;
-                radFriction = 0.90;
+            gl.useProgram(program);
+            
+            date = new Date;
+            deltaTime = 0.0;
+            t1 = date.getTime();
+            damp = vec2(0.75, 0.5);
+            airFriction = 0.99;
+            radFriction = 0.90;
 
-                num = 100;
-                rad = 0.5;
-                vertices = [mv.vec2(0, 0)];
-                for (var angle = 0; angle <= Math.PI * 2; angle += Math.PI * 2 / num)
-                    vertices.push(mv.vec2(rad * Math.cos(angle), rad * Math.sin(angle)));
+            num = 100;
+            rad = 0.5;
+            vertices = [vec2(0, 0)];
+            for (var angle = 0; angle <= Math.PI * 2; angle += Math.PI * 2 / num)
+                vertices.push(vec2(rad * Math.cos(angle), rad * Math.sin(angle)));
 
-                var vBuffer = gl.createBuffer();
-                gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
-                gl.bufferData(gl.ARRAY_BUFFER, mv.flatten(vertices), gl.STATIC_DRAW);
+            var vBuffer = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
+            gl.bufferData(gl.ARRAY_BUFFER, flatten(vertices), gl.STATIC_DRAW);
 
-                var vPosition = gl.getAttribLocation(program, "vPosition");
-                gl.vertexAttribPointer(vPosition, 2, gl.FLOAT, false, 0, 0);
-                gl.enableVertexAttribArray(vPosition);
+            var vPosition = gl.getAttribLocation(program, "vPosition");
+            gl.vertexAttribPointer(vPosition, 2, gl.FLOAT, false, 0, 0);
+            gl.enableVertexAttribArray(vPosition);
 
-                render();
-            } catch (error) {
-                console.error(error);
-            }
+            render();
 
             codeSnippets = await fetchCodeSnippets($page.url.pathname);
             isLoading = false;
@@ -80,16 +76,16 @@
     }
 
     const update = () => {
-        pos = mv.add(pos, mv.mult(vel, deltaTime));
+        pos = add(pos, mult(vel, deltaTime));
         if (Math.abs(pos[1] + 0.5) > 0.015 || Math.abs(vel[1]) > 0.015)
-            vel = mv.add(vel, mv.mult(acc, deltaTime));
+            vel = add(vel, mult(acc, deltaTime));
         else { 
             pos[1] = -0.5;
             vel[1] = 0.0;
             vel[0] = vel[0] * radFriction;
         }
 
-        vel = mv.mult(vel, airFriction);
+        vel = mult(vel, airFriction);
     }
 
     const bounce = () => {
@@ -112,8 +108,8 @@
     }
 
     const initBall = () => {
-        vel = mv.vec2(Math.random() * 20 - 10, Math.random() * 20 - 10);
-        pos = mv.vec2(Math.random() - 0.5, Math.random() - 0.5);
+        vel = vec2(Math.random() * 20 - 10, Math.random() * 20 - 10);
+        pos = vec2(Math.random() - 0.5, Math.random() - 0.5);
     }
 </script>
 

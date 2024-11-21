@@ -2,7 +2,7 @@
     import { onMount } from 'svelte';
     import { page } from '$app/stores'
     import { WebGLUtils, fetchCodeSnippets, initShaders, convertToLatex } from '$lib/utils.svelte.js';
-    import * as mv from '$lib/Libraries/MV.js';
+    import { vec3, vec4, flatten, perspective, mat4, normalize, mix, lookAt } from '$lib/Libraries/MV.js';
     import Result from '$lib/components/Result.svelte';
 
     let viewIndex = $state(1);
@@ -32,86 +32,82 @@
             gl.viewport(0, 0, canvas.width, canvas.height);
             gl.clearColor(0.3921, 0.5843, 0.9294, 1.0);
 
-            try {
-                [gl, program] = await initShaders(gl, program, $page.url.pathname + '/vshader.glsl', $page.url.pathname + '/fshader.glsl');
+            program = await initShaders(gl, program, $page.url.pathname + '/vshader.glsl', $page.url.pathname + '/fshader.glsl');
 
-                gl.enable(gl.DEPTH_TEST);
-                gl.enable(gl.CULL_FACE);
-                gl.cullFace(gl.FRONT);
+            gl.enable(gl.DEPTH_TEST);
+            gl.enable(gl.CULL_FACE);
+            gl.cullFace(gl.FRONT);
 
-                var lightDirection = mv.vec3(0.0, 0.0, 1.0);
-                var lightDirectionLoc = gl.getUniformLocation(program, "lightDirection");
-                gl.uniform3fv(lightDirectionLoc, mv.flatten(lightDirection));
+            var lightDirection = vec3(0.0, 0.0, 1.0);
+            var lightDirectionLoc = gl.getUniformLocation(program, "lightDirection");
+            gl.uniform3fv(lightDirectionLoc, flatten(lightDirection));
 
-                viewMatrixLoc = gl.getUniformLocation(program, "viewMatrix");
-                modelMatrixLoc = gl.getUniformLocation(program, "modelMatrix");
-                projectionMatrixLoc = gl.getUniformLocation(program, "projectionMatrix");
+            viewMatrixLoc = gl.getUniformLocation(program, "viewMatrix");
+            modelMatrixLoc = gl.getUniformLocation(program, "modelMatrix");
+            projectionMatrixLoc = gl.getUniformLocation(program, "projectionMatrix");
 
-                vertices = [];
-                v0 = mv.vec4(0.0, 0.0, -1.0, 1); 
-                v1 = mv.vec4(0.0, 0.942809, 0.333333, 1);
-                v2 = mv.vec4(-0.816497, -0.471405, 0.333333, 1);
-                v3 = mv.vec4(0.816497, -0.471405, 0.333333, 1);
+            vertices = [];
+            v0 = vec4(0.0, 0.0, -1.0, 1); 
+            v1 = vec4(0.0, 0.942809, 0.333333, 1);
+            v2 = vec4(-0.816497, -0.471405, 0.333333, 1);
+            v3 = vec4(0.816497, -0.471405, 0.333333, 1);
 
-                normals = [];
-                textures = [
-                    "/assets/textures/earth/base.jpg", 
-                    "/assets/textures/earth/night.jpg", 
-                    "/assets/textures/earth/clouds.jpg", 
-                    "/assets/textures/earth/height.jpg",
-                    "/assets/textures/moon/base.jpg",
-                    "/assets/textures/moon/height.jpg",
-                    "/assets/textures/moon/normal.jpg",
-                    "/assets/textures/space.jpg"
-                ];
+            normals = [];
+            textures = [
+                "/assets/textures/earth/base.jpg", 
+                "/assets/textures/earth/night.jpg", 
+                "/assets/textures/earth/clouds.jpg", 
+                "/assets/textures/earth/height.jpg",
+                "/assets/textures/moon/base.jpg",
+                "/assets/textures/moon/height.jpg",
+                "/assets/textures/moon/normal.jpg",
+                "/assets/textures/space.jpg"
+            ];
 
-                loadImages(textures, function(images) {
-                    var textures = [];
-                    images.forEach((image, index) => {
-                        const texture = gl.createTexture();
-                        gl.activeTexture(gl[`TEXTURE${index}`]);
-                        gl.bindTexture(gl.TEXTURE_2D, texture);
-                        
-                        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-                        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-                        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-                        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-                
-                        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
-                        gl.generateMipmap(gl.TEXTURE_2D);
-                
-                        textures.push(texture);
-                    });
-                
-                    gl.uniform1i(gl.getUniformLocation(program, "earthTexMap"), 0);
-                    gl.uniform1i(gl.getUniformLocation(program, "nightTexMap"), 1);
-                    gl.uniform1i(gl.getUniformLocation(program, "cloudTexMap"), 2);
-                    gl.uniform1i(gl.getUniformLocation(program, "heightTexMap"), 3);
-                    gl.uniform1i(gl.getUniformLocation(program, "moonTexMap"), 4);
-                    gl.uniform1i(gl.getUniformLocation(program, "moonHeightTexMap"), 5);
-                    gl.uniform1i(gl.getUniformLocation(program, "moonNormalTexMap"), 6);
-                    gl.uniform1i(gl.getUniformLocation(program, "spaceTexMap"), 7);
-                
-                    subdivisions = 9;
-                    lightAngle = 0;
-                
-                    buildPolyhedron();
-                    render();
-
-                    dist = 3.0;
-                    cameraPos = {
-                        x: dist,
-                        y: 0
-                    }
-                    isDragging = false;
-                    mousePrev = {
-                        x: 0,
-                        y: 0,
-                    }
+            loadImages(textures, function(images) {
+                var textures = [];
+                images.forEach((image, index) => {
+                    const texture = gl.createTexture();
+                    gl.activeTexture(gl[`TEXTURE${index}`]);
+                    gl.bindTexture(gl.TEXTURE_2D, texture);
+                    
+                    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+                    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+                    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+                    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+            
+                    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+                    gl.generateMipmap(gl.TEXTURE_2D);
+            
+                    textures.push(texture);
                 });
-            } catch (error) {
-                console.error(error);
-            }
+            
+                gl.uniform1i(gl.getUniformLocation(program, "earthTexMap"), 0);
+                gl.uniform1i(gl.getUniformLocation(program, "nightTexMap"), 1);
+                gl.uniform1i(gl.getUniformLocation(program, "cloudTexMap"), 2);
+                gl.uniform1i(gl.getUniformLocation(program, "heightTexMap"), 3);
+                gl.uniform1i(gl.getUniformLocation(program, "moonTexMap"), 4);
+                gl.uniform1i(gl.getUniformLocation(program, "moonHeightTexMap"), 5);
+                gl.uniform1i(gl.getUniformLocation(program, "moonNormalTexMap"), 6);
+                gl.uniform1i(gl.getUniformLocation(program, "spaceTexMap"), 7);
+            
+                subdivisions = 9;
+                lightAngle = 0;
+            
+                buildPolyhedron();
+                render();
+
+                dist = 3.0;
+                cameraPos = {
+                    x: dist,
+                    y: 0
+                }
+                isDragging = false;
+                mousePrev = {
+                    x: 0,
+                    y: 0,
+                }
+            });
 
             codeSnippets = await fetchCodeSnippets($page.url.pathname);
             isLoading = false;
@@ -129,26 +125,26 @@
 
         lightAngle += 0.005;
 
-        var lightDirection = mv.vec3(Math.cos(lightAngle), 0.0, Math.sin(lightAngle));
+        var lightDirection = vec3(Math.cos(lightAngle), 0.0, Math.sin(lightAngle));
         var lightDirectionLoc = gl.getUniformLocation(program, "lightDirection");
-        gl.uniform3fv(lightDirectionLoc, mv.flatten(lightDirection));
+        gl.uniform3fv(lightDirectionLoc, flatten(lightDirection));
 
-        var projectionMatrix = mv.perspective(45, canvas.width / canvas.height, 0.1, 100.0);
+        var projectionMatrix = perspective(45, canvas.width / canvas.height, 0.1, 100.0);
 
-        var eye = mv.vec3(
+        var eye = vec3(
             dist * Math.cos(cameraPos.x) * Math.cos(cameraPos.y), 
             dist * Math.sin(cameraPos.y), 
             dist * Math.sin(cameraPos.x) * Math.cos(cameraPos.y)
         );
-        var at = mv.vec3(0.0, 0.0, 0.0);
-        var up = mv.vec3(0.0, 1.0, 0.0);
-        var viewMatrix = mv.lookAt(eye, at, up);
+        var at = vec3(0.0, 0.0, 0.0);
+        var up = vec3(0.0, 1.0, 0.0);
+        var viewMatrix = lookAt(eye, at, up);
 
-        var modelMatrix = mv.mat4();
+        var modelMatrix = mat4();
 
-        gl.uniformMatrix4fv(projectionMatrixLoc, false, mv.flatten(projectionMatrix));
-        gl.uniformMatrix4fv(viewMatrixLoc, false, mv.flatten(viewMatrix));
-        gl.uniformMatrix4fv(modelMatrixLoc, false, mv.flatten(modelMatrix));
+        gl.uniformMatrix4fv(projectionMatrixLoc, false, flatten(projectionMatrix));
+        gl.uniformMatrix4fv(viewMatrixLoc, false, flatten(viewMatrix));
+        gl.uniformMatrix4fv(modelMatrixLoc, false, flatten(modelMatrix));
 
         gl.drawArrays(gl.TRIANGLES, 0, vertices.length);
         
@@ -211,14 +207,14 @@
 
         vBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, mv.flatten(vertices), gl.STATIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER, flatten(vertices), gl.STATIC_DRAW);
         var vPosition = gl.getAttribLocation(program, "vPosition");
         gl.vertexAttribPointer(vPosition, 4, gl.FLOAT, false, 0, 0);
         gl.enableVertexAttribArray(vPosition);
 
         nBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, nBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, mv.flatten(normals), gl.STATIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER, flatten(normals), gl.STATIC_DRAW);
         var vNormal = gl.getAttribLocation(program, "vNormal");
         gl.vertexAttribPointer(vNormal, 4, gl.FLOAT, false, 0, 0);
         gl.enableVertexAttribArray(vNormal);
@@ -237,9 +233,9 @@
             return;
         }
 
-        var ab = mv.normalize(mv.mix(a, b, 0.5), true);
-        var ac = mv.normalize(mv.mix(a, c, 0.5), true);
-        var bc = mv.normalize(mv.mix(b, c, 0.5), true);
+        var ab = normalize(mix(a, b, 0.5), true);
+        var ac = normalize(mix(a, c, 0.5), true);
+        var bc = normalize(mix(b, c, 0.5), true);
 
         divideTriangle(a, ab, ac, count - 1);
         divideTriangle(ab, b, bc, count - 1);

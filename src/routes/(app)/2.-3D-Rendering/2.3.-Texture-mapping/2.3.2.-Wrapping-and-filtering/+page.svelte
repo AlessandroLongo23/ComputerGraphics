@@ -2,7 +2,7 @@
     import { onMount } from 'svelte';
     import { page } from '$app/stores'
     import { WebGLUtils, fetchCodeSnippets, initShaders, convertToLatex } from '$lib/utils.svelte.js';
-    import * as mv from '$lib/Libraries/MV.js';
+    import { vec2, vec4, flatten, perspective, mat4 } from '$lib/Libraries/MV.js';
     import Result from '$lib/components/Result.svelte';
 
     let viewIndex = $state(1);
@@ -23,113 +23,109 @@
             gl.viewport(0, 0, canvas.width, canvas.height);
             gl.clearColor(0.3921, 0.5843, 0.9294, 1.0);
 
-            try {
-                [gl, program] = await initShaders(gl, program, $page.url.pathname + '/vshader.glsl', $page.url.pathname + '/fshader.glsl');
+            program = await initShaders(gl, program, $page.url.pathname + '/vshader.glsl', $page.url.pathname + '/fshader.glsl');
 
-                vertices = [
-                    mv.vec4(-4.0, -1.0, -1.0, 1.0), 
-                    mv.vec4(4.0, -1.0, -1.0, 1.0), 
-                    mv.vec4(4.0, -1.0, -21.0, 1.0),
-                    mv.vec4(-4.0, -1.0, -21.0, 1.0),
-                ];
-                var vBuffer = gl.createBuffer();
-                gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
-                gl.bufferData(gl.ARRAY_BUFFER, mv.flatten(vertices), gl.STATIC_DRAW);
-                var vPosition = gl.getAttribLocation(program, "vPosition");
-                gl.vertexAttribPointer(vPosition, 4, gl.FLOAT, false, 0, 0);
-                gl.enableVertexAttribArray(vPosition);
+            vertices = [
+                vec4(-4.0, -1.0, -1.0, 1.0), 
+                vec4(4.0, -1.0, -1.0, 1.0), 
+                vec4(4.0, -1.0, -21.0, 1.0),
+                vec4(-4.0, -1.0, -21.0, 1.0),
+            ];
+            var vBuffer = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
+            gl.bufferData(gl.ARRAY_BUFFER, flatten(vertices), gl.STATIC_DRAW);
+            var vPosition = gl.getAttribLocation(program, "vPosition");
+            gl.vertexAttribPointer(vPosition, 4, gl.FLOAT, false, 0, 0);
+            gl.enableVertexAttribArray(vPosition);
 
-                gl.activeTexture(gl.TEXTURE0);
-                texture = gl.createTexture();
-                gl.bindTexture(gl.TEXTURE_2D, texture);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-                
-                textureLoc = gl.getUniformLocation(program, "texMap");
-                gl.uniform1i(textureLoc, 0);
+            gl.activeTexture(gl.TEXTURE0);
+            texture = gl.createTexture();
+            gl.bindTexture(gl.TEXTURE_2D, texture);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+            
+            textureLoc = gl.getUniformLocation(program, "texMap");
+            gl.uniform1i(textureLoc, 0);
 
-                var texSize = 64;
-                var numRows = 8;
-                var numCols = 8;
-                var myTexels = new Uint8Array(4 * texSize * texSize);
-                for (var i = 0; i < texSize; ++i) {
-                    for (var j = 0; j < texSize; ++j) {
-                        var patchx = Math.floor(i / (texSize / numRows));
-                        var patchy = Math.floor(j / (texSize / numCols));
-                        var c = patchx % 2 !== patchy % 2 ? 255 : 0;
-                        myTexels[4 * i * texSize + 4 * j] = c;
-                        myTexels[4 * i * texSize + 4 * j + 1] = c;
-                        myTexels[4 * i * texSize + 4 * j + 2] = c;
-                        myTexels[4 * i * texSize + 4 * j + 3] = 255;
-                    }
+            var texSize = 64;
+            var numRows = 8;
+            var numCols = 8;
+            var myTexels = new Uint8Array(4 * texSize * texSize);
+            for (var i = 0; i < texSize; ++i) {
+                for (var j = 0; j < texSize; ++j) {
+                    var patchx = Math.floor(i / (texSize / numRows));
+                    var patchy = Math.floor(j / (texSize / numCols));
+                    var c = patchx % 2 !== patchy % 2 ? 255 : 0;
+                    myTexels[4 * i * texSize + 4 * j] = c;
+                    myTexels[4 * i * texSize + 4 * j + 1] = c;
+                    myTexels[4 * i * texSize + 4 * j + 2] = c;
+                    myTexels[4 * i * texSize + 4 * j + 3] = 255;
                 }
-
-                gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, texSize, texSize, 0, gl.RGBA, gl.UNSIGNED_BYTE, myTexels);
-                gl.generateMipmap(gl.TEXTURE_2D);
-
-                var textCoords = [
-                    mv.vec2(-1.5, 0.0),
-                    mv.vec2(2.5, 0.0),
-                    mv.vec2(2.5, 10.0),
-                    mv.vec2(-1.5, 10.0),
-                ];
-
-                var tBuffer = gl.createBuffer();
-                gl.bindBuffer(gl.ARRAY_BUFFER, tBuffer);
-                gl.bufferData(gl.ARRAY_BUFFER, mv.flatten(textCoords), gl.STATIC_DRAW);
-                var vTexCoord = gl.getAttribLocation(program, "vTexCoord");
-                gl.vertexAttribPointer(vTexCoord, 2, gl.FLOAT, false, 0, 0);
-                gl.enableVertexAttribArray(vTexCoord);
-
-                modelViewMatrixLoc = gl.getUniformLocation(program, "modelViewMatrix");
-                projectionMatrixLoc = gl.getUniformLocation(program, "projectionMatrix");
-
-                document.getElementById("wrapping").addEventListener("change", () => {
-                    switch(parseInt(document.getElementById("wrapping").value)) {
-                        case 0:
-                            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-                            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-                            break;
-                        case 1:
-                            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
-                            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
-                            break;
-                    }
-                });
-
-                document.getElementById("filtering").addEventListener("change", () => {
-                    switch(parseInt(document.getElementById("filtering").value)) {
-                        case 0:
-                            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-                            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-                            break;
-                        case 1:
-                            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-                            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-                            break;
-                        case 2:
-                            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_NEAREST);
-                            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-                            break;
-                        case 3:
-                            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
-                            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-                            break;
-                        case 4:
-                            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_LINEAR);
-                            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-                            break;
-                        case 5:
-                            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
-                            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-                            break;
-                    }
-                });
-
-                render();
-            } catch (error) {
-                console.error(error);
             }
+
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, texSize, texSize, 0, gl.RGBA, gl.UNSIGNED_BYTE, myTexels);
+            gl.generateMipmap(gl.TEXTURE_2D);
+
+            var textCoords = [
+                vec2(-1.5, 0.0),
+                vec2(2.5, 0.0),
+                vec2(2.5, 10.0),
+                vec2(-1.5, 10.0),
+            ];
+
+            var tBuffer = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, tBuffer);
+            gl.bufferData(gl.ARRAY_BUFFER, flatten(textCoords), gl.STATIC_DRAW);
+            var vTexCoord = gl.getAttribLocation(program, "vTexCoord");
+            gl.vertexAttribPointer(vTexCoord, 2, gl.FLOAT, false, 0, 0);
+            gl.enableVertexAttribArray(vTexCoord);
+
+            modelViewMatrixLoc = gl.getUniformLocation(program, "modelViewMatrix");
+            projectionMatrixLoc = gl.getUniformLocation(program, "projectionMatrix");
+
+            document.getElementById("wrapping").addEventListener("change", () => {
+                switch(parseInt(document.getElementById("wrapping").value)) {
+                    case 0:
+                        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+                        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+                        break;
+                    case 1:
+                        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+                        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
+                        break;
+                }
+            });
+
+            document.getElementById("filtering").addEventListener("change", () => {
+                switch(parseInt(document.getElementById("filtering").value)) {
+                    case 0:
+                        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+                        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+                        break;
+                    case 1:
+                        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+                        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+                        break;
+                    case 2:
+                        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_NEAREST);
+                        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+                        break;
+                    case 3:
+                        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
+                        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+                        break;
+                    case 4:
+                        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_LINEAR);
+                        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+                        break;
+                    case 5:
+                        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+                        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+                        break;
+                }
+            });
+
+            render();
 
             codeSnippets = await fetchCodeSnippets($page.url.pathname);
             isLoading = false;
@@ -139,11 +135,11 @@
     const render = () => {
         gl.clear(gl.COLOR_BUFFER_BIT);
 
-        var projectionMatrix = mv.perspective(90, canvas.width / canvas.height, .1, 30.0);
-        gl.uniformMatrix4fv(projectionMatrixLoc, false, mv.flatten(projectionMatrix));
+        var projectionMatrix = perspective(90, canvas.width / canvas.height, .1, 30.0);
+        gl.uniformMatrix4fv(projectionMatrixLoc, false, flatten(projectionMatrix));
 
-        var ctm = mv.mat4();
-        gl.uniformMatrix4fv(modelViewMatrixLoc, false, mv.flatten(ctm));
+        var ctm = mat4();
+        gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(ctm));
 
         gl.drawArrays(gl.TRIANGLE_FAN, 0, vertices.length);
 

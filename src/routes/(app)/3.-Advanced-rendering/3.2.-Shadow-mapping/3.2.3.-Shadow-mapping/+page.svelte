@@ -2,7 +2,7 @@
     import { onMount } from 'svelte';
     import { page } from '$app/stores'
     import { WebGLUtils, fetchCodeSnippets, initShaders, convertToLatex } from '$lib/utils.svelte.js';
-    import * as mv from '$lib/Libraries/MV.js';
+    import { vec2, vec3, vec4, mat4, perspective, mult, translate, flatten, lookAt } from '$lib/Libraries/MV.js';
     import { readOBJFile } from '$lib/Libraries/OBJParser.js';
     import Result from '$lib/components/Result.svelte';
     import Admonition from '$lib/components/UI/Admonition.svelte';
@@ -39,64 +39,60 @@
             gl.enable(gl.BLEND);
             gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
-            try {
-                [gl, teapotProgram] = await initShaders(gl, teapotProgram, $page.url.pathname + '/teapotShaders/vshader.glsl', $page.url.pathname + '/teapotShaders/fshader.glsl');
-                [gl, groundProgram] = await initShaders(gl, groundProgram, $page.url.pathname + '/groundShaders/vshader.glsl', $page.url.pathname + '/groundShaders/fshader.glsl');
-                [gl, shadowProgram] = await initShaders(gl, shadowProgram, $page.url.pathname + '/shadowShaders/vshader.glsl', $page.url.pathname + '/shadowShaders/fshader.glsl');
+            teapotProgram = await initShaders(gl, teapotProgram, $page.url.pathname + '/teapotShaders/vshader.glsl', $page.url.pathname + '/teapotShaders/fshader.glsl');
+            groundProgram = await initShaders(gl, groundProgram, $page.url.pathname + '/groundShaders/vshader.glsl', $page.url.pathname + '/groundShaders/fshader.glsl');
+            shadowProgram = await initShaders(gl, shadowProgram, $page.url.pathname + '/shadowShaders/vshader.glsl', $page.url.pathname + '/shadowShaders/fshader.glsl');
 
-                lightTime = teapotTime = 0.0;
-                lightMovement = teapotMovement = true;
-                initCamera();
-                initLight();
+            lightTime = teapotTime = 0.0;
+            lightMovement = teapotMovement = true;
+            initCamera();
+            initLight();
 
-                initMatrices(groundProgram);
-                initGroundVertices();
-                initGroundObject();
+            initMatrices(groundProgram);
+            initGroundVertices();
+            initGroundObject();
 
-                initGroundTexture();
+            initGroundTexture();
 
-                groundProgram.shadowMapLoc = gl.getUniformLocation(groundProgram, "shadowMap");
-                gl.uniform1i(groundProgram.shadowMapLoc, 1);
+            groundProgram.shadowMapLoc = gl.getUniformLocation(groundProgram, "shadowMap");
+            gl.uniform1i(groundProgram.shadowMapLoc, 1);
 
-                groundProgram.viewMatrixFromLight = mv.mat4();
-                groundProgram.viewMatrixFromLightLoc = gl.getUniformLocation(groundProgram, "viewMatrixFromLight");
-                gl.uniformMatrix4fv(groundProgram.viewMatrixFromLightLoc, false, mv.flatten(groundProgram.viewMatrixFromLight));
+            groundProgram.viewMatrixFromLight = mat4();
+            groundProgram.viewMatrixFromLightLoc = gl.getUniformLocation(groundProgram, "viewMatrixFromLight");
+            gl.uniformMatrix4fv(groundProgram.viewMatrixFromLightLoc, false, flatten(groundProgram.viewMatrixFromLight));
 
-                groundProgram.projectionMatrixFromLight = mv.mat4();
-                groundProgram.projectionMatrixFromLightLoc = gl.getUniformLocation(groundProgram, "projectionMatrixFromLight");
-                gl.uniformMatrix4fv(groundProgram.projectionMatrixFromLightLoc, false, mv.flatten(groundProgram.projectionMatrixFromLight));
+            groundProgram.projectionMatrixFromLight = mat4();
+            groundProgram.projectionMatrixFromLightLoc = gl.getUniformLocation(groundProgram, "projectionMatrixFromLight");
+            gl.uniformMatrix4fv(groundProgram.projectionMatrixFromLightLoc, false, flatten(groundProgram.projectionMatrixFromLight));
 
-                groundProgram.modelMatrixFromLight = mv.mat4();
-                groundProgram.modelMatrixFromLightLoc = gl.getUniformLocation(groundProgram, "modelMatrixFromLight");
-                gl.uniformMatrix4fv(groundProgram.modelMatrixFromLightLoc, false, mv.flatten(groundProgram.modelMatrixFromLight));
+            groundProgram.modelMatrixFromLight = mat4();
+            groundProgram.modelMatrixFromLightLoc = gl.getUniformLocation(groundProgram, "modelMatrixFromLight");
+            gl.uniformMatrix4fv(groundProgram.modelMatrixFromLightLoc, false, flatten(groundProgram.modelMatrixFromLight));
 
-                initMatrices(shadowProgram);
-                initShadowTexture();
+            initMatrices(shadowProgram);
+            initShadowTexture();
 
-                shadowProgram.modelMatrixLoc = gl.getUniformLocation(shadowProgram, 'modelMatrix');
-                shadowProgram.projectionMatrixLoc = gl.getUniformLocation(shadowProgram, 'projectionMatrix');
-                shadowProgram.viewMatrixLoc = gl.getUniformLocation(shadowProgram, 'viewMatrix');
+            shadowProgram.modelMatrixLoc = gl.getUniformLocation(shadowProgram, 'modelMatrix');
+            shadowProgram.projectionMatrixLoc = gl.getUniformLocation(shadowProgram, 'projectionMatrix');
+            shadowProgram.viewMatrixLoc = gl.getUniformLocation(shadowProgram, 'viewMatrix');
 
-                initMatrices(teapotProgram);
-                initTeapotObject();
+            initMatrices(teapotProgram);
+            initTeapotObject();
 
-                teapotProgram.shadowMapLoc = gl.getUniformLocation(teapotProgram, "shadowMap");
-                gl.uniform1i(teapotProgram.shadowMapLoc, 1);
+            teapotProgram.shadowMapLoc = gl.getUniformLocation(teapotProgram, "shadowMap");
+            gl.uniform1i(teapotProgram.shadowMapLoc, 1);
 
-                teapotProgram.viewMatrixFromLight = mv.mat4();
-                teapotProgram.viewMatrixFromLightLoc = gl.getUniformLocation(teapotProgram, "viewMatrixFromLight");
-                gl.uniformMatrix4fv(teapotProgram.viewMatrixFromLightLoc, false, mv.flatten(teapotProgram.viewMatrixFromLight));
+            teapotProgram.viewMatrixFromLight = mat4();
+            teapotProgram.viewMatrixFromLightLoc = gl.getUniformLocation(teapotProgram, "viewMatrixFromLight");
+            gl.uniformMatrix4fv(teapotProgram.viewMatrixFromLightLoc, false, flatten(teapotProgram.viewMatrixFromLight));
 
-                teapotProgram.projectionMatrixFromLight = mv.mat4();
-                teapotProgram.projectionMatrixFromLightLoc = gl.getUniformLocation(teapotProgram, "projectionMatrixFromLight");
-                gl.uniformMatrix4fv(teapotProgram.projectionMatrixFromLightLoc, false, mv.flatten(teapotProgram.projectionMatrixFromLight));
+            teapotProgram.projectionMatrixFromLight = mat4();
+            teapotProgram.projectionMatrixFromLightLoc = gl.getUniformLocation(teapotProgram, "projectionMatrixFromLight");
+            gl.uniformMatrix4fv(teapotProgram.projectionMatrixFromLightLoc, false, flatten(teapotProgram.projectionMatrixFromLight));
 
-                teapotProgram.modelMatrixFromLight = mv.mat4();
-                teapotProgram.modelMatrixFromLightLoc = gl.getUniformLocation(teapotProgram, "modelMatrixFromLight");
-                gl.uniformMatrix4fv(teapotProgram.modelMatrixFromLightLoc, false, mv.flatten(teapotProgram.modelMatrixFromLight));
-            } catch (error) {
-                console.error(error);
-            }
+            teapotProgram.modelMatrixFromLight = mat4();
+            teapotProgram.modelMatrixFromLightLoc = gl.getUniformLocation(teapotProgram, "modelMatrixFromLight");
+            gl.uniformMatrix4fv(teapotProgram.modelMatrixFromLightLoc, false, flatten(teapotProgram.modelMatrixFromLight));
 
             codeSnippets = await fetchCodeSnippets([
                 {
@@ -145,13 +141,13 @@
     });
 
     const initCamera = () => {
-        cameraPosition = mv.vec3(0.0, 0.0, 3.0);
-        target = mv.vec3(0.0, 0.0, 0.0);
-        up = mv.vec3(0.0, 1.0, 0.0);
+        cameraPosition = vec3(0.0, 0.0, 3.0);
+        target = vec3(0.0, 0.0, 0.0);
+        up = vec3(0.0, 1.0, 0.0);
     };
 
     const initLight = () => {
-        pointLightCenter = mv.vec3(0.0, 2.0, 0.0);
+        pointLightCenter = vec3(0.0, 2.0, 0.0);
         pointLightRadius = 5;
 
         teapotProgram.pointLightPositionLoc = gl.getUniformLocation(teapotProgram, "light");
@@ -159,17 +155,17 @@
 
     const initGroundVertices = () => {
         vertices = [
-            mv.vec4(-2.0, 0.0, 2.0, 1.0), 
-            mv.vec4(-2.0, 0.0, -2.0, 1.0), 
-            mv.vec4(2.0, 0.0, -2.0, 1.0),
-            mv.vec4(-2.0, 0.0, 2.0, 1.0), 
-            mv.vec4(2.0, 0.0, -2.0, 1.0),
-            mv.vec4(2.0, 0.0, 2.0, 1.0),
+            vec4(-2.0, 0.0, 2.0, 1.0), 
+            vec4(-2.0, 0.0, -2.0, 1.0), 
+            vec4(2.0, 0.0, -2.0, 1.0),
+            vec4(-2.0, 0.0, 2.0, 1.0), 
+            vec4(2.0, 0.0, -2.0, 1.0),
+            vec4(2.0, 0.0, 2.0, 1.0),
         ];
         
         groundProgram.vPositionBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, groundProgram.vPositionBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, mv.flatten(vertices), gl.STATIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER, flatten(vertices), gl.STATIC_DRAW);
         groundProgram.vPositionBuffer.num = 4;
         groundProgram.vPositionBuffer.type = gl.FLOAT;
         groundProgram.vPosition = gl.getAttribLocation(groundProgram, "vPosition");
@@ -178,34 +174,34 @@
     };
 
     const initGroundObject = () => {
-        groundProgram.projectionMatrix = mv.perspective(90, canvas.width / canvas.height, 0.1, 10.0);
+        groundProgram.projectionMatrix = perspective(90, canvas.width / canvas.height, 0.1, 10.0);
         groundProgram.projectionMatrixLoc = gl.getUniformLocation(groundProgram, "projectionMatrix");
-        gl.uniformMatrix4fv(groundProgram.projectionMatrixLoc, false, mv.flatten(groundProgram.projectionMatrix));
+        gl.uniformMatrix4fv(groundProgram.projectionMatrixLoc, false, flatten(groundProgram.projectionMatrix));
 
-        groundPosition = mv.vec3(0.0, -1.0, 0.0);
-        groundProgram.modelMatrix = mv.mat4();
-        groundProgram.modelMatrix = mv.mult(groundProgram.modelMatrix, mv.translate(groundPosition));
-        gl.uniformMatrix4fv(groundProgram.modelMatrixLoc, false, mv.flatten(groundProgram.modelMatrix));
+        groundPosition = vec3(0.0, -1.0, 0.0);
+        groundProgram.modelMatrix = mat4();
+        groundProgram.modelMatrix = mult(groundProgram.modelMatrix, translate(groundPosition));
+        gl.uniformMatrix4fv(groundProgram.modelMatrixLoc, false, flatten(groundProgram.modelMatrix));
 
         let eye = cameraPosition;
-        groundProgram.viewMatrix = mv.lookAt(eye, target, up);
-        gl.uniformMatrix4fv(groundProgram.viewMatrixLoc, false, mv.flatten(groundProgram.viewMatrix));
+        groundProgram.viewMatrix = lookAt(eye, target, up);
+        gl.uniformMatrix4fv(groundProgram.viewMatrixLoc, false, flatten(groundProgram.viewMatrix));
     }
 
     const initMatrices = (program) => {
         gl.useProgram(program);
 
-        program.projectionMatrix = mv.perspective(90, canvas.width / canvas.height, 0.1, 10.0);
+        program.projectionMatrix = perspective(90, canvas.width / canvas.height, 0.1, 10.0);
         program.projectionMatrixLoc = gl.getUniformLocation(program, "projectionMatrix");
-        gl.uniformMatrix4fv(program.projectionMatrixLoc, false, mv.flatten(program.projectionMatrix));
+        gl.uniformMatrix4fv(program.projectionMatrixLoc, false, flatten(program.projectionMatrix));
 
-        program.viewMatrix = mv.mat4();
+        program.viewMatrix = mat4();
         program.viewMatrixLoc = gl.getUniformLocation(program, "viewMatrix");
-        gl.uniformMatrix4fv(program.viewMatrixLoc, false, mv.flatten(program.viewMatrix));
+        gl.uniformMatrix4fv(program.viewMatrixLoc, false, flatten(program.viewMatrix));
 
-        program.modelMatrix = mv.mat4();
+        program.modelMatrix = mat4();
         program.modelMatrixLoc = gl.getUniformLocation(program, "modelMatrix");
-        gl.uniformMatrix4fv(program.modelMatrixLoc, false, mv.flatten(program.modelMatrix));
+        gl.uniformMatrix4fv(program.modelMatrixLoc, false, flatten(program.modelMatrix));
     }
 
     const initGroundTexture = () => {
@@ -228,13 +224,13 @@
         myTexels.src = "/assets/textures/groundTexture.png";
         
         var textCoords = [
-            mv.vec2(0.0, 0.0), mv.vec2(1.0, 0.0), mv.vec2(1.0, 1.0),
-            mv.vec2(0.0, 0.0), mv.vec2(1.0, 1.0), mv.vec2(0.0, 1.0),
+            vec2(0.0, 0.0), vec2(1.0, 0.0), vec2(1.0, 1.0),
+            vec2(0.0, 0.0), vec2(1.0, 1.0), vec2(0.0, 1.0),
         ];
 
         groundProgram.vTexCoordBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, groundProgram.vTexCoordBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, mv.flatten(textCoords), gl.STATIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER, flatten(textCoords), gl.STATIC_DRAW);
         groundProgram.vTexCoordBuffer.num = 2;
         groundProgram.vTexCoordBuffer.type = gl.FLOAT;
         groundProgram.vTexCoord = gl.getAttribLocation(groundProgram, "vTexCoord");
@@ -290,7 +286,7 @@
 
                 teapotProgram.vPositionBuffer = gl.createBuffer();
                 gl.bindBuffer(gl.ARRAY_BUFFER, teapotProgram.vPositionBuffer);
-                gl.bufferData(gl.ARRAY_BUFFER, mv.flatten(obj.vertices), gl.STATIC_DRAW);
+                gl.bufferData(gl.ARRAY_BUFFER, flatten(obj.vertices), gl.STATIC_DRAW);
                 teapotProgram.vPositionBuffer.num = 3;
                 teapotProgram.vPositionBuffer.type = gl.FLOAT;
                 teapotProgram.vPosition = gl.getAttribLocation(teapotProgram, "vPosition");
@@ -299,7 +295,7 @@
 
                 teapotProgram.vNormalBuffer = gl.createBuffer();
                 gl.bindBuffer(gl.ARRAY_BUFFER, teapotProgram.vNormalBuffer);
-                gl.bufferData(gl.ARRAY_BUFFER, mv.flatten(obj.normals), gl.STATIC_DRAW);
+                gl.bufferData(gl.ARRAY_BUFFER, flatten(obj.normals), gl.STATIC_DRAW);
                 teapotProgram.vNormalBuffer.num = 3;
                 teapotProgram.vNormalBuffer.type = gl.FLOAT;
                 teapotProgram.vNormal = gl.getAttribLocation(teapotProgram, "vNormal");
@@ -317,10 +313,10 @@
                 console.error("Error loading OBJ file:", error);
             });
 
-        teapotProgram.viewMatrix = mv.mat4();
+        teapotProgram.viewMatrix = mat4();
         let eye = cameraPosition;
-        teapotProgram.viewMatrix = mv.lookAt(eye, target, up);
-        gl.uniformMatrix4fv(teapotProgram.viewMatrixLoc, false, mv.flatten(teapotProgram.viewMatrix));
+        teapotProgram.viewMatrix = lookAt(eye, target, up);
+        gl.uniformMatrix4fv(teapotProgram.viewMatrixLoc, false, flatten(teapotProgram.viewMatrix));
     };
 
     const render = () => {
@@ -343,19 +339,19 @@
     const updateLightPosition = () => {
         lightTime += 0.01 * lightMovement;
 
-        pointLightPosition = mv.vec3(
+        pointLightPosition = vec3(
             pointLightCenter[0] + pointLightRadius * Math.cos(lightTime),
             pointLightCenter[1],
             pointLightCenter[2] + pointLightRadius * Math.sin(lightTime),
         );
 
-        gl.uniform3fv(teapotProgram.pointLightPositionLoc, mv.flatten(pointLightPosition));
+        gl.uniform3fv(teapotProgram.pointLightPositionLoc, flatten(pointLightPosition));
     };
     
     const updateTeapotPosition = () => {
         teapotTime += 0.01 * teapotMovement;
         
-        teapotPosition = mv.vec3(
+        teapotPosition = vec3(
             0.0,
             -0.25 + 0.75 * Math.cos(teapotTime * 2),
             0.0,
@@ -363,28 +359,28 @@
     }
 
     const computeShadow = () => {
-        let projectionMatrixFromLight = mv.perspective(90, canvas.width / canvas.height, .5, 10.0);
+        let projectionMatrixFromLight = perspective(90, canvas.width / canvas.height, .5, 10.0);
 
-        let modelMatrixFromLight = mv.mat4();
-        modelMatrixFromLight = mv.mult(modelMatrixFromLight, mv.translate(teapotPosition));   
+        let modelMatrixFromLight = mat4();
+        modelMatrixFromLight = mult(modelMatrixFromLight, translate(teapotPosition));   
 
         let eye = pointLightPosition;
-        let viewMatrixFromLight = mv.lookAt(eye, target, up);
+        let viewMatrixFromLight = lookAt(eye, target, up);
 
         gl.useProgram(teapotProgram);
-        gl.uniformMatrix4fv(teapotProgram.projectionMatrixFromLightLoc, false, mv.flatten(projectionMatrixFromLight));
-        gl.uniformMatrix4fv(teapotProgram.modelMatrixFromLightLoc, false, mv.flatten(modelMatrixFromLight));
-        gl.uniformMatrix4fv(teapotProgram.viewMatrixFromLightLoc, false, mv.flatten(viewMatrixFromLight));
+        gl.uniformMatrix4fv(teapotProgram.projectionMatrixFromLightLoc, false, flatten(projectionMatrixFromLight));
+        gl.uniformMatrix4fv(teapotProgram.modelMatrixFromLightLoc, false, flatten(modelMatrixFromLight));
+        gl.uniformMatrix4fv(teapotProgram.viewMatrixFromLightLoc, false, flatten(viewMatrixFromLight));
         
         gl.useProgram(groundProgram);
-        gl.uniformMatrix4fv(groundProgram.projectionMatrixFromLightLoc, false, mv.flatten(projectionMatrixFromLight));
-        gl.uniformMatrix4fv(groundProgram.modelMatrixFromLightLoc, false, mv.flatten(modelMatrixFromLight));
-        gl.uniformMatrix4fv(groundProgram.viewMatrixFromLightLoc, false, mv.flatten(viewMatrixFromLight));
+        gl.uniformMatrix4fv(groundProgram.projectionMatrixFromLightLoc, false, flatten(projectionMatrixFromLight));
+        gl.uniformMatrix4fv(groundProgram.modelMatrixFromLightLoc, false, flatten(modelMatrixFromLight));
+        gl.uniformMatrix4fv(groundProgram.viewMatrixFromLightLoc, false, flatten(viewMatrixFromLight));
 
         gl.useProgram(shadowProgram);
-        gl.uniformMatrix4fv(shadowProgram.projectionMatrixLoc, false, mv.flatten(projectionMatrixFromLight));
-        gl.uniformMatrix4fv(shadowProgram.modelMatrixLoc, false, mv.flatten(modelMatrixFromLight));
-        gl.uniformMatrix4fv(shadowProgram.viewMatrixLoc, false, mv.flatten(viewMatrixFromLight));
+        gl.uniformMatrix4fv(shadowProgram.projectionMatrixLoc, false, flatten(projectionMatrixFromLight));
+        gl.uniformMatrix4fv(shadowProgram.modelMatrixLoc, false, flatten(modelMatrixFromLight));
+        gl.uniformMatrix4fv(shadowProgram.viewMatrixLoc, false, flatten(viewMatrixFromLight));
 
         gl.bindFramebuffer(gl.FRAMEBUFFER, fbo.framebuffer);
         gl.clearColor(1.0, 1.0, 1.0, 1.0);
@@ -421,9 +417,9 @@
         initAttributeVariable(gl, teapotProgram.vPosition, teapotProgram.vPositionBuffer)
         initAttributeVariable(gl, teapotProgram.vNormal, teapotProgram.vNormalBuffer)
 
-        teapotProgram.modelMatrix = mv.mat4();
-        teapotProgram.modelMatrix = mv.mult(teapotProgram.modelMatrix, mv.translate(teapotPosition)); 
-        gl.uniformMatrix4fv(teapotProgram.modelMatrixLoc, false, mv.flatten(teapotProgram.modelMatrix));
+        teapotProgram.modelMatrix = mat4();
+        teapotProgram.modelMatrix = mult(teapotProgram.modelMatrix, translate(teapotPosition)); 
+        gl.uniformMatrix4fv(teapotProgram.modelMatrixLoc, false, flatten(teapotProgram.modelMatrix));
 
         gl.bindTexture(gl.TEXTURE_2D, fbo.texture);
         gl.uniform1i(teapotProgram.shadowMapLoc, 1);

@@ -6,7 +6,6 @@
     import { vec2, vec4, flatten, sizeof } from '$lib/Libraries/MV.js';
     import Result from '$lib/components/Result.svelte';
     import Toggle from '$lib/components/UI/Toggle.svelte';
-    import Admonition from '$lib/components/UI/Admonition.svelte';
     import { Dot, Triangle, Circle } from 'lucide-svelte'
 
     let viewIndex = $state(1);
@@ -33,23 +32,49 @@
             gl.viewport(0, 0, canvas.width, canvas.height);
             gl.clearColor(0.3921, 0.5843, 0.9294, 1.0);
 
-            try {
-                [gl, program] = await initShaders(gl, program, $page.url.pathname + '/vshader.glsl', $page.url.pathname + '/fshader.glsl');
+            program = await initShaders(gl, program, $page.url.pathname + '/vshader.glsl', $page.url.pathname + '/fshader.glsl');
 
-                colors = [];
-                vertices = [];
-                
-                var vBuffer = gl.createBuffer();
-                gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
-                gl.bufferData(gl.ARRAY_BUFFER, sizeof['vec2'] * maxPoints, gl.STATIC_DRAW);
-                gl.bufferSubData(gl.ARRAY_BUFFER, 0, flatten(vertices));
-                
-                var vPosition = gl.getAttribLocation(program, "vPosition");
-                gl.vertexAttribPointer(vPosition, 2, gl.FLOAT, false, 0, 0);
-                gl.enableVertexAttribArray(vPosition);
+            colors = [];
+            vertices = [];
+            
+            var vBuffer = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
+            gl.bufferData(gl.ARRAY_BUFFER, sizeof['vec2'] * maxPoints, gl.STATIC_DRAW);
+            gl.bufferSubData(gl.ARRAY_BUFFER, 0, flatten(vertices));
+            
+            var vPosition = gl.getAttribLocation(program, "vPosition");
+            gl.vertexAttribPointer(vPosition, 2, gl.FLOAT, false, 0, 0);
+            gl.enableVertexAttribArray(vPosition);
 
-                canvas.addEventListener("click", function(event) {
-                    if (mode == 'points') {
+            canvas.addEventListener("click", function(event) {
+                if (mode == 'points') {
+                    switch(document.getElementById("pointscolor").selectedIndex) {
+                        case 0:
+                            for (let i = 0; i < 6; i++)
+                                colors.push(vec4(0.0, 0.0, 0.0, 1.0));
+                            break;
+                        case 1:
+                            for (let i = 0; i < 6; i++)
+                                colors.push(vec4(1.0, 1.0, 1.0, 1.0));
+                            break;
+                    }
+                } else if (mode == 'triangles') {
+                    count++;
+                    if (count == 3) {
+                        var firstVertexColor = colors[colors.length - 6];
+                        var secondVertexColor = colors[colors.length - 3];
+                        colors = colors.slice(0, colors.length - 12);
+                        colors.push(firstVertexColor);
+                        colors.push(secondVertexColor);
+                        switch(document.getElementById("pointscolor").selectedIndex) {
+                            case 0:
+                                colors.push(vec4(0.0, 0.0, 0.0, 1.0)); 
+                                break;
+                            case 1:
+                                colors.push(vec4(1.0, 1.0, 1.0, 1.0));
+                                break;
+                        }
+                    } else {
                         switch(document.getElementById("pointscolor").selectedIndex) {
                             case 0:
                                 for (let i = 0; i < 6; i++)
@@ -60,165 +85,135 @@
                                     colors.push(vec4(1.0, 1.0, 1.0, 1.0));
                                 break;
                         }
-                    } else if (mode == 'triangles') {
-                        count++;
-                        if (count == 3) {
-                            var firstVertexColor = colors[colors.length - 6];
-                            var secondVertexColor = colors[colors.length - 3];
-                            colors = colors.slice(0, colors.length - 12);
-                            colors.push(firstVertexColor);
-                            colors.push(secondVertexColor);
-                            switch(document.getElementById("pointscolor").selectedIndex) {
-                                case 0:
-                                    colors.push(vec4(0.0, 0.0, 0.0, 1.0)); 
-                                    break;
-                                case 1:
+                    }
+                } else if (mode == 'circles') {
+                    count++;
+                    if (count == 2) {
+                        var centerColor = colors[colors.length - 1];
+                        switch(document.getElementById("pointscolor").selectedIndex) {
+                            case 0:
+                                for (let i = 0; i < numTriangles; i++) {
+                                    colors.push(vec4(0.0, 0.0, 0.0, 1.0));
+                                    colors.push(vec4(0.0, 0.0, 0.0, 1.0));
+                                    colors.push(centerColor);
+                                }
+                                break;
+                            case 1:
+                                for (let i = 0; i < numTriangles; i++) {
                                     colors.push(vec4(1.0, 1.0, 1.0, 1.0));
-                                    break;
-                            }
-                        } else {
-                            switch(document.getElementById("pointscolor").selectedIndex) {
-                                case 0:
-                                    for (let i = 0; i < 6; i++)
-                                        colors.push(vec4(0.0, 0.0, 0.0, 1.0));
-                                    break;
-                                case 1:
-                                    for (let i = 0; i < 6; i++)
-                                        colors.push(vec4(1.0, 1.0, 1.0, 1.0));
-                                    break;
-                            }
+                                    colors.push(vec4(1.0, 1.0, 1.0, 1.0));
+                                    colors.push(centerColor);
+                                }
+                                break;
                         }
-                    } else if (mode == 'circles') {
-                        count++;
-                        if (count == 2) {
-                            var centerColor = colors[colors.length - 1];
-                            switch(document.getElementById("pointscolor").selectedIndex) {
-                                case 0:
-                                    for (let i = 0; i < numTriangles; i++) {
-                                        colors.push(vec4(0.0, 0.0, 0.0, 1.0));
-                                        colors.push(vec4(0.0, 0.0, 0.0, 1.0));
-                                        colors.push(centerColor);
-                                    }
-                                    break;
-                                case 1:
-                                    for (let i = 0; i < numTriangles; i++) {
-                                        colors.push(vec4(1.0, 1.0, 1.0, 1.0));
-                                        colors.push(vec4(1.0, 1.0, 1.0, 1.0));
-                                        colors.push(centerColor);
-                                    }
-                                    break;
-                            }
-                        } else {
-                            switch(document.getElementById("pointscolor").selectedIndex) {
-                                case 0:
-                                    for (let i = 0; i < 6; i++)
-                                        colors.push(vec4(0.0, 0.0, 0.0, 1.0));
-                                    break;
-                                case 1:
-                                    for (let i = 0; i < 6; i++)
-                                        colors.push(vec4(1.0, 1.0, 1.0, 1.0));
-                                    break;
-                            }
+                    } else {
+                        switch(document.getElementById("pointscolor").selectedIndex) {
+                            case 0:
+                                for (let i = 0; i < 6; i++)
+                                    colors.push(vec4(0.0, 0.0, 0.0, 1.0));
+                                break;
+                            case 1:
+                                for (let i = 0; i < 6; i++)
+                                    colors.push(vec4(1.0, 1.0, 1.0, 1.0));
+                                break;
                         }
                     }
+                }
 
-                    cBuffer = gl.createBuffer();
-                    gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
-                    gl.bufferData(gl.ARRAY_BUFFER, flatten(colors), gl.STATIC_DRAW);
-                    vColor = gl.getAttribLocation(program, "vColor");
-                    gl.vertexAttribPointer(vColor, 4, gl.FLOAT, false, 0, 0);
-                    gl.enableVertexAttribArray(vColor);
+                cBuffer = gl.createBuffer();
+                gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
+                gl.bufferData(gl.ARRAY_BUFFER, flatten(colors), gl.STATIC_DRAW);
+                vColor = gl.getAttribLocation(program, "vColor");
+                gl.vertexAttribPointer(vColor, 4, gl.FLOAT, false, 0, 0);
+                gl.enableVertexAttribArray(vColor);
 
-                    var t = vec2(
-                        -1 + 2 * (event.clientX - canvas.getBoundingClientRect().x) / canvas.width,
-                        1 - 2 * (event.clientY - canvas.getBoundingClientRect().y) / canvas.height
-                    );
-                    var newVertices = [];
-                    if (mode == 'points') {
+                var t = vec2(
+                    -1 + 2 * (event.clientX - canvas.getBoundingClientRect().x) / canvas.width,
+                    1 - 2 * (event.clientY - canvas.getBoundingClientRect().y) / canvas.height
+                );
+                var newVertices = [];
+                if (mode == 'points') {
+                    newVertices = [
+                        vec2(t[0] - side / canvas.width, t[1] - side / canvas.height),
+                        vec2(t[0] - side / canvas.width, t[1] + side / canvas.height),
+                        vec2(t[0] + side / canvas.width, t[1] + side / canvas.height),
+
+                        vec2(t[0] - side / canvas.width, t[1] - side / canvas.height),
+                        vec2(t[0] + side / canvas.width, t[1] - side / canvas.height),
+                        vec2(t[0] + side / canvas.width, t[1] + side / canvas.height),
+                    ]
+                } else if (mode == 'triangles') {
+                    if (count == 3) {
+                        var firstVertex = vec2(
+                            (vertices[vertices.length - 1][0] + vertices[vertices.length - 3][0]) / 2, 
+                            (vertices[vertices.length - 1][1] + vertices[vertices.length - 3][1]) / 2
+                        );
+                        var secondVertex = vec2(
+                            (vertices[vertices.length - 7][0] + vertices[vertices.length - 9][0]) / 2, 
+                            (vertices[vertices.length - 7][1] + vertices[vertices.length - 9][1]) / 2
+                        );
+
+                        vertices = vertices.slice(0, vertices.length - 12);
+
+                        newVertices = [
+                            firstVertex,
+                            secondVertex,
+                            t
+                        ]
+                        count = 0;
+                    } else {
                         newVertices = [
                             vec2(t[0] - side / canvas.width, t[1] - side / canvas.height),
                             vec2(t[0] - side / canvas.width, t[1] + side / canvas.height),
                             vec2(t[0] + side / canvas.width, t[1] + side / canvas.height),
-
+            
                             vec2(t[0] - side / canvas.width, t[1] - side / canvas.height),
                             vec2(t[0] + side / canvas.width, t[1] - side / canvas.height),
                             vec2(t[0] + side / canvas.width, t[1] + side / canvas.height),
                         ]
-                    } else if (mode == 'triangles') {
-                        if (count == 3) {
-                            var firstVertex = vec2(
-                                (vertices[vertices.length - 1][0] + vertices[vertices.length - 3][0]) / 2, 
-                                (vertices[vertices.length - 1][1] + vertices[vertices.length - 3][1]) / 2
-                            );
-                            var secondVertex = vec2(
-                                (vertices[vertices.length - 7][0] + vertices[vertices.length - 9][0]) / 2, 
-                                (vertices[vertices.length - 7][1] + vertices[vertices.length - 9][1]) / 2
-                            );
-
-                            vertices = vertices.slice(0, vertices.length - 12);
-
-                            newVertices = [
-                                firstVertex,
-                                secondVertex,
-                                t
-                            ]
-                            count = 0;
-                        } else {
-                            newVertices = [
-                                vec2(t[0] - side / canvas.width, t[1] - side / canvas.height),
-                                vec2(t[0] - side / canvas.width, t[1] + side / canvas.height),
-                                vec2(t[0] + side / canvas.width, t[1] + side / canvas.height),
-                
-                                vec2(t[0] - side / canvas.width, t[1] - side / canvas.height),
-                                vec2(t[0] + side / canvas.width, t[1] - side / canvas.height),
-                                vec2(t[0] + side / canvas.width, t[1] + side / canvas.height),
-                            ]
-                        }
-                    } else if (mode == 'circles') {
-                        if (count == 2) {
-                            var center = vec2(
-                                (vertices[vertices.length - 1][0] + vertices[vertices.length - 3][0]) / 2, 
-                                (vertices[vertices.length - 1][1] + vertices[vertices.length - 3][1]) / 2
-                            );
-                            var rad = Math.sqrt(Math.pow(center[0] - t[0], 2) + Math.pow(center[1] - t[1], 2));
-
-                            newVertices = [];
-                            for (let angle = 0; angle < Math.PI * 2; angle += Math.PI * 2 / numTriangles) {
-                                newVertices.push(vec2(
-                                    center[0] + rad * Math.cos(angle),
-                                    center[1] + rad * Math.sin(angle)
-                                ));
-                                newVertices.push(vec2(
-                                    center[0] + rad * Math.cos(angle + Math.PI * 2 / numTriangles),
-                                    center[1] + rad * Math.sin(angle + Math.PI * 2 / numTriangles)
-                                ));
-                                newVertices.push(center);
-                            }
-                            count = 0;
-                        } else {
-                            newVertices = [
-                                vec2(t[0] - side / canvas.width, t[1] - side / canvas.height),
-                                vec2(t[0] - side / canvas.width, t[1] + side / canvas.height),
-                                vec2(t[0] + side / canvas.width, t[1] + side / canvas.height),
-                
-                                vec2(t[0] - side / canvas.width, t[1] - side / canvas.height),
-                                vec2(t[0] + side / canvas.width, t[1] - side / canvas.height),
-                                vec2(t[0] + side / canvas.width, t[1] + side / canvas.height),
-                            ]
-                        }
                     }
-                    
-                    for (let i = 0; i < newVertices.length; i++)
-                        vertices.push(newVertices[i]);
+                } else if (mode == 'circles') {
+                    if (count == 2) {
+                        var center = vec2(
+                            (vertices[vertices.length - 1][0] + vertices[vertices.length - 3][0]) / 2, 
+                            (vertices[vertices.length - 1][1] + vertices[vertices.length - 3][1]) / 2
+                        );
+                        var rad = Math.sqrt(Math.pow(center[0] - t[0], 2) + Math.pow(center[1] - t[1], 2));
 
-                    gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
-                    gl.bufferSubData(gl.ARRAY_BUFFER, 0, flatten(vertices));
-                });
+                        newVertices = [];
+                        for (let angle = 0; angle < Math.PI * 2; angle += Math.PI * 2 / numTriangles) {
+                            newVertices.push(vec2(
+                                center[0] + rad * Math.cos(angle),
+                                center[1] + rad * Math.sin(angle)
+                            ));
+                            newVertices.push(vec2(
+                                center[0] + rad * Math.cos(angle + Math.PI * 2 / numTriangles),
+                                center[1] + rad * Math.sin(angle + Math.PI * 2 / numTriangles)
+                            ));
+                            newVertices.push(center);
+                        }
+                        count = 0;
+                    } else {
+                        newVertices = [
+                            vec2(t[0] - side / canvas.width, t[1] - side / canvas.height),
+                            vec2(t[0] - side / canvas.width, t[1] + side / canvas.height),
+                            vec2(t[0] + side / canvas.width, t[1] + side / canvas.height),
+            
+                            vec2(t[0] - side / canvas.width, t[1] - side / canvas.height),
+                            vec2(t[0] + side / canvas.width, t[1] - side / canvas.height),
+                            vec2(t[0] + side / canvas.width, t[1] + side / canvas.height),
+                        ]
+                    }
+                }
+                
+                for (let i = 0; i < newVertices.length; i++)
+                    vertices.push(newVertices[i]);
 
-                render();
-            } catch (error) {
-                console.error(error);
-            }
+                gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
+                gl.bufferSubData(gl.ARRAY_BUFFER, 0, flatten(vertices));
+            });
+
+            render();
 
             document.getElementById("clear").addEventListener("click", () => {
                 switch(document.getElementById("mymenu").selectedIndex) {

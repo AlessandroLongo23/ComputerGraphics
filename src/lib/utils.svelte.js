@@ -29,9 +29,8 @@ export const WebGLUtils = function() {
         for (var i = 0; i < names.length; ++i) {
             try {
                 context = canvas.getContext(names[i], opt_attribs);
-            } catch(e) {
-
-            }
+            } catch(e) {}
+            
             if (context)
                 break;
         }
@@ -61,7 +60,7 @@ export async function fetchCodeSnippets(params) {
     let codeSnippets_info = [];
     if (params instanceof Array) {
         codeSnippets_info = params;
-    } else {
+    } else if (typeof params == "string") { 
         codeSnippets_info = [
             {
                 name: 'main.js',
@@ -130,7 +129,7 @@ export async function initShaders(gl, program, vertex_shader_url, fragment_shade
     gl.linkProgram(program);
     gl.useProgram(program);
 
-    return [gl, program];
+    return program;
 }
 
 export function capitalize(str) {

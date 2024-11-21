@@ -1,13 +1,6 @@
-<script>
-    import { page } from '$app/stores'
-    import { getChildren } from '$lib/data/pages.svelte.js';
-    import Section from "$lib/components/Section.svelte";
-
-    let sections = getChildren($page.url.pathname);
-</script>
-
-<div class="flex flex-row justify-evenly items-center w-3/4 m-auto">
-    {#each sections as section}
-        <Section title={section}></Section> 
-    {/each}
+<div class="flex flex-col gap-1 items-start w-1/2 m-auto">
+    <p>The purpose of this set of exercises is to start interacting with the graphics elements that we draw using input devices. You will make a small 2D drawing program where primitive shapes of different colors can be added using the mouse.</p>
+    <p>Although it is possible to draw 2D shapes using a 2D canvas context, you will do it with a WebGL context as it is really not much harder, and WebGL enables later extension to full 3D.</p>
+    <p>The following screenshot is an example of what the final web application could look like. Your version doesn't have to be exactly like it. The important point is that it has the features we want.</p>
+    <img src="/assets/images/1.2.-Inputs-and-interactions.png" alt="2D drawing" class="w-4/5 m-auto">
 </div>

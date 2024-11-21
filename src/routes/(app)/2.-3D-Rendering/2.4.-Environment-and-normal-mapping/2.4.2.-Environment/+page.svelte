@@ -2,7 +2,7 @@
     import { onMount } from 'svelte';
     import { page } from '$app/stores'
     import { WebGLUtils, fetchCodeSnippets, initShaders, convertToLatex } from '$lib/utils.svelte.js';
-    import * as mv from '$lib/Libraries/MV.js';
+    import { vec3, vec4, flatten, normalize, mix, perspective, lookAt, mat4, inverse, mult } from '$lib/Libraries/MV.js';
     import Result from '$lib/components/Result.svelte';
 
     let viewIndex = $state(1);
@@ -25,23 +25,19 @@
             gl.viewport(0, 0, canvas.width, canvas.height);
             gl.clearColor(0.3921, 0.5843, 0.9294, 1.0);
 
-            try {
-                [gl, program] = await initShaders(gl, program, $page.url.pathname + '/vshader.glsl', $page.url.pathname + '/fshader.glsl');
+            program = await initShaders(gl, program, $page.url.pathname + '/vshader.glsl', $page.url.pathname + '/fshader.glsl');
 
-                configureWebGL();
+            configureWebGL();
 
-                initUniforms();
-                initCubeMap();
+            initUniforms();
+            initCubeMap();
 
-                initBackgroundQuad();
-                initCubeMap();
+            initBackgroundQuad();
+            initCubeMap();
 
-                initSphere();
+            initSphere();
 
-                render();
-            } catch (error) {
-                console.error(error);
-            }
+            render();
 
             codeSnippets = await fetchCodeSnippets($page.url.pathname);
             isLoading = false;
@@ -103,17 +99,17 @@
 
     const initBackgroundQuad = () => {
         const backgroundVertices = [
-            mv.vec4(-1.0, -1.0, 0.999, 1.0),
-            mv.vec4(1.0, 1.0, 0.999, 1.0),
-            mv.vec4(1.0, -1.0, 0.999, 1.0),
-            mv.vec4(-1.0, -1.0, 0.999, 1.0),
-            mv.vec4(-1.0, 1.0, 0.999, 1.0),
-            mv.vec4(1.0, 1.0, 0.999, 1.0),
+            vec4(-1.0, -1.0, 0.999, 1.0),
+            vec4(1.0, 1.0, 0.999, 1.0),
+            vec4(1.0, -1.0, 0.999, 1.0),
+            vec4(-1.0, -1.0, 0.999, 1.0),
+            vec4(-1.0, 1.0, 0.999, 1.0),
+            vec4(1.0, 1.0, 0.999, 1.0),
         ];
 
         backgroundBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, backgroundBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, mv.flatten(backgroundVertices), gl.STATIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER, flatten(backgroundVertices), gl.STATIC_DRAW);
     }
 
     const initSphere = () => {
@@ -122,20 +118,20 @@
 
         thetaY = 0;
 
-        const v0 = mv.vec4(0.0, 0.0, -1.0, 1);
-        const v1 = mv.vec4(0.0, 0.942809, 0.333333, 1);
-        const v2 = mv.vec4(-0.816497, -0.471405, 0.333333, 1);
-        const v3 = mv.vec4(0.816497, -0.471405, 0.333333, 1);
+        const v0 = vec4(0.0, 0.0, -1.0, 1);
+        const v1 = vec4(0.0, 0.942809, 0.333333, 1);
+        const v2 = vec4(-0.816497, -0.471405, 0.333333, 1);
+        const v3 = vec4(0.816497, -0.471405, 0.333333, 1);
 
         tetrahedron(v0, v1, v2, v3, 9);
 
         vertexBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, mv.flatten(sphereVertices), gl.STATIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER, flatten(sphereVertices), gl.STATIC_DRAW);
         
         normalBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, mv.flatten(sphereNormals), gl.STATIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER, flatten(sphereNormals), gl.STATIC_DRAW);
     }
 
     const tetrahedron = (a, b, c, d, n) => {
@@ -151,9 +147,9 @@
             return;
         }
 
-        const ab = mv.normalize(mv.mix(a, b, 0.5), true);
-        const ac = mv.normalize(mv.mix(a, c, 0.5), true);
-        const bc = mv.normalize(mv.mix(b, c, 0.5), true);
+        const ab = normalize(mix(a, b, 0.5), true);
+        const ac = normalize(mix(a, c, 0.5), true);
+        const bc = normalize(mix(b, c, 0.5), true);
 
         divideTriangle(a, ab, ac, count - 1);
         divideTriangle(ab, b, bc, count - 1);
@@ -175,13 +171,13 @@
 
         thetaY += 0.001;
 
-        projectionMatrix = mv.perspective(45, canvas.width / canvas.height, 0.1, 100.0);
+        projectionMatrix = perspective(45, canvas.width / canvas.height, 0.1, 100.0);
         const dist = 5.0;
-        const eye = mv.vec3(dist * Math.cos(thetaY), 0.0, dist * Math.sin(thetaY));
-        const at = mv.vec3(0.0, 0.0, 0.0);
-        const up = mv.vec3(0.0, 1.0, 0.0);
-        viewMatrix = mv.lookAt(eye, at, up);
-        modelMatrix = mv.mat4();
+        const eye = vec3(dist * Math.cos(thetaY), 0.0, dist * Math.sin(thetaY));
+        const at = vec3(0.0, 0.0, 0.0);
+        const up = vec3(0.0, 1.0, 0.0);
+        viewMatrix = lookAt(eye, at, up);
+        modelMatrix = mat4();
 
         drawBackground();
         drawSphere();
@@ -195,12 +191,12 @@
         gl.vertexAttribPointer(vPosition, 4, gl.FLOAT, false, 0, 0);
         gl.enableVertexAttribArray(vPosition);
         
-        gl.uniformMatrix4fv(modelMatrixLoc, false, mv.flatten(mv.mat4()));
-        gl.uniformMatrix4fv(viewMatrixLoc, false, mv.flatten(mv.mat4()));
-        gl.uniformMatrix4fv(projectionMatrixLoc, false, mv.flatten(mv.mat4()));
+        gl.uniformMatrix4fv(modelMatrixLoc, false, flatten(mat4()));
+        gl.uniformMatrix4fv(viewMatrixLoc, false, flatten(mat4()));
+        gl.uniformMatrix4fv(projectionMatrixLoc, false, flatten(mat4()));
         
-        const texMatrix = mv.mult(mv.inverse(viewMatrix), mv.inverse(projectionMatrix));
-        gl.uniformMatrix4fv(texMatrixLoc, false, mv.flatten(texMatrix));
+        const texMatrix = mult(inverse(viewMatrix), inverse(projectionMatrix));
+        gl.uniformMatrix4fv(texMatrixLoc, false, flatten(texMatrix));
         
         gl.drawArrays(gl.TRIANGLES, 0, 6);
     }
@@ -216,10 +212,10 @@
         gl.vertexAttribPointer(vNormal, 4, gl.FLOAT, false, 0, 0);
         gl.enableVertexAttribArray(vNormal);
         
-        gl.uniformMatrix4fv(projectionMatrixLoc, false, mv.flatten(projectionMatrix));
-        gl.uniformMatrix4fv(viewMatrixLoc, false, mv.flatten(viewMatrix));
-        gl.uniformMatrix4fv(modelMatrixLoc, false, mv.flatten(modelMatrix));
-        gl.uniformMatrix4fv(texMatrixLoc, false, mv.flatten(mv.mat4()));
+        gl.uniformMatrix4fv(projectionMatrixLoc, false, flatten(projectionMatrix));
+        gl.uniformMatrix4fv(viewMatrixLoc, false, flatten(viewMatrix));
+        gl.uniformMatrix4fv(modelMatrixLoc, false, flatten(modelMatrix));
+        gl.uniformMatrix4fv(texMatrixLoc, false, flatten(mat4()));
         
         gl.drawArrays(gl.TRIANGLES, 0, sphereVertices.length);
     }

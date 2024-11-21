@@ -2,9 +2,8 @@
     import { onMount } from 'svelte';
     import { page } from '$app/stores'
     import { WebGLUtils, fetchCodeSnippets, initShaders, convertToLatex } from '$lib/utils.svelte.js';
-    import * as mv from '$lib/Libraries/MV.js';
+    import { vec2, vec3, vec4, flatten, perspective, mat4, lookAt, mult, translate } from '$lib/Libraries/MV.js';
     import Result from '$lib/components/Result.svelte';
-    import Admonition from '$lib/components/UI/Admonition.svelte';
 
     let viewIndex = $state(1);
     let isLoading = $state(true);
@@ -34,23 +33,19 @@
             gl.enable(gl.BLEND);
             gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
-            try {
-                [gl, program] = await initShaders(gl, program, $page.url.pathname + '/vshader.glsl', $page.url.pathname + '/fshader.glsl');
+            program = await initShaders(gl, program, $page.url.pathname + '/vshader.glsl', $page.url.pathname + '/fshader.glsl');
 
-                time = 0.0;
-                initPointLight();
-                initVertices();
-                initGroundTexture();
-                initTextureCoordinates();
-                initMatrices();
-                
-                visibilityLoc = gl.getUniformLocation(program, "visibility");
-                isGroundLoc = gl.getUniformLocation(program, "isGround");
+            time = 0.0;
+            initPointLight();
+            initVertices();
+            initGroundTexture();
+            initTextureCoordinates();
+            initMatrices();
+            
+            visibilityLoc = gl.getUniformLocation(program, "visibility");
+            isGroundLoc = gl.getUniformLocation(program, "isGround");
 
-                render();
-            } catch (error) {
-                console.error(error);
-            }
+            render();
 
             codeSnippets = await fetchCodeSnippets($page.url.pathname);
             isLoading = false;
@@ -58,37 +53,37 @@
     });
 
     const initPointLight = () => {
-        pointLightCenter = mv.vec3(0.0, 2.0, -2.0);
+        pointLightCenter = vec3(0.0, 2.0, -2.0);
         pointLightRadius = 2.0;
     }
 
     const initVertices = () => {
         vertices = [
-            mv.vec4(-2.0, -1.0, -1.0, 1.0), 
-            mv.vec4(-2.0, -1.0, -5.0, 1.0), 
-            mv.vec4(2.0, -1.0, -5.0, 1.0),
-            mv.vec4(-2.0, -1.0, -1.0, 1.0), 
-            mv.vec4(2.0, -1.0, -5.0, 1.0),
-            mv.vec4(2.0, -1.0, -1.0, 1.0),
+            vec4(-2.0, -1.0, -1.0, 1.0), 
+            vec4(-2.0, -1.0, -5.0, 1.0), 
+            vec4(2.0, -1.0, -5.0, 1.0),
+            vec4(-2.0, -1.0, -1.0, 1.0), 
+            vec4(2.0, -1.0, -5.0, 1.0),
+            vec4(2.0, -1.0, -1.0, 1.0),
 
-            mv.vec4(0.25, -0.5, -1.25, 1.0),
-            mv.vec4(0.25, -0.5, -1.75, 1.0),
-            mv.vec4(0.75, -0.5, -1.75, 1.0),
-            mv.vec4(0.25, -0.5, -1.25, 1.0),
-            mv.vec4(0.75, -0.5, -1.75, 1.0),
-            mv.vec4(0.75, -0.5, -1.25, 1.0),
+            vec4(0.25, -0.5, -1.25, 1.0),
+            vec4(0.25, -0.5, -1.75, 1.0),
+            vec4(0.75, -0.5, -1.75, 1.0),
+            vec4(0.25, -0.5, -1.25, 1.0),
+            vec4(0.75, -0.5, -1.75, 1.0),
+            vec4(0.75, -0.5, -1.25, 1.0),
 
-            mv.vec4(-1.0, -1.0, -2.5, 1.0),
-            mv.vec4(-1.0, -1.0, -3.0, 1.0),
-            mv.vec4(-1.0, -0.0, -3.0, 1.0),
-            mv.vec4(-1.0, -1.0, -2.5, 1.0),
-            mv.vec4(-1.0, -0.0, -3.0, 1.0),
-            mv.vec4(-1.0, -0.0, -2.5, 1.0),
+            vec4(-1.0, -1.0, -2.5, 1.0),
+            vec4(-1.0, -1.0, -3.0, 1.0),
+            vec4(-1.0, -0.0, -3.0, 1.0),
+            vec4(-1.0, -1.0, -2.5, 1.0),
+            vec4(-1.0, -0.0, -3.0, 1.0),
+            vec4(-1.0, -0.0, -2.5, 1.0),
         ];
 
         var vBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, mv.flatten(vertices), gl.STATIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER, flatten(vertices), gl.STATIC_DRAW);
         var vPosition = gl.getAttribLocation(program, "vPosition");
         gl.vertexAttribPointer(vPosition, 4, gl.FLOAT, false, 0, 0);
         gl.enableVertexAttribArray(vPosition);
@@ -116,13 +111,13 @@
 
     const initTextureCoordinates = () => {
         var textCoords = [
-            mv.vec2(-.5, -.5), mv.vec2(.5, -.5), mv.vec2(.5, .5),
-            mv.vec2(-.5, -.5), mv.vec2(.5, .5), mv.vec2(-.5, .5),
+            vec2(-.5, -.5), vec2(.5, -.5), vec2(.5, .5),
+            vec2(-.5, -.5), vec2(.5, .5), vec2(-.5, .5),
         ];
 
         var tBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, tBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, mv.flatten(textCoords), gl.STATIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER, flatten(textCoords), gl.STATIC_DRAW);
         var vTexCoord = gl.getAttribLocation(program, "vTexCoord");
         gl.vertexAttribPointer(vTexCoord, 2, gl.FLOAT, false, 0, 0);
         gl.enableVertexAttribArray(vTexCoord);
@@ -130,12 +125,12 @@
 
     const initMatrices = () => {
         projectionMatrixLoc = gl.getUniformLocation(program, "projectionMatrix");
-        projectionMatrix = mv.perspective(90, canvas.width / canvas.height, .1, 30.0);
-        gl.uniformMatrix4fv(projectionMatrixLoc, false, mv.flatten(projectionMatrix));
+        projectionMatrix = perspective(90, canvas.width / canvas.height, .1, 30.0);
+        gl.uniformMatrix4fv(projectionMatrixLoc, false, flatten(projectionMatrix));
         
-        at = mv.vec3(0.0, 0.0, 0.0);
-        up = mv.vec3(0.0, 1.0, 0.0);
-        eye = mv.vec3(0.0, 0.0, 0.0);
+        at = vec3(0.0, 0.0, 0.0);
+        up = vec3(0.0, 1.0, 0.0);
+        eye = vec3(0.0, 0.0, 0.0);
         modelViewMatrixLoc = gl.getUniformLocation(program, "modelViewMatrix");
     }
 
@@ -156,7 +151,7 @@
     }
 
     const updateLightPosition = () => {
-        pointLightPosition = mv.vec3(
+        pointLightPosition = vec3(
             pointLightCenter[0] + pointLightRadius * Math.cos(time),
             pointLightCenter[1],
             pointLightCenter[2] + pointLightRadius * Math.sin(time),
@@ -173,15 +168,15 @@
     const renderShadow = () => {
         gl.depthFunc(gl.GREATER);
 
-        modelViewMatrix = mv.lookAt(eye, at, up);
+        modelViewMatrix = lookAt(eye, at, up);
         let epsilon = 0.001;
-        let m = mv.mat4();
+        let m = mat4();
         m[3][3] = 0.0;
         m[3][1] = -1.0 / (pointLightPosition[1] + 1.0 + epsilon);
-        modelViewMatrix = mv.mult(modelViewMatrix, mv.translate(pointLightPosition));
-        modelViewMatrix = mv.mult(modelViewMatrix, m);
-        modelViewMatrix = mv.mult(modelViewMatrix, mv.translate(-pointLightPosition[0], -pointLightPosition[1], -pointLightPosition[2]));
-        gl.uniformMatrix4fv(modelViewMatrixLoc, false, mv.flatten(modelViewMatrix));
+        modelViewMatrix = mult(modelViewMatrix, translate(pointLightPosition));
+        modelViewMatrix = mult(modelViewMatrix, m);
+        modelViewMatrix = mult(modelViewMatrix, translate(-pointLightPosition[0], -pointLightPosition[1], -pointLightPosition[2]));
+        gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
 
         gl.uniform1i(visibilityLoc, false);
         gl.drawArrays(gl.TRIANGLES, 6, 18);
@@ -190,9 +185,9 @@
     }
 
     const renderRects = () => {
-        modelViewMatrix = mv.lookAt(eye, at, up);
+        modelViewMatrix = lookAt(eye, at, up);
         
-        gl.uniformMatrix4fv(modelViewMatrixLoc, false, mv.flatten(modelViewMatrix));
+        gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
         gl.uniform1i(visibilityLoc, true);
         gl.drawArrays(gl.TRIANGLES, 6, 18);
     }

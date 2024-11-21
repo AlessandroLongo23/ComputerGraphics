@@ -3,7 +3,7 @@
     import { page } from '$app/stores'
     import { WebGLUtils, fetchCodeSnippets, initShaders, convertToLatex } from '$lib/utils.svelte.js';
     import { SendToBack, BringToFront, X } from 'lucide-svelte'
-    import * as mv from '$lib/Libraries/MV.js';
+    import { vec3, vec4, flatten, perspective, lookAt, mat4, mult, translate, normalize, mix } from '$lib/Libraries/MV.js';
     import Result from '$lib/components/Result.svelte';
     import Counter from '$lib/components/UI/Counter.svelte';
     import Toggle from '$lib/components/UI/Toggle.svelte';
@@ -31,26 +31,22 @@
             gl.viewport(0, 0, canvas.width, canvas.height);
             gl.clearColor(0.3921, 0.5843, 0.9294, 1.0);
 
-            try {
-                [gl, program] = await initShaders(gl, program, $page.url.pathname + '/vshader.glsl', $page.url.pathname + '/fshader.glsl');
+            program = await initShaders(gl, program, $page.url.pathname + '/vshader.glsl', $page.url.pathname + '/fshader.glsl');
 
-                culling = 0;
+            culling = 0;
 
-                baseVertices = [
-                    mv.vec4(0.0, 0.0, -1.0, 1), 
-                    mv.vec4(0.0, 0.942809, 0.333333, 1),
-                    mv.vec4(-0.816497, -0.471405, 0.333333, 1),
-                    mv.vec4(0.816497, -0.471405, 0.333333, 1)
-                ]
-                subdivisions = 1;
-                
-                initMatrices();
-                buildPolyhedron();
+            baseVertices = [
+                vec4(0.0, 0.0, -1.0, 1), 
+                vec4(0.0, 0.942809, 0.333333, 1),
+                vec4(-0.816497, -0.471405, 0.333333, 1),
+                vec4(0.816497, -0.471405, 0.333333, 1)
+            ]
+            subdivisions = 1;
+            
+            initMatrices();
+            buildPolyhedron();
 
-                render();
-            } catch (error) {
-                console.error(error);
-            }
+            render();
 
             codeSnippets = await fetchCodeSnippets($page.url.pathname);
             isLoading = false;
@@ -59,22 +55,22 @@
 
     const initMatrices = () => {
         projectionMatrixLoc = gl.getUniformLocation(program, "projectionMatrix");
-        projectionMatrix = mv.perspective(45, canvas.width / canvas.height, .001, 10.0);
-        gl.uniformMatrix4fv(projectionMatrixLoc, false, mv.flatten(projectionMatrix));
+        projectionMatrix = perspective(45, canvas.width / canvas.height, .001, 10.0);
+        gl.uniformMatrix4fv(projectionMatrixLoc, false, flatten(projectionMatrix));
 
         viewMatrixLoc = gl.getUniformLocation(program, "viewMatrix");
         dist = 4.0;
         thetaY = 30;
-        eye = mv.vec3(dist * Math.cos(thetaY), 0.0, dist * Math.sin(thetaY));
-        at = mv.vec3(0.0, 0.0, 0.0);
-        up = mv.vec3(0.0, 1.0, 0.0);
-        viewMatrix = mv.lookAt(eye, at, up);
-        gl.uniformMatrix4fv(viewMatrixLoc, false, mv.flatten(viewMatrix));
+        eye = vec3(dist * Math.cos(thetaY), 0.0, dist * Math.sin(thetaY));
+        at = vec3(0.0, 0.0, 0.0);
+        up = vec3(0.0, 1.0, 0.0);
+        viewMatrix = lookAt(eye, at, up);
+        gl.uniformMatrix4fv(viewMatrixLoc, false, flatten(viewMatrix));
 
         modelMatrixLoc = gl.getUniformLocation(program, "modelMatrix");
-        modelMatrix = mv.mat4();
-        modelMatrix = mv.mult(modelMatrix, mv.translate(mv.vec3(0.0, -0.25, 0.0)));
-        gl.uniformMatrix4fv(modelMatrixLoc, false, mv.flatten(modelMatrix));
+        modelMatrix = mat4();
+        modelMatrix = mult(modelMatrix, translate(vec3(0.0, -0.25, 0.0)));
+        gl.uniformMatrix4fv(modelMatrixLoc, false, flatten(modelMatrix));
     };
 
     const buildPolyhedron = () => {
@@ -84,14 +80,14 @@
 
         vBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, mv.flatten(vertices), gl.STATIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER, flatten(vertices), gl.STATIC_DRAW);
         var vPosition = gl.getAttribLocation(program, "vPosition");
         gl.vertexAttribPointer(vPosition, 4, gl.FLOAT, false, 0, 0);
         gl.enableVertexAttribArray(vPosition);
 
         var cBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, mv.flatten(colors), gl.STATIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER, flatten(colors), gl.STATIC_DRAW);
         var vColor = gl.getAttribLocation(program, "vColor");
         gl.vertexAttribPointer(vColor, 4, gl.FLOAT, false, 0, 0);
         gl.enableVertexAttribArray(vColor);
@@ -110,9 +106,9 @@
             return;
         }
 
-        var ab = mv.normalize(mv.mix(a, b, 0.5), true);
-        var ac = mv.normalize(mv.mix(a, c, 0.5), true);
-        var bc = mv.normalize(mv.mix(b, c, 0.5), true);
+        var ab = normalize(mix(a, b, 0.5), true);
+        var ac = normalize(mix(a, c, 0.5), true);
+        var bc = normalize(mix(b, c, 0.5), true);
 
         divideTriangle(a, ab, ac, count - 1);
         divideTriangle(ab, b, bc, count - 1);
@@ -122,11 +118,11 @@
 
     const triangle = (a, b, c) => {
         vertices.push(a);
-        colors.push(mv.vec4(0.5 * a[0] + 0.5, 0.5 * a[1] + 0.5, 0.5 * a[2] + 0.5, 1.0))
+        colors.push(vec4(0.5 * a[0] + 0.5, 0.5 * a[1] + 0.5, 0.5 * a[2] + 0.5, 1.0))
         vertices.push(b);
-        colors.push(mv.vec4(0.5 * b[0] + 0.5, 0.5 * b[1] + 0.5, 0.5 * b[2] + 0.5, 1.0))
+        colors.push(vec4(0.5 * b[0] + 0.5, 0.5 * b[1] + 0.5, 0.5 * b[2] + 0.5, 1.0))
         vertices.push(c);
-        colors.push(mv.vec4(0.5 * c[0] + 0.5, 0.5 * c[1] + 0.5, 0.5 * c[2] + 0.5, 1.0))
+        colors.push(vec4(0.5 * c[0] + 0.5, 0.5 * c[1] + 0.5, 0.5 * c[2] + 0.5, 1.0))
     }
 
     const render = () => {
@@ -149,9 +145,9 @@
 
     const updateCamera = () => {
         thetaY += 0.005;
-        eye = mv.vec3(dist * Math.cos(thetaY), 0.0, dist * Math.sin(thetaY));
-        viewMatrix = mv.lookAt(eye, at, up);
-        gl.uniformMatrix4fv(viewMatrixLoc, false, mv.flatten(viewMatrix));
+        eye = vec3(dist * Math.cos(thetaY), 0.0, dist * Math.sin(thetaY));
+        viewMatrix = lookAt(eye, at, up);
+        gl.uniformMatrix4fv(viewMatrixLoc, false, flatten(viewMatrix));
     }
 
     $effect(() => {

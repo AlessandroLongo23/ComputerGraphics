@@ -3,7 +3,7 @@
     import { page } from '$app/stores'
     import { WebGLUtils, fetchCodeSnippets, initShaders, convertToLatex } from '$lib/utils.svelte.js';
     import { Quaternion } from '$lib/Libraries/Quaternion.js';
-    import * as mv from '$lib/Libraries/MV.js';
+    import { vec3, vec4, mat4, perspective, flatten, lookAt, normalize, mix } from '$lib/Libraries/MV.js';
     import Result from '$lib/components/Result.svelte';
     import Admonition from '$lib/components/UI/Admonition.svelte';
 
@@ -38,25 +38,21 @@
             gl.viewport(0, 0, canvas.width, canvas.height);
             gl.clearColor(0.3921, 0.5843, 0.9294, 1.0);
 
-            try {
-                [gl, program] = await initShaders(gl, program, $page.url.pathname + '/vshader.glsl', $page.url.pathname + '/fshader.glsl');
+            program = await initShaders(gl, program, $page.url.pathname + '/vshader.glsl', $page.url.pathname + '/fshader.glsl');
 
-                initLight();
-                initMatrices();
-                initVertices();
-                initGroundTexture();
+            initLight();
+            initMatrices();
+            initVertices();
+            initGroundTexture();
 
-                initEventHandlers(document.getElementById("gl-canvas"));
-                qRotation = new Quaternion();
-                qIncrement = new Quaternion();
+            initEventHandlers(document.getElementById("gl-canvas"));
+            qRotation = new Quaternion();
+            qIncrement = new Quaternion();
 
-                subdivisions = 6;
-                buildPolyhedron();
+            subdivisions = 6;
+            buildPolyhedron();
 
-                render();
-            } catch (error) {
-                console.error(error);
-            }
+            render();
 
             codeSnippets = await fetchCodeSnippets($page.url.pathname);
             isLoading = false;
@@ -64,35 +60,35 @@
     });
 
     const initLight = () => {
-        var lightDirection = mv.vec3(0.0, 0.0, 1.0);
+        var lightDirection = vec3(0.0, 0.0, 1.0);
         var lightDirectionLoc = gl.getUniformLocation(program, "lightDirection");
-        gl.uniform3fv(lightDirectionLoc, mv.flatten(lightDirection));
+        gl.uniform3fv(lightDirectionLoc, flatten(lightDirection));
     }
 
     const initMatrices = () => {
         projectionMatrixLoc = gl.getUniformLocation(program, "projectionMatrix");
-        projectionMatrix = mv.perspective(45, canvas.width / canvas.height, 0.1, 100.0);
-        gl.uniformMatrix4fv(projectionMatrixLoc, false, mv.flatten(projectionMatrix));
+        projectionMatrix = perspective(45, canvas.width / canvas.height, 0.1, 100.0);
+        gl.uniformMatrix4fv(projectionMatrixLoc, false, flatten(projectionMatrix));
 
         viewMatrixLoc = gl.getUniformLocation(program, "viewMatrix");
         dist = 4.0;
-        eye = mv.vec3(0.0, 0.0, dist);
-        at = mv.vec3(0.0, 0.0, 0.0);
-        up = mv.vec3(0.0, 1.0, 0.0);
-        viewMatrix = mv.lookAt(eye, at, up);
-        gl.uniformMatrix4fv(viewMatrixLoc, false, mv.flatten(viewMatrix));
+        eye = vec3(0.0, 0.0, dist);
+        at = vec3(0.0, 0.0, 0.0);
+        up = vec3(0.0, 1.0, 0.0);
+        viewMatrix = lookAt(eye, at, up);
+        gl.uniformMatrix4fv(viewMatrixLoc, false, flatten(viewMatrix));
 
-        modelMatrix = mv.mat4();
+        modelMatrix = mat4();
         modelMatrixLoc = gl.getUniformLocation(program, "modelMatrix");
-        gl.uniformMatrix4fv(modelMatrixLoc, false, mv.flatten(modelMatrix));
+        gl.uniformMatrix4fv(modelMatrixLoc, false, flatten(modelMatrix));
     }
 
     const initVertices = () => {
         baseVertices = [
-            mv.vec4(0.0, 0.0, -1.0, 1),
-            mv.vec4(0.0, 0.942809, 0.333333, 1),
-            mv.vec4(-0.816497, -0.471405, 0.333333, 1),
-            mv.vec4(0.816497, -0.471405, 0.333333, 1),
+            vec4(0.0, 0.0, -1.0, 1),
+            vec4(0.0, 0.942809, 0.333333, 1),
+            vec4(-0.816497, -0.471405, 0.333333, 1),
+            vec4(0.816497, -0.471405, 0.333333, 1),
         ]
     }
 
@@ -123,14 +119,14 @@
 
         vBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, mv.flatten(vertices), gl.STATIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER, flatten(vertices), gl.STATIC_DRAW);
         var vPosition = gl.getAttribLocation(program, "vPosition");
         gl.vertexAttribPointer(vPosition, 4, gl.FLOAT, false, 0, 0);
         gl.enableVertexAttribArray(vPosition);
 
         nBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, nBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, mv.flatten(normals), gl.STATIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER, flatten(normals), gl.STATIC_DRAW);
         var vNormal = gl.getAttribLocation(program, "vNormal");
         gl.vertexAttribPointer(vNormal, 4, gl.FLOAT, false, 0, 0);
         gl.enableVertexAttribArray(vNormal);
@@ -149,9 +145,9 @@
             return;
         }
 
-        var ab = mv.normalize(mv.mix(a, b, 0.5), true);
-        var ac = mv.normalize(mv.mix(a, c, 0.5), true);
-        var bc = mv.normalize(mv.mix(b, c, 0.5), true);
+        var ab = normalize(mix(a, b, 0.5), true);
+        var ac = normalize(mix(a, c, 0.5), true);
+        var bc = normalize(mix(b, c, 0.5), true);
 
         divideTriangle(a, ab, ac, count - 1);
         divideTriangle(ab, b, bc, count - 1);
@@ -171,8 +167,8 @@
     const render = () => {
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-        viewMatrix = mv.lookAt(qRotation.apply(eye), at, qRotation.apply(up));
-        gl.uniformMatrix4fv(viewMatrixLoc, false, mv.flatten(viewMatrix));
+        viewMatrix = lookAt(qRotation.apply(eye), at, qRotation.apply(up));
+        gl.uniformMatrix4fv(viewMatrixLoc, false, flatten(viewMatrix));
 
         gl.drawArrays(gl.TRIANGLES, 0, vertices.length);
         
@@ -180,7 +176,7 @@
     }
 
     const initEventHandlers = (canvas) => {
-        mouseVector = mv.vec3();
+        mouseVector = vec3();
         prevMouseVector = null;
         isLeftButtonDown = false;
 
@@ -229,8 +225,8 @@
         else
             mouseVirtualZ = 1 / (2 * d);
         
-        let v = mv.vec3(mouseVirtualX, mouseVirtualY, mouseVirtualZ);
-        v = mv.normalize(v);
+        let v = vec3(mouseVirtualX, mouseVirtualY, mouseVirtualZ);
+        v = normalize(v);
 
         return v;
     }
