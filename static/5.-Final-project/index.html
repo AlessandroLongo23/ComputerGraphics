@@ -1,0 +1,41 @@
+<html>
+    <head>
+        <script type="text/javascript" src="../lib/webgl-utils.js"></script>
+        <script type="text/javascript" src="../lib/initShaders2.js"></script>
+        <script type="text/javascript" src="../lib/MV.js"></script>
+        <script type="text/javascript" src="../lib/OBJParser.js"></script>
+    </head>
+
+    <body>
+        <canvas id="gl-canvas" width="700" height="700"></canvas>
+
+        <input id="displacementScale" type="range" min="0" max=".5" step="0.01" value="0.1">
+        <input id="patternRepeat" type="range" min="1" max="4" step="1" value="1">
+
+        <select id="texturePack">
+            <option value="corrugated_iron_2k">Corrugated Iron</option>
+            <option value="herringbone_brick_2k">Herringbone Brick</option>
+            <option value="metal_plate_02_2k">Metal Plate</option>
+            <option value="recycled_brick_floor_2k">Recycled Brick Floor</option>
+        </select>
+
+        <select id="model">
+            <option value="sphere">Sphere</option>
+            <option value="suzanne">Suzanne</option>
+            <option value="teapot">Teapot</option>
+            <option value="pumpkin">Pumpkin</option>
+        </select> 
+
+        <select id="cubemap">
+            <option value="autumn">Autumn</option>
+            <option value="brightday">Bright Day</option>
+            <option value="greenhill">Green Hill</option>
+            <option value="nvidia">Nvidia</option>
+            <option value="terrain">Terrain</option>
+        </select>
+    </body>
+
+    <script type="text/javascript" src="main.js"></script>
+    <script type="text/javascript" src="sphere.js"></script>
+    <script type="text/javascript" src="loaders.js"></script>
+</html>

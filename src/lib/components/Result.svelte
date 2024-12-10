@@ -11,17 +11,18 @@
         isLoading,
         codeSnippets,
         folderPath,
+        icons = [Code, Columns2, Play],
         width = 512,
         controls
     } = $props();
 </script>
 
 <div class="mx-auto my-4">
-    <Toggle bind:selected={viewIndex} icons={[Code, Columns2, Play]}/>
+    <Toggle bind:selected={viewIndex} icons={icons}/>
 </div>
 
 <div class="flex flex-row justify-evenly items-center m-auto">
-    <div class="{viewIndex !== 2 ? 'visible' : 'hidden'} w-full">
+    <div class="{((icons.length == 3 && viewIndex !== 2) || (icons.length == 2 && viewIndex == 0)) ? 'visible' : 'hidden'} w-full">
         {#if !isLoading}
             <CodeBlock codeSnippets={codeSnippets} viewIndex={viewIndex} folderPath={folderPath} style="width: {viewIndex == 1 ? '768' : '1024'}px; height: 512px;"/>
         {:else}
@@ -29,9 +30,11 @@
         {/if}
     </div>
 
-    <Canvas bind:canvas={canvas} viewIndex={viewIndex} width={width}>
-        {#snippet contr()}
-            {@render controls?.()}
-        {/snippet}
-    </Canvas>
+    <div class="{viewIndex !== 0 ? 'visible' : 'hidden'}"> 
+        <Canvas bind:canvas={canvas} width={width} rounded="rounded-lg {icons.length == 3 && viewIndex == 1 && 'rounded-l-none'}">  
+            {#snippet contr()}
+                {@render controls?.()}
+            {/snippet}
+        </Canvas>
+    </div>
 </div>

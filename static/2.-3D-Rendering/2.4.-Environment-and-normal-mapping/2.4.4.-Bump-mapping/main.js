@@ -59,7 +59,7 @@ const initCubeMap = () => {
         { target: gl.TEXTURE_CUBE_MAP_NEGATIVE_Z, url: '../cubemaps/brightday/negz.png' }
     ];
 
-    gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
     gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
 
     let loadedImages = 0;

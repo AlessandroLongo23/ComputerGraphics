@@ -4,6 +4,7 @@
     import { WebGLUtils, fetchCodeSnippets, initShaders, convertToLatex } from '$lib/utils.svelte.js';
     import { vec3, flatten, mat4, mult, translate, rotateX, rotateY, rotateZ, perspective } from '$lib/Libraries/MV.js';
     import Result from '$lib/components/Result.svelte';
+    import { Code, Play } from 'lucide-svelte';
 
     let viewIndex = $state(1);
     let isLoading = $state(true);
@@ -132,5 +133,5 @@
         <p>Draw the cube three times in the same rendering. Transform the cubes so that one is in one-point (front) perspective, one is in two-point (X) perspective, and one is in three-point perspective. [Angel 4.9-4.11, 5.1.5]</p>
     </div>
 
-    <Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets} width={1024}/>
+    <Result bind:canvas={canvas} bind:viewIndex={viewIndex} icons={[Code, Play]} isLoading={isLoading} codeSnippets={codeSnippets} width={1024}/>
 </div>

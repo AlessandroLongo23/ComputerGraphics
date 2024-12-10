@@ -19,7 +19,8 @@ var OBJDoc = function (fileName) {
 	this.mtls = new Array(0);     
 	this.objects = new Array(0);   
 	this.vertices = new Array(0);  
-	this.normals = new Array(0);   
+	this.normals = new Array(0); 
+	// this.texCoords = new Array(0);  
 }
 
 OBJDoc.prototype.parse = async function (fileString, scale, reverse) {
@@ -80,11 +81,21 @@ OBJDoc.prototype.parse = async function (fileString, scale, reverse) {
 				var face = this.parseFace(sp, currentMaterialName, this.vertices, reverse);
 				currentObject.addFace(face);
 				continue;
+			// case 'vt':
+			// 	var texCoord = this.parseTexCoord(sp);
+			// 	this.texCoords.push(texCoord);
+			// 	continue;
 		}
 	}
 
 	return true;
 }
+
+// OBJDoc.prototype.parseTexCoord = function (sp) {
+// 	var x = sp.getFloat();
+// 	var y = sp.getFloat();
+// 	return (new TexCoord(x, y));
+// }
 
 OBJDoc.prototype.parseMtllib = function (sp, fileName) {
 	var i = fileName.lastIndexOf("/");
@@ -252,16 +263,19 @@ OBJDoc.prototype.findColor = function (name) {
 }
 
 OBJDoc.prototype.getDrawingInfo = function () {
-	var numVertices = 0;
 	var numIndices = 0;
 	for (var i = 0; i < this.objects.length; i++)
 		numIndices += this.objects[i].numIndices;
 
 	var numVertices = this.vertices.length;
+	// var numNormals = this.normals.length;
+	// var numTexCoords = this.texCoords.length;
+
 	var vertices = new Float32Array(numVertices * 4);
 	var normals = new Float32Array(numVertices * 4);
 	var colors = new Float32Array(numVertices * 4);
 	var indices = new Uint32Array(numIndices);
+	// var texCoords = new Float32Array(numTexCoords * 2);
 
 	var index_indices = 0;
 	for (var i = 0; i < this.objects.length; i++) {
@@ -299,10 +313,14 @@ OBJDoc.prototype.getDrawingInfo = function () {
 					normals[vIdx * 4 + 3] = 0.0;
 				}
 				index_indices++;
+
+				// texCoords[vIdx * 2 + 0] = this.texCoords[vIdx].x;
+				// texCoords[vIdx * 2 + 1] = this.texCoords[vIdx].y;
 			}
 		}
 	}
 
+	// return new DrawingInfo(vertices, normals, colors, indices, texCoords);
 	return new DrawingInfo(vertices, normals, colors, indices);
 }
 
@@ -326,6 +344,11 @@ var Material = function (name, r, g, b, a) {
 	this.name = name;
 	this.color = new Color(r, g, b, a);
 }
+
+// var TexCoord = function (x, y) {
+// 	this.x = x;
+// 	this.y = y;
+// }
 
 var Vertex = function (x, y, z) {
 	this.x = x;
@@ -365,11 +388,13 @@ var Face = function (materialName) {
 	this.nIndices = new Array(0);
 }
 
-var DrawingInfo = function (vertices, normals, colors, indices) {
+// var DrawingInfo = function (vertices, normals, colors, indices, texCoords) {
+	var DrawingInfo = function (vertices, normals, colors, indices) {
 	this.vertices = vertices;
 	this.normals = normals;
 	this.colors = colors;
 	this.indices = indices;
+	// this.texCoords = texCoords;
 }
 
 var StringParser = function (str) {

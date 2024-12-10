@@ -5,6 +5,7 @@ const chapterIcons = [
     ls.Box,
     ls.Boxes,
     ls.Orbit,
+    ls.CodeXml
 ];
 
 export const contentTree = {
@@ -244,6 +245,10 @@ export const contentTree = {
                     ]
                 }
             ]
+        },
+        {
+            icon: chapterIcons[4],
+            href: '/5.-Final-project',
         }
     ]
 };

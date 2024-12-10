@@ -48,7 +48,15 @@ p, li {
 
 a {
 	font-size: 1.125rem;
+	color: var(--color-theme-1);
+	text-decoration: none;
+	/* border-bottom: 2px dashed transparent; */
 }
+
+/* a:hover {
+	border-bottom: 2px dashed var(--color-theme-1);
+	transition: border-bottom 0.1s ease-out;
+} */
 
 li::before {
     content: '';
@@ -67,10 +75,7 @@ li {
     padding-left: 1.5rem;
 }
 
-a {
-	color: var(--color-theme-1);
-	text-decoration: none;
-}
+
 
 h1 {
 	font-size: 2rem;
