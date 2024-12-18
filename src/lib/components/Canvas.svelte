@@ -1,14 +1,15 @@
 <script>
     let {
         canvas = $bindable(),
-        width = 512,
+        width,
+        height,
         contr,
         rounded,
     } = $props();
 </script>
 
 <div class="relative">
-    <canvas bind:this={canvas} id="gl-canvas" width="{width}" height="512" class={rounded} ></canvas>
+    <canvas bind:this={canvas} id="gl-canvas" width="{width}" height="{height}" class={rounded} ></canvas>
 
     {@render contr?.()}
 </div>

@@ -7,7 +7,7 @@ varying vec4 fPosition;
 
 uniform samplerCube cubeMap;
 
-uniform sampler2D colorTexture;
+uniform sampler2D albedoMap;
 uniform sampler2D normalTexture;
 uniform sampler2D armTexture;
 uniform sampler2D metalTexture;
@@ -44,32 +44,30 @@ vec3 rotate_to_normal(vec3 n, vec3 v) {
 void main() {
     vec4 fColor;
     if (reflective) {
-        vec3 baseColor = texture2D(colorTexture, texCoords).rgb;
+        vec3 albedo = texture2D(albedoMap, texCoords).rgb;
         float ao = texture2D(armTexture, texCoords).r;
         float roughness = texture2D(armTexture, texCoords).g;
         float metal = texture2D(metalTexture, texCoords).r;
 
-        vec3 N = normalize(fNormal);
         vec3 tangentNormal = texture2D(normalTexture, texCoords).rgb * 2.0 - 1.0;
-        vec3 worldNormal = rotate_to_normal(N, tangentNormal);
+        vec3 worldNormal = rotate_to_normal(fNormal, tangentNormal);
         
         vec3 w_i = normalize(-lightDirection);
         vec3 viewDir = normalize(eye - fPosition.xyz);
 
         vec3 ambientColor = calcAmbientColor(0.2, vec3(1.0));
-        vec3 diffuseColor = calcDiffuseColor(worldNormal, w_i, 1.0, vec3(1.0));
+        vec3 diffuseColor = calcDiffuseColor(worldNormal, w_i, 2.0, vec3(1.0));
 
         float s = pow(1.0 - roughness, 4.0) * 128.0;
         float ks = mix(0.04, 1.0, metal);
-        vec3 specularColor = calcSpecularColor(worldNormal, w_i, fPosition.xyz, s, ks, baseColor, vec3(1.0), metal);
+        vec3 specularColor = calcSpecularColor(worldNormal, w_i, fPosition.xyz, s, ks, albedo, vec3(1.0), metal);
 
         vec3 lightColor = ambientColor + diffuseColor + specularColor;
 
-        // Calculate reflection vector in world space
         vec3 reflectionDirection = reflect(-viewDir, worldNormal);
         vec3 cubeMapReflection = textureCube(cubeMap, reflectionDirection).rgb;
 
-        fColor = vec4(clamp(mix(baseColor, cubeMapReflection, metal) * ao * lightColor, 0.0, 1.0), 1.0);
+        fColor = vec4(clamp(mix(albedo, cubeMapReflection, metal) * ao * lightColor, 0.0, 1.0), 1.0);
     } else {
         fColor = textureCube(cubeMap, cubeMapCoords);
     }

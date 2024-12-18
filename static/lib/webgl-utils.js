@@ -57,8 +57,8 @@ WebGLUtils = function() {
 	};
 }();
 
-window.requestAnimFrame = (function() {
-	return window.requestAnimationFrame ||
+requestAnimFrame = (function() {
+	return requestAnimationFrame ||
 		window.webkitRequestAnimationFrame ||
 		window.mozRequestAnimationFrame ||
 		window.oRequestAnimationFrame ||

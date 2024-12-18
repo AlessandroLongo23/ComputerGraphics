@@ -166,7 +166,7 @@
         {#snippet controls()}
             <div class="absolute left-0 top-0 flex flex-row justify-evenly items-center gap-4 w-full p-4 bg-gray-900/25 rounded-{viewIndex == 1 && 'r-'}lg">    
                 <Toggle bind:selected={culling} icons={[X, SendToBack, BringToFront]}/>
-                <Counter bind:count={subdivisions} min={0} max={6}/>
+                <Counter bind:count={subdivisions} min={0} max={6} label="subdivisions"/>
             </div>
         {/snippet}
     </Result>

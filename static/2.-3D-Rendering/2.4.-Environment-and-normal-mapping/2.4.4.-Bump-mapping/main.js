@@ -6,7 +6,7 @@ window.onload = () => {
     initUniforms();
     
     initCubeMap();
-    initBumpMap();
+    initBumpMap(1);
     
     initBackgroundQuad();
     initSphere();
@@ -51,12 +51,12 @@ const initCubeMap = () => {
     gl.bindTexture(gl.TEXTURE_CUBE_MAP, cubeTexture);
     
     const faces = [
-        { target: gl.TEXTURE_CUBE_MAP_POSITIVE_X, url: '../cubemaps/brightday/posx.png' },
-        { target: gl.TEXTURE_CUBE_MAP_NEGATIVE_X, url: '../cubemaps/brightday/negx.png' },
-        { target: gl.TEXTURE_CUBE_MAP_POSITIVE_Y, url: '../cubemaps/brightday/posy.png' },
-        { target: gl.TEXTURE_CUBE_MAP_NEGATIVE_Y, url: '../cubemaps/brightday/negy.png' },
-        { target: gl.TEXTURE_CUBE_MAP_POSITIVE_Z, url: '../cubemaps/brightday/posz.png' },
-        { target: gl.TEXTURE_CUBE_MAP_NEGATIVE_Z, url: '../cubemaps/brightday/negz.png' }
+        { target: gl.TEXTURE_CUBE_MAP_POSITIVE_X, url: '../../../assets/textures/cubemaps/brightday/posx.png' },
+        { target: gl.TEXTURE_CUBE_MAP_NEGATIVE_X, url: '../../../assets/textures/cubemaps/brightday/negx.png' },
+        { target: gl.TEXTURE_CUBE_MAP_POSITIVE_Y, url: '../../../assets/textures/cubemaps/brightday/posy.png' },
+        { target: gl.TEXTURE_CUBE_MAP_NEGATIVE_Y, url: '../../../assets/textures/cubemaps/brightday/negy.png' },
+        { target: gl.TEXTURE_CUBE_MAP_POSITIVE_Z, url: '../../../assets/textures/cubemaps/brightday/posz.png' },
+        { target: gl.TEXTURE_CUBE_MAP_NEGATIVE_Z, url: '../../../assets/textures/cubemaps/brightday/negz.png' }
     ];
 
     gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
@@ -83,11 +83,11 @@ const initCubeMap = () => {
     gl.uniform1i(cubeMapLoc, 0);
 }
 
-const initBumpMap = () => {
+const initBumpMap = (index) => {
     gl.activeTexture(gl.TEXTURE1);
     bumpTexture = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, bumpTexture);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
 
     bumpTextureLoc = gl.getUniformLocation(program, "bumpMap");
@@ -100,7 +100,7 @@ const initBumpMap = () => {
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, myTexels);
         gl.generateMipmap(gl.TEXTURE_2D);
     }
-    myTexels.src = "../bumpmaps/bumpMap2.png";
+    myTexels.src = "../../../assets/textures/bumpmaps/bumpMap" + index + ".png";
 }
 
 const initBackgroundQuad = () => {
@@ -229,4 +229,8 @@ const drawSphere = () => {
     gl.uniform1i(reflectiveLoc, true);
 
     gl.drawArrays(gl.TRIANGLES, 0, sphereVertices.length);
+}
+
+document.getElementById("bumpmap").onchange = () => {
+    initBumpMap(document.getElementById("bumpmap").selectedIndex + 1);
 }

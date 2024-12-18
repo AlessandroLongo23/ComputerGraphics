@@ -57,9 +57,9 @@ WebGLUtils = () => {
 	};
 };
 
-window.requestAnimFrame = (() => {
+requestAnimFrame = (() => {
 	return (
-		window.requestAnimationFrame ||
+		requestAnimationFrame ||
 		window.webkitRequestAnimationFrame ||
 		window.mozRequestAnimationFrame ||
 		window.oRequestAnimationFrame ||

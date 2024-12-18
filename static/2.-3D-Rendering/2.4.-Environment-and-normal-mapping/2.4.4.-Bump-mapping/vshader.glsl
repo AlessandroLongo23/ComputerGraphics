@@ -3,7 +3,7 @@ attribute vec4 vNormal;
 
 varying vec3 texCoords;
 varying vec4 fPosition;
-varying vec4 fNormal;
+varying vec3 fNormal;
 
 uniform mat4 modelMatrix;
 uniform mat4 viewMatrix;
@@ -15,7 +15,7 @@ void main() {
     texCoords = normalize(transformedPos.xyz / transformedPos.w);
 
     fPosition = vPosition;
-    fNormal = vNormal;
+    fNormal = normalize((modelMatrix * vec4(vNormal.xyz, 0.0)).xyz);
     
     gl_Position = projectionMatrix * viewMatrix * modelMatrix * vPosition;
 }

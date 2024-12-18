@@ -13,6 +13,7 @@
         folderPath,
         icons = [Code, Columns2, Play],
         width = 512,
+        height = 512,
         controls
     } = $props();
 </script>
@@ -31,7 +32,7 @@
     </div>
 
     <div class="{viewIndex !== 0 ? 'visible' : 'hidden'}"> 
-        <Canvas bind:canvas={canvas} width={width} rounded="rounded-lg {icons.length == 3 && viewIndex == 1 && 'rounded-l-none'}">  
+        <Canvas bind:canvas={canvas} width={width} height={height} rounded="rounded-lg {icons.length == 3 && viewIndex == 1 && 'rounded-l-none'}">  
             {#snippet contr()}
                 {@render controls?.()}
             {/snippet}

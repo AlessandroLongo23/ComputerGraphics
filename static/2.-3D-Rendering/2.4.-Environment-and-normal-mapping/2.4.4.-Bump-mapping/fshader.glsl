@@ -2,7 +2,7 @@ precision mediump float;
 
 varying vec3 texCoords;
 varying vec4 fPosition;
-varying vec4 fNormal;
+varying vec3 fNormal;
 
 uniform samplerCube cubeMap;
 uniform sampler2D bumpMap;
@@ -22,15 +22,15 @@ vec3 rotate_to_normal(vec3 n, vec3 v) {
 void main() {
     vec4 fColor;
     if (reflective) {
-        vec3 n = normalize(fNormal.xyz);
-        float u = 0.5 + (atan(n.x, n.z) / (2.0 * PI));
-        float v = 0.5 - (asin(-n.y) / PI);
-        vec2 texCoord = vec2(u, v);
+        vec2 uvCoords = vec2(
+            0.5 + (atan(fNormal.x, fNormal.z) / (2.0 * PI)),
+            0.5 - (asin(-fNormal.y) / PI)
+        );
 
-        n = texture2D(bumpMap, texCoord).xyz;
-        n = rotate_to_normal(fNormal.xyz, n);
+        vec3 tangentNormal = texture2D(bumpMap, uvCoords).rgb * 2.0 - 1.0;
+        vec3 worldNormal = rotate_to_normal(fNormal, tangentNormal);
         vec3 incidentDirection = fPosition.xyz - eye;
-        vec3 reflectionDirection = reflect(incidentDirection, n);
+        vec3 reflectionDirection = reflect(incidentDirection, worldNormal);
         fColor = textureCube(cubeMap, reflectionDirection);
     } else {
         fColor = textureCube(cubeMap, texCoords);

@@ -321,7 +321,7 @@ const computeShadow = () => {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     
     shadowProgram.vPosition = gl.getAttribLocation(shadowProgram, "vPosition");
-    initAttributeVariable(gl, shadowProgram.vPosition, teapotProgram.vPositionBuffer)
+    initAttributeVariable(gl, shadowProgram.vPosition, teapotProgram.vPositionBuffer);
     gl.drawElements(gl.TRIANGLES, obj.indices.length, gl.UNSIGNED_SHORT, 0);
 
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
@@ -330,8 +330,8 @@ const computeShadow = () => {
 const renderGround = () => {
     gl.useProgram(groundProgram);
 
-    initAttributeVariable(gl, groundProgram.vPosition, groundProgram.vPositionBuffer)
-    initAttributeVariable(gl, groundProgram.vTexCoord, groundProgram.vTexCoordBuffer)
+    initAttributeVariable(gl, groundProgram.vPosition, groundProgram.vPositionBuffer);
+    initAttributeVariable(gl, groundProgram.vTexCoord, groundProgram.vTexCoordBuffer);
 
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, groundTexture);
@@ -347,8 +347,8 @@ const renderGround = () => {
 const renderTeapot = () => {
     gl.useProgram(teapotProgram);
 
-    initAttributeVariable(gl, teapotProgram.vPosition, teapotProgram.vPositionBuffer)
-    initAttributeVariable(gl, teapotProgram.vNormal, teapotProgram.vNormalBuffer)
+    initAttributeVariable(gl, teapotProgram.vPosition, teapotProgram.vPositionBuffer);
+    initAttributeVariable(gl, teapotProgram.vNormal, teapotProgram.vNormalBuffer);
 
     teapotProgram.modelMatrix = mat4();
     teapotProgram.modelMatrix = mult(teapotProgram.modelMatrix, translate(teapotPosition)); 

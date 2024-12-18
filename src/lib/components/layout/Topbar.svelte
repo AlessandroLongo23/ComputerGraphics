@@ -75,9 +75,9 @@
         <i class="px-6 {$themeIndex == 0 ? 'text-black' : 'text-white'}"></i>
     {/if}
 
-    <div class="absolute right-8">
+    <!-- <div class="absolute right-8">
         <Toggle bind:selected={$themeIndex} icons={[Sun, Moon]}/>
-    </div>
+    </div> -->
 </div>
 
 <style>

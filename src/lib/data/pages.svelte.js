@@ -74,6 +74,10 @@ export const contentTree = {
                             icon: chapterIcons[0],
                             href: '/1.-2D-Basics/1.3.-Model,-view-and-projections/1.3.2.-Perspective-views' 
                         },
+                        {
+                            icon: chapterIcons[0],
+                            href: '/1.-2D-Basics/1.3.-Model,-view-and-projections/1.3.3.-Considerations'
+                        }
                     ]
                 }
             ]

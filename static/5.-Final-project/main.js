@@ -9,6 +9,7 @@ window.onload = () => {
     texturePack = 'corrugated_iron_2k';
     modelLoaded = false;
     cubeTexture = null;
+    yOffset = 0.0;
 
     configureWebGL();
     initEventHandlers(document.getElementById("gl-canvas"));
@@ -116,6 +117,8 @@ const render = () => {
     );
     
     viewMatrix = lookAt(eye, at, up);
+    modelMatrix = mat4();
+    modelMatrix = mult(modelMatrix, translate(0.0, -yOffset, 0.0));
     texMatrix = mult(inverse(viewMatrix), inverse(projectionMatrix));
     gl.uniform3fv(eyeLoc, eye);
 

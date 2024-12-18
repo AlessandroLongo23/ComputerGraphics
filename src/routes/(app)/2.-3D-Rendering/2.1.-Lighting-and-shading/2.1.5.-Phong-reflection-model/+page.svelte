@@ -170,18 +170,18 @@
     <Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets} folderPath={$page.url.pathname}>
         {#snippet controls()}
             <div class="absolute left-0 top-0 flex flex-col justify-evenly items-center gap-4 w-full p-4 bg-gray-900/25 rounded-{viewIndex == 1 && 'r-'}lg">    
-                <Counter bind:count={subdivisions} min={0} max={6}/>
+                <Counter bind:count={subdivisions} min={0} max={6} label="subdivisions"/>
             </div>
 
-            <div class="absolute left-0 bottom-0 flex flex-row justify-evenly items-center gap-4 w-full p-4 bg-gray-900/75 rounded-{viewIndex == 1 && 'r-'}lg">
-                <div class="flex flex-col justify-evenly w-full">
-                    <Slider min={0} max={1} bind:value={k} step={0.01} id={k} label="k"/>
-                    <Slider min={0} max={1} bind:value={L} step={0.01} id={L} label="L"/>
+            <div class="absolute left-0 bottom-0 flex flex-row justify-evenly items-center gap-4 w-full p-4 bg-gray-900/25 rounded-{viewIndex == 1 && 'r-'}lg">
+                <div class="flex flex-col justify-evenly w-full gap-2">
+                    <Slider type="compact" min={0} max={1} bind:value={k} step={0.01} id={k} label="k"/>
+                    <Slider type="compact" min={0} max={1} bind:value={L} step={0.01} id={L} label="L"/>
                 </div>    
 
-                <div class="flex flex-col justify-evenly w-full">
-                    <Slider min={0} max={1} bind:value={ks} step={0.01} id={ks} label="k_s"/>
-                    <Slider min={0} max={3} bind:value={s} step={0.01} id={s} label="s" f={(x) => Math.round(Math.pow(10, x))}/>
+                <div class="flex flex-col justify-evenly w-full gap-2">
+                    <Slider type="compact" min={0} max={1} bind:value={ks} step={0.01} id={ks} label="k_s"/>
+                    <Slider type="compact" min={0} max={3} bind:value={s} step={0.01} id={s} label="s" f={((x) => Math.round(Math.pow(10, x)))} precision={0}/>
                 </div>
             </div>
         {/snippet}

@@ -68,7 +68,7 @@
     const render = () => {
         gl.clear(gl.COLOR_BUFFER_BIT);
         gl.drawArrays(gl.POINTS, 0, index);
-        window.requestAnimFrame(render, canvas);
+        requestAnimFrame(render, canvas);
     }
 </script>
 

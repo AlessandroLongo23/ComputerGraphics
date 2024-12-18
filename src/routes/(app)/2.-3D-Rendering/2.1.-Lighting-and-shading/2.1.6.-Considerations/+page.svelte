@@ -25,5 +25,14 @@
         </ul>
 
         <p class="text-3xl mt-16">Answers</p>
+        <ul>
+            <li class="text-black text-lg">a)</li>
+            <li class="text-black text-lg">b)</li>
+            <li class="text-black text-lg">c)</li>
+            <li class="text-black text-lg">d)</li>
+            <li class="text-black text-lg">e)</li>
+            <li class="text-black text-lg">f)</li>
+            <li class="text-black text-lg">g)</li>
+        </ul>
     </div>
 </div>

@@ -1,7 +1,6 @@
 const initCubeMap = (cubemapPack) => {
-    if (cubeTexture) {
+    if (cubeTexture)
         gl.deleteTexture(cubeTexture);
-    }
 
     cubeTexture = gl.createTexture();
     gl.activeTexture(gl.TEXTURE0);
@@ -57,11 +56,11 @@ const initCubeMap = (cubemapPack) => {
 }
 
 const initTextures = (texturePack) => {
-    initTexture("./textures/" + texturePack + "/color.jpg", "colorTexture", 1);
-    initTexture("./textures/" + texturePack + "/displacement.jpg", "displacementTexture", 2);
-    initTexture("./textures/" + texturePack + "/normal.png", "normalTexture", 3);
-    initTexture("./textures/" + texturePack + "/arm.jpg", "armTexture", 4);
-    initTexture("./textures/" + texturePack + "/metal.jpg", "metalTexture", 5);
+    initTexture("./textures/" + texturePack + "/textures/" + texturePack.slice(0, -2) + "diff_" + texturePack.slice(-2) + ".jpg", "albedoMap", 1);
+    initTexture("./textures/" + texturePack + "/textures/" + texturePack.slice(0, -2) + "disp_" + texturePack.slice(-2) + ".jpg", "displacementTexture", 2);
+    initTexture("./textures/" + texturePack + "/textures/" + texturePack.slice(0, -2) + "nor_gl_" + texturePack.slice(-2) + ".png", "normalTexture", 3);
+    initTexture("./textures/" + texturePack + "/textures/" + texturePack.slice(0, -2) + "arm_" + texturePack.slice(-2) + ".jpg", "armTexture", 4);
+    initTexture("./textures/" + texturePack + "/textures/" + texturePack.slice(0, -2) + "metal_" + texturePack.slice(-2) + ".jpg", "metalTexture", 5);
 }
 
 const initTexture = (srcPath, shader_keyword, textureUnit) => {
@@ -94,22 +93,47 @@ const initModel = (model) => {
     if (model === 'sphere') {
         initSphere();
         modelLoaded = true;
+        yOffset = 0.0;
     } else {
         switch (model) {
             case 'sphere':
                 scale = 1.0;
+                yOffset = 0.0;
+                reverse = false;
                 break;
             case 'teapot':
                 scale = .5;
+                yOffset = 0.5;
+                reverse = false;
                 break;
             case 'suzanne':
                 scale = 1.0;
+                yOffset = 0.0;
+                reverse = false;
                 break;
             case 'pumpkin':
                 scale = 0.01;
+                yOffset = 0.5;
+                reverse = true;
+                break;
+            case 'marble_bust':
+                scale = 4;
+                yOffset = 1;
+                reverse = false;
+                break;
+            case 'rubber_duck':
+                scale = 6;
+                yOffset = 1;
+                reverse = false;
+                break;
+            case 'watering_can':
+                scale = 6;
+                yOffset = 0.5;
+                reverse = false;
                 break;
         }
-        readOBJFile(fileName = './models/' + model + '.obj', scale = scale, reverse = false)
+
+        readOBJFile(fileName = './models/' + model + '.obj', scale = scale, reverse = reverse)
             .then(objInfo => {
                 obj = objInfo;
 
@@ -118,7 +142,7 @@ const initModel = (model) => {
                 for (let i = 0; i < obj.vertices.length; i++) {
                     if (i % 4 != 3) {
                         newVertices.push(obj.vertices[i]);
-                        newNormals.push(model === 'pumpkin' ? -obj.normals[i] : obj.normals[i]);
+                        newNormals.push(obj.normals[i]);
                     }
                 }
         

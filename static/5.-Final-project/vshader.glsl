@@ -34,7 +34,7 @@ void main() {
         );
 
         float displacement = texture2D(displacementTexture, texCoords).r;
-        vec3 displacedPos = worldPos.xyz + fNormal.xyz * displacement * displacementScale;
+        vec3 displacedPos = worldPos.xyz + fNormal.xyz * displacement * displacementScale / patternRepeat;
         fPosition = vec4(displacedPos, 1.0);
         gl_Position = projectionMatrix * viewMatrix * vec4(displacedPos, 1.0);
     } else {

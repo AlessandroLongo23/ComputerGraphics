@@ -188,7 +188,7 @@
         mode = modeIndex == 0 ? 'points' : 'triangles';
         gl.clear(gl.COLOR_BUFFER_BIT);
         gl.drawArrays(gl.TRIANGLES, 0, vertices.length);
-        window.requestAnimFrame(render, canvas);
+        requestAnimFrame(render, canvas);
     }
 </script>
 
