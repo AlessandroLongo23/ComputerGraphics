@@ -13,7 +13,7 @@
             
             <Admonition type='tip'>
                 {#snippet textContent()}
-                    <p>A handy WebGL quick reference card can be downloaded <a href="https://www.khronos.org/files/webgl/webgl-reference-card-1_0.pdf">here</a> and a Basic JavaScript reference can be found at this <a href="http://www.w3schools.com/jsref/">link</a>.</p>
+                    <p>A handy WebGL quick reference card can be downloaded <a class="text-teal-400 hover:text-teal-500" href="https://www.khronos.org/files/webgl/webgl-reference-card-1_0.pdf">here</a> and a Basic JavaScript reference can be found at this <a class="text-teal-400 hover:text-teal-500" href="http://www.w3schools.com/jsref/">link</a>.</p>
                 {/snippet}
             </Admonition>
             

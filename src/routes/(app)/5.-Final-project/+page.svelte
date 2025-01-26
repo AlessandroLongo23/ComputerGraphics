@@ -1,148 +1,16 @@
 <script>
-    import { onMount } from 'svelte';
-    import { page } from '$app/stores';
-    import { Code, Play, Download } from 'lucide-svelte';
+    import { vec2, vec3, vec4, mat4, perspective, flatten, lookAt, normalize, mix, mult, translate, inverse } from '$lib/Libraries/MV.js';
+    import { modelOptions, texturePackOptions, cubemapOptions } from '$lib/stores/finalProject.svelte.js'
     import { WebGLUtils, fetchCodeSnippets, initShaders, convertToLatex } from '$lib/utils.svelte.js';
     import { readOBJFile } from '$lib/Libraries/OBJParser.js';
-    import { vec2, vec3, vec4, mat4, perspective, flatten, lookAt, normalize, mix, mult, translate, inverse } from '$lib/Libraries/MV.js';
-    import Result from '$lib/components/Result.svelte';
+    import { Code, Play, Download } from 'lucide-svelte';
+    import { page } from '$app/stores';
+    import { onMount } from 'svelte';
+
+    import Counter from '$lib/components/UI/Counter.svelte';
     import Select from '$lib/components/UI/Select.svelte';
     import Slider from '$lib/components/UI/Slider.svelte';
-    import Counter from '$lib/components/UI/Counter.svelte';
-    // import Admonition from '$lib/components/UI/Admonition.svelte';
-
-    let modelOptions = [
-        {
-            value: 'sphere',
-            label: 'Sphere',
-        },
-        {
-            value: 'suzanne',
-            label: 'Suzanne',
-        },
-        {
-            value: 'teapot',
-            label: 'Teapot',
-        },
-        {
-            value: 'pumpkin',
-            label: 'Pumpkin',
-        },
-        {
-            value: 'marble_bust',
-            label: 'Marble Bust',
-        },
-        {
-            value: 'rubber_duck',
-            label: 'Rubber Duck',
-        },
-        {
-            value: 'watering_can',
-            label: 'Watering Can',
-        }
-    ];
-
-    let texturePackOptions = [
-        {
-            value: 'bark_willow_02_2k',
-            label: 'Bark Willow',
-        },
-        {
-            value: 'blue_metal_plate_2k',
-            label: 'Blue Metal Plate',
-        },
-        {
-            value: 'brick_wall_04_2k',
-            label: 'Brick Wall',
-        },
-        {
-            value: 'concrete_wall_007_2k',
-            label: 'Concrete Wall',
-        },
-        {
-            value: 'corrugated_iron_2k',
-            label: 'Corrugated Iron',
-        },
-        {
-            value: 'denim_fabric_02_2k',
-            label: 'Denim Fabric',
-        },
-        {
-            value: 'fabric_leather_02_2k',
-            label: 'Fabric Leather',
-        },
-        {
-            value: 'fabric_pattern_07_2k',
-            label: 'Fabric Pattern',
-        },        
-        {
-            value: 'ganges_river_pebbles_2k',
-            label: 'Ganges River Pebbles',
-        },
-        {
-            value: 'gravel_stones_2k',
-            label: 'Gravel Stones',
-        },
-        {
-            value: 'gray_rocks_2k',
-            label: 'Gray Rocks',
-        },
-        {
-            value: 'herringbone_brick_2k',
-            label: 'Herringbone Brick',
-        },
-        {
-            value: 'metal_plate_2k',
-            label: 'Metal Plate',
-        },
-        {
-            value: 'metal_plate_02_2k',
-            label: 'Metal Plate 2',
-        },
-        {
-            value: 'mud_cracked_dry_riverbed_002_2k',
-            label: 'Mud Cracked Dry Riverbed',
-        },
-        {
-            value: 'oak_veneer_01_2k',
-            label: 'Oak Veneer',
-        },        
-        {
-            value: 'raw_plank_wall_2k',
-            label: 'Raw Plank Wall',
-        },
-        {
-            value: 'recycled_brick_floor_2k',
-            label: 'Recycled Brick Floor',
-        },
-        {
-            value: 'rock_embedded_concrete_wall_2k',
-            label: 'Rock Embedded Concrete Wall',
-        }
-    ]
-
-    let cubemapOptions = [
-        {
-            value: 'autumn',
-            label: 'Autumn',
-        },
-        {
-            value: 'brightday',
-            label: 'Bright Day',
-        },
-        {
-            value: 'greenhill',
-            label: 'Green Hill',
-        },
-        {
-            value: 'nvidia',
-            label: 'Nvidia',
-        },
-        {
-            value: 'terrain',
-            label: 'Terrain',
-        }
-    ];
+    import Result from '$lib/components/Result.svelte';
 
     let viewIndex = $state(1);
     let isLoading = $state(true);
@@ -724,9 +592,9 @@
     <Result bind:canvas={canvas} bind:viewIndex={viewIndex} icons={[Code, Play]} width="700" height="700" isLoading={isLoading} codeSnippets={codeSnippets} folderPath={$page.url.pathname}>
         {#snippet controls()}
         <div class="absolute left-0 top-0 flex flex-row justify-center items-center gap-4 w-full p-4 bg-zinc-900/25 rounded-{viewIndex == 1 && 'r-'}lg">    
-            <Select label="Model" bind:value={model} options={modelOptions} width="w-40"/>
-            <Select label="Texture Pack" bind:value={texturePack} options={texturePackOptions} width="w-64"/>
-            <Select label="Cubemap" bind:value={cubemapPack} options={cubemapOptions} width="w-40"/>
+            <Select label="Model" bind:value={model} options={$modelOptions} width="w-40"/>
+            <Select label="Texture Pack" bind:value={texturePack} options={$texturePackOptions} width="w-64"/>
+            <Select label="Cubemap" bind:value={cubemapPack} options={$cubemapOptions} width="w-40"/>
         </div>
         
         <div class="absolute left-0 bottom-0 flex flex-row justify-center items-center gap-4 w-full p-4 bg-zinc-900/25 rounded-{viewIndex == 1 && 'r-'}lg">    

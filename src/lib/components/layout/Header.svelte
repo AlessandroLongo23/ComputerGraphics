@@ -2,8 +2,8 @@
     import { ChevronRight, ChevronLeft, Home, Sun, Moon } from "lucide-svelte";
     import { contentSequence } from "$lib/data/pages.svelte.js";
     import { themeStore } from "$lib/stores/theme.svelte.js";
-    import { page } from "$app/stores";
     import { getPage } from "$lib/utils/pages.svelte.js";
+    import { page } from "$app/stores";
 
     import Toggle from "$lib/components/UI/Toggle.svelte";
     
@@ -39,7 +39,7 @@
                 return path?.length === currentPath.length && 
                         path.slice(0, -1).join("/") === currentPath.slice(0, -1).join("/");
             });
-            
+
             let index = sameLevel.findIndex(it => it.href?.split('/').pop() === currentPath[currentPath.length - 1]);
             isLastChapter = index === sameLevel.length - 1;
             isFirstChapter = index === 0;
@@ -87,7 +87,7 @@
     {#if prevPageUrl}
         <a 
             href="{prevPageUrl}" 
-            class="flex flex-row items-center gap-2 text-zinc-950 dark:text-zinc-50 opacity-65 hover:opacity-100 relative after:absolute after:bg-zinc-850 after:dark:bg-zinc-200 after:-bottom-[3px] after:left-0 after:h-[1px] after:w-0 hover:after:w-full transition-opacity duration-300 after:transition-all after:duration-300"
+            class="flex flex-row items-center gap-2 text-zinc-950 dark:text-zinc-50 opacity-65 hover:opacity-100 relative after:absolute after:bg-zinc-850 after:dark:bg-zinc-200 after:-bottom-[3px] after:right-0 after:h-[1px] after:w-0 hover:after:w-full transition-opacity duration-300 after:transition-all after:duration-300"
         >
             <ChevronLeft size={16}/>
             <p>{previousText}</p>

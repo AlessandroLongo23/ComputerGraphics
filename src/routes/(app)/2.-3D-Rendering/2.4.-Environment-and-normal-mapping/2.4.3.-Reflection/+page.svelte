@@ -1,10 +1,12 @@
 <script>
-    import { onMount } from 'svelte';
-    import { page } from '$app/stores';
-    import { WebGLUtils, fetchCodeSnippets, initShaders, convertToLatex } from '$lib/utils.svelte.js';
     import { vec3, vec4, flatten, perspective, lookAt, mat4, normalize, mix, mult, inverse } from '$lib/Libraries/MV.js';
-    import Result from '$lib/components/Result.svelte';
+    import { WebGLUtils, fetchCodeSnippets, initShaders, convertToLatex } from '$lib/utils.svelte.js';
+    import { textWidth } from '$lib/stores/layout.svelte.js';
+    import { page } from '$app/stores';
+    import { onMount } from 'svelte';
+
     import Admonition from '$lib/components/UI/Admonition.svelte';
+    import Result from '$lib/components/Result.svelte';
 
     let viewIndex = $state(1);
     let isLoading = $state(true);
@@ -232,8 +234,10 @@
     }
 </script>
 
-<div class="flex flex-col justify-center items-start w-4/5 text-xl m-auto">
-    <div class="w-4/5 m-auto">
+<div class="flex flex-col justify-center items-start {$textWidth} text-xl m-auto gap-6">
+    <p class="text-xl font-medium m-0">Assignment</p>
+    
+    <div class="flex flex-col gap-4 text-zinc-950/65 dark:text-zinc-50/65">
         <p>The sphere is not really like a mirror ball. Instead of looking up the environment in the normal direction, we should look up the environment in the direction of reflection. [Angel 7.7]</p>
         <p>Create a uniform variable (reflective) to distinguish reflective objects (the mirror ball) from other objects (the background quad).</p>
         <p>Upload the eye position to the fragment shader as a uniform variable and compute the direction of incidence (the view vector, $v$) in world space coordinates.</p>
@@ -246,6 +250,6 @@
             {/snippet}
         </Admonition>
     </div>
-
-    <Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets} folderPath={$page.url.pathname}/>
 </div>
+
+<Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets} folderPath={$page.url.pathname}/>

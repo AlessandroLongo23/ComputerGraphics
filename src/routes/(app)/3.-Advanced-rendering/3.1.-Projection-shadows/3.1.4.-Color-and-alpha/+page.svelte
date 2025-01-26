@@ -1,8 +1,10 @@
 <script>
-    import { onMount } from 'svelte';
-    import { page } from '$app/stores';
-    import { WebGLUtils, fetchCodeSnippets, initShaders, convertToLatex } from '$lib/utils.svelte.js';
     import { vec2, vec3, vec4, flatten, perspective, mat4, lookAt, mult, translate } from '$lib/Libraries/MV.js';
+    import { WebGLUtils, fetchCodeSnippets, initShaders, convertToLatex } from '$lib/utils.svelte.js';
+    import { textWidth } from '$lib/stores/layout.svelte.js';
+    import { page } from '$app/stores';
+    import { onMount } from 'svelte';
+
     import Result from '$lib/components/Result.svelte';
 
     let viewIndex = $state(1);
@@ -193,13 +195,15 @@
     }
 </script>
 
-<div class="flex flex-col justify-center items-start w-4/5 text-xl m-auto">
-    <div class="w-4/5 m-auto">
+<div class="flex flex-col justify-center items-start {$textWidth} text-xl m-auto gap-6">
+    <p class="text-xl font-medium m-0">Assignment</p>
+    
+    <div class="flex flex-col gap-4 text-zinc-950/65 dark:text-zinc-50/65">
         <p>The black shadows seem too dark. We would like to see a darker version of the ground texture in the shadows. Semi-transparent shadow polygons can achieve this effect.</p>
         <p>Enable blending and set an appropriate blending function to render a darker version of the ground texture in the shadows. [Angel 7.10-7.10.3]</p> 
         <!-- <p>Blending in WebGL is influenced by browser compositing. Use var gl = WebGLUtils.setupWebGL(canvas, { alpha: false }); to switch off this effect.</p> -->
     </div>
-
-    <Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets} folderPath={$page.url.pathname}/>
 </div>
+
+<Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets} folderPath={$page.url.pathname}/>
 

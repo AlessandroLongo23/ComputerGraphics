@@ -1,10 +1,12 @@
 <script>
-    import { onMount } from 'svelte';
-    import { page } from '$app/stores';
-    import { WebGLUtils, fetchCodeSnippets, initShaders, convertToLatex } from '$lib/utils.svelte.js';
     import { vec2, vec3, vec4, flatten, perspective, mat4, lookAt, mult, translate } from '$lib/Libraries/MV.js';
-    import Result from '$lib/components/Result.svelte';
+    import { WebGLUtils, fetchCodeSnippets, initShaders, convertToLatex } from '$lib/utils.svelte.js';
+    import { textWidth } from '$lib/stores/layout.svelte.js';
+    import { page } from '$app/stores';
+    import { onMount } from 'svelte';
+
     import Admonition from '$lib/components/UI/Admonition.svelte';
+    import Result from '$lib/components/Result.svelte';
 
     let viewIndex = $state(1);
     let isLoading = $state(true);
@@ -190,8 +192,10 @@
     }
 </script>
 
-<div class="flex flex-col justify-center items-start w-4/5 text-xl m-auto">
-    <div class="w-4/5 m-auto">
+<div class="flex flex-col justify-center items-start {$textWidth} text-xl m-auto gap-6">
+    <p class="text-xl font-medium m-0">Assignment</p>
+    
+    <div class="flex flex-col gap-4 text-zinc-950/65 dark:text-zinc-50/65">
         <p>A light source position is needed to cast shadows. Introduce an animated point light that circles the scene with circle center $(0,2,-2)$ and radius $2$.</p>
         <p>Implement projection shadows using the following steps:</p>
         <ul class="list-disc list-inside">
@@ -206,7 +210,6 @@
             {/snippet}
         </Admonition>
     </div>
-
-    <Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets} folderPath={$page.url.pathname}/>
 </div>
 
+<Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets} folderPath={$page.url.pathname}/>

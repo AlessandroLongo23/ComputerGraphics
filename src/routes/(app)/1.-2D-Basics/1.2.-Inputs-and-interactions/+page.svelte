@@ -6,7 +6,7 @@
     <div class="flex flex-col gap-6 items-start w-1/2 m-auto">
         <p class="text-xl font-medium m-0">Introduction</p>
 
-        <div class="flex flex-col gap-4">
+        <div class="flex flex-col gap-4 text-zinc-950/65 dark:text-zinc-50/65">
             <p>The purpose of this set of exercises is to start interacting with the graphics elements that we draw using input devices. You will make a small 2D drawing program where primitive shapes of different colors can be added using the mouse.</p>
             <p>The purpose of this set of exercises is to start interacting with the graphics elements that we draw using input devices. You will make a small 2D drawing program where primitive shapes of different colors can be added using the mouse.</p>
             <p>Although it is possible to draw 2D shapes using a 2D canvas context, you will do it with a WebGL context as it is really not much harder, and WebGL enables later extension to full 3D.</p>

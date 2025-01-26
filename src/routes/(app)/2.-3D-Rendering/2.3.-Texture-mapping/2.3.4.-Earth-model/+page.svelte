@@ -1,15 +1,17 @@
 <script>
-    import { onMount } from 'svelte';
-    import { page } from '$app/stores';
-    import { WebGLUtils, fetchCodeSnippets, initShaders, convertToLatex } from '$lib/utils.svelte.js';
     import { vec3, vec4, flatten, perspective, mat4, normalize, mix, lookAt } from '$lib/Libraries/MV.js';
+    import { WebGLUtils, fetchCodeSnippets, initShaders, convertToLatex } from '$lib/utils.svelte.js';
+    import { textWidth } from '$lib/stores/layout.svelte.js';
+    import { page } from '$app/stores';
+    import { onMount } from 'svelte';
+
     import Result from '$lib/components/Result.svelte';
 
-    let viewIndex = $state(1);
+    let codeSnippets = $state([]);
     let isLoading = $state(true);
+    let viewIndex = $state(1);
     let canvas = $state();
     let gl, program;
-    let codeSnippets = $state([]);
 
     let vertices, v0, v1, v2, v3;
     let normals;
@@ -190,6 +192,7 @@
     }
 
     const mouseWheel = (event) => {
+        event.preventDefault();
         dist += event.deltaY / 1000;
         dist = Math.min(5.0, Math.max(dist, 1.25));
     }
@@ -253,10 +256,14 @@
     }
 </script>
 
-<div class="flex flex-col justify-center items-start w-4/5 text-xl m-auto">
-    <div class="w-4/5 m-auto">
-    </div>
+<div class="flex flex-col justify-center items-start {$textWidth} text-xl m-auto gap-6">
+    <p class="text-xl font-medium m-0">Extra</p>
 
-    <Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets} folderPath={$page.url.pathname}/>
+    <div class="flex flex-col gap-4 text-zinc-950/65 dark:text-zinc-50/65">
+        <p>This project is an additional exercise I wanted to try on my own. It's an interactive 3D visualization of the Earth that features realistic textures, including daytime, nighttime, cloud, and height maps.</p>
+        <p>It can be explored by rotating the view with the mouse, and zooming in and out with the scroll wheel.</p>
+        <p>The lighting in the scene simulates the movement of a distant light source, as the sun would do.</p>
+    </div>
 </div>
 
+<Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets} folderPath={$page.url.pathname}/>

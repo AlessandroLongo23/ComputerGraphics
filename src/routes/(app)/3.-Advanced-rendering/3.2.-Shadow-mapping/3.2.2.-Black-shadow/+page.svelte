@@ -1,11 +1,13 @@
 <script>
-    import { onMount } from 'svelte';
-    import { page } from '$app/stores';
-    import { WebGLUtils, fetchCodeSnippets, initShaders, convertToLatex } from '$lib/utils.svelte.js';
     import { vec2, vec3, vec4, mat4, perspective, mult, translate, flatten } from '$lib/Libraries/MV.js';
+    import { WebGLUtils, fetchCodeSnippets, initShaders, convertToLatex } from '$lib/utils.svelte.js';
     import { readOBJFile } from '$lib/Libraries/OBJParser.js';
-    import Result from '$lib/components/Result.svelte';
+    import { textWidth } from '$lib/stores/layout.svelte.js';
+    import { page } from '$app/stores';
+    import { onMount } from 'svelte';
+
     import Checkbox from '$lib/components/UI/Checkbox.svelte';
+    import Result from '$lib/components/Result.svelte';
 
     let viewIndex = $state(1);
     let isLoading = $state(true);
@@ -300,21 +302,22 @@
     }
 </script>
 
-<div class="flex flex-col justify-center items-start w-4/5 text-xl m-auto">
-    <div class="w-4/5 m-auto">
+<div class="flex flex-col justify-center items-start {$textWidth} text-xl m-auto gap-6">
+    <p class="text-xl font-medium m-0">Assignment</p>
+    
+    <div class="flex flex-col gap-4 text-zinc-950/65 dark:text-zinc-50/65">
         <p>For reference, insert the black projection shadows from Part 3 of Worksheet 8. In this scene, we use a model matrix to move the shadow-casting object. It is important to realize that the model matrix should be applied first (before the shadow projection matrix) when rendering the shadow polygons.</p>
         <p>Set the light direction in the teapot shading according to the position of the point light circling the scene. Create a button that switches point light animation on/off.</p>
     </div>
-
-    <Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets} folderPath={$page.url.pathname}>
-        {#snippet controls()}
-            <div class="absolute left-0 top-0 flex flex-row justify-evenly items-center gap-4 w-full p-4 bg-zinc-900/25 rounded-{viewIndex == 1 && 'r-'}lg">    
-                <div class="flex flex-row justify-between items-center gap-2">
-                    <Checkbox bind:checked={teapotMovement} label={'move teapot'}></Checkbox>
-                    <Checkbox bind:checked={lightMovement} label={'move light'}></Checkbox>
-                </div>
-            </div>
-        {/snippet}
-    </Result>
 </div>
 
+<Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets} folderPath={$page.url.pathname}>
+    {#snippet controls()}
+        <div class="absolute left-0 top-0 flex flex-row justify-evenly items-center gap-4 w-full p-4 bg-zinc-900/25 rounded-{viewIndex == 1 && 'r-'}lg">    
+            <div class="flex flex-row justify-between items-center gap-2">
+                <Checkbox bind:checked={teapotMovement} label={'move teapot'}></Checkbox>
+                <Checkbox bind:checked={lightMovement} label={'move light'}></Checkbox>
+            </div>
+        </div>
+    {/snippet}
+</Result>

@@ -1,9 +1,9 @@
 <script>
-    import { onMount } from 'svelte';
-    import { page } from '$app/stores';
-    
-    import { WebGLUtils, fetchCodeSnippets, initShaders, convertToLatex } from '$lib/utils.svelte.js';
     import { vec3, vec4, flatten, perspective, mat4, normalize, mix, lookAt} from '$lib/Libraries/MV.js';
+    import { WebGLUtils, fetchCodeSnippets, initShaders, convertToLatex } from '$lib/utils.svelte.js';
+    import { textWidth } from '$lib/stores/layout.svelte.js';
+    import { page } from '$app/stores';
+    import { onMount } from 'svelte';
 
     import Result from '$lib/components/Result.svelte';
     import Admonition from '$lib/components/UI/Admonition.svelte';
@@ -183,8 +183,10 @@
     }
 </script>
 
-<div class="flex flex-col justify-center items-start w-4/5 text-xl m-auto">
-    <div class="w-4/5 m-auto">
+<div class="flex flex-col justify-center items-start {$textWidth} text-xl m-auto gap-6">
+    <p class="text-xl font-medium m-0">Assignment</p>
+
+    <div class="flex flex-col gap-4 text-zinc-950/65 dark:text-zinc-50/65">
         <p>Start from a textured sphere (Part 3 of Worksheet 6). Instead of the ordinary 2D texture, we will now use a cube map to texture the sphere. [Angel 7.8]</p>
         <p>Modify your texture initialization such that it loads a cube map from six image files, one file for each face. The files are in textures.zip (on DTU  Learn).</p>    
         
@@ -192,14 +194,14 @@
             {#snippet textContent()}
                 <p class="m-0">The file names and their orientation in the cube map are:</p>
                 <p>
-                    <!-- var cubemap = [
+                    {`var cubemap = [
                         'textures/cm_left.png',    // POSITIVE_X
                         'textures/cm_right.png',   // NEGATIVE_X
                         'textures/cm_top.png',     // POSITIVE_Y
                         'textures/cm_bottom.png',  // NEGATIVE_Y
                         'textures/cm_back.png',    // POSITIVE_Z
                         'textures/cm_front.png'    // NEGATIVE_Z
-                    ]; -->
+                    ];`}
                 </p>
             {/snippet}
         </Admonition>
@@ -208,17 +210,15 @@
             {#snippet textContent()}
                 <p class="m-0">If you use a loop to load the image files, you must retrieve the image from the event variable in the onload function</p>
                 <p class="m-0">
-                    <!-- ```
-                    image.onload = function(event) {       
+                    {`image.onload = function(event) {       
                         var image = event.target;       // Insert cube face texture initialization here
-                    };
-                    ```   -->
+                    };`}
                 </p>
             {/snippet}
         </Admonition>
     
         <p>Once the cube map is initialized, no inverse map is needed to compute texture coordinates. Simply use the world space normal as texture coordinates when looking up the texture color in the fragment shader.</p>
     </div>
-
-    <Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets} folderPath={$page.url.pathname}/>
 </div>
+
+<Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets} folderPath={$page.url.pathname}/>

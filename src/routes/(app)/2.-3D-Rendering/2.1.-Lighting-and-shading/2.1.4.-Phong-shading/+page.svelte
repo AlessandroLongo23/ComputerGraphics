@@ -1,12 +1,14 @@
 <script>
-    import { onMount } from 'svelte';
-    import { page } from '$app/stores';
-    import { WebGLUtils, fetchCodeSnippets, initShaders, convertToLatex } from '$lib/utils.svelte.js';
     import { vec3, vec4, flatten, perspective, lookAt, mat4, normalize, mix } from '$lib/Libraries/MV.js';
-    import Result from '$lib/components/Result.svelte';
+    import { WebGLUtils, fetchCodeSnippets, initShaders, convertToLatex } from '$lib/utils.svelte.js';
+    import { textWidth } from '$lib/stores/layout.svelte.js';
+    import { page } from '$app/stores';
+    import { onMount } from 'svelte';
+    
+    import Admonition from '$lib/components/UI/Admonition.svelte';
     import Counter from '$lib/components/UI/Counter.svelte';
     import Slider from '$lib/components/UI/Slider.svelte';
-    import Admonition from '$lib/components/UI/Admonition.svelte';
+    import Result from '$lib/components/Result.svelte';
 
     let viewIndex = $state(1);
     let isLoading = $state(true);
@@ -150,8 +152,10 @@
     });
 </script>
 
-<div class="flex flex-col justify-center items-start w-4/5 text-xl m-auto">
-    <div class="w-4/5 m-auto">
+<div class="flex flex-col justify-center items-start {$textWidth} text-xl m-auto gap-6">
+    <p class="text-xl font-medium m-0">Assignment</p>
+
+    <div class="flex flex-col gap-4 text-zinc-950/65 dark:text-zinc-50/65">
         <p>Implement the full Phong reflection model in the vertex shader and create sliders for material parameters ($k_d$, $k_s$, $s$) and light parameters ($L_e$, $L_a$). Here, $s$ is the shininess called $\alpha$ in the textbook. [Angel 3.6.5, 6.3, 6.7-6.8]</p>
         <Admonition type='tip'>
             {#snippet textContent()}
@@ -169,24 +173,24 @@
             {/snippet}
         </Admonition> 
     </div>
-      
-    <Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets} folderPath={$page.url.pathname}>
-        {#snippet controls()}
-            <div class="absolute left-0 top-0 flex flex-col justify-evenly items-center gap-4 w-full p-4 bg-zinc-900/25 rounded-{viewIndex == 1 && 'r-'}lg">    
-                <Counter bind:count={subdivisions} min={0} max={6} label="subdivisions"/>
-            </div>
-
-            <div class="absolute left-0 bottom-0 flex flex-row justify-evenly items-center gap-4 w-full p-4 bg-zinc-900/25 rounded-{viewIndex == 1 && 'r-'}lg">
-                <div class="flex flex-col justify-evenly w-full gap-2">
-                    <Slider type="compact" min={0} max={1} bind:value={k} step={0.01} id={k} label="k"/>
-                    <Slider type="compact" min={0} max={1} bind:value={L} step={0.01} id={L} label="L"/>
-                </div>    
-
-                <div class="flex flex-col justify-evenly w-full gap-2">
-                    <Slider type="compact" min={0} max={1} bind:value={ks} step={0.01} id={ks} label="k_s"/>
-                    <Slider type="compact" min={0} max={3} bind:value={s} step={0.01} id={s} label="s" f={((x) => Math.round(Math.pow(10, x)))} precision={0}/>
-                </div>
-            </div>
-        {/snippet}
-    </Result>
 </div>
+      
+<Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets} folderPath={$page.url.pathname}>
+    {#snippet controls()}
+        <div class="absolute left-0 top-0 flex flex-col justify-evenly items-center gap-4 w-full p-4 bg-zinc-900/25 rounded-{viewIndex == 1 && 'r-'}lg">    
+            <Counter bind:count={subdivisions} min={0} max={6} label="subdivisions"/>
+        </div>
+
+        <div class="absolute left-0 bottom-0 flex flex-row justify-evenly items-center gap-4 w-full p-4 bg-zinc-900/25 rounded-{viewIndex == 1 && 'r-'}lg">
+            <div class="flex flex-col justify-evenly w-full gap-2">
+                <Slider type="compact" min={0} max={1} bind:value={k} step={0.01} id={k} label="k"/>
+                <Slider type="compact" min={0} max={1} bind:value={L} step={0.01} id={L} label="L"/>
+            </div>    
+
+            <div class="flex flex-col justify-evenly w-full gap-2">
+                <Slider type="compact" min={0} max={1} bind:value={ks} step={0.01} id={ks} label="k_s"/>
+                <Slider type="compact" min={0} max={3} bind:value={s} step={0.01} id={s} label="s" f={((x) => Math.round(Math.pow(10, x)))} precision={0}/>
+            </div>
+        </div>
+    {/snippet}
+</Result>

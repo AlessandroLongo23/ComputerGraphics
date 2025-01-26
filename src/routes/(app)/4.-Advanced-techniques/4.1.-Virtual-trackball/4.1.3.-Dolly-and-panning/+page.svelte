@@ -1,9 +1,11 @@
 <script>
-    import { onMount } from 'svelte';
-    import { page } from '$app/stores';
+    import { vec3, vec4, mat4, perspective, flatten, lookAt, normalize, mix } from '$lib/Libraries/MV.js';
     import { WebGLUtils, fetchCodeSnippets, initShaders, convertToLatex } from '$lib/utils.svelte.js';
     import { Quaternion } from '$lib/Libraries/Quaternion.js';
-    import { vec3, vec4, mat4, perspective, flatten, lookAt, normalize, mix } from '$lib/Libraries/MV.js';
+    import { textWidth } from '$lib/stores/layout.svelte.js';
+    import { page } from '$app/stores';
+    import { onMount } from 'svelte';
+
     import Result from '$lib/components/Result.svelte';
 
     let viewIndex = $state(1);
@@ -283,8 +285,10 @@
     }
 </script>
 
-<div class="flex flex-col justify-center items-start w-4/5 text-xl m-auto mb-16">
-    <div class="w-4/5 m-auto">
+<div class="flex flex-col justify-center items-start {$textWidth} text-xl m-auto gap-6">
+    <p class="text-xl font-medium m-0">Assignment</p>
+    
+    <div class="flex flex-col gap-4 text-zinc-950/65 dark:text-zinc-50/65">
         <p>Set up interaction modes (using either webpage buttons or mouse buttons) for orbiting, dollying, and panning.</p>
         <p>Store distance to the eye point from the look-at point and the $xy$ displacement of the look-at point together with the quaternions used for orbiting.</p>
         <ul class="list-disc list-inside">
@@ -292,6 +296,6 @@
             <li>In panning mode, the differences in $x$ and $y$ coordinates of the mouse position are used for displacement of both look-at and eye points along the world space basis vectors of the image plane.</li>
         </ul>
     </div>
-
-    <Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets} folderPath={$page.url.pathname}/>
 </div>
+
+<Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets} folderPath={$page.url.pathname}/>

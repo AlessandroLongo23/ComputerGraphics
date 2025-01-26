@@ -1,8 +1,10 @@
 <script>
-    import { onMount } from 'svelte';
-    import { page } from '$app/stores';
-    import { WebGLUtils, fetchCodeSnippets, initShaders, convertToLatex } from '$lib/utils.svelte.js';
     import { vec2, vec3, vec4, flatten, perspective, mat4, lookAt, mult, translate } from '$lib/Libraries/MV.js';
+    import { WebGLUtils, fetchCodeSnippets, initShaders, convertToLatex } from '$lib/utils.svelte.js';
+    import { textWidth } from '$lib/stores/layout.svelte.js';
+    import { page } from '$app/stores';
+    import { onMount } from 'svelte';
+
     import Result from '$lib/components/Result.svelte';
 
     let viewIndex = $state(1);
@@ -196,13 +198,14 @@
     }
 </script>
 
-<div class="flex flex-col justify-center items-start w-4/5 text-xl m-auto">
-    <div class="w-4/5 m-auto">
+<div class="flex flex-col justify-center items-start {$textWidth} text-xl m-auto gap-6">
+    <p class="text-xl font-medium m-0">Assignment</p>
+    
+    <div class="flex flex-col gap-4 text-zinc-950/65 dark:text-zinc-50/65">
         <p>One problem with shadow polygons is that they are drawn even if there is no ground polygon. Use the depth buffer with a depth test function that accepts fragments with greater depth values to draw shadow polygons only if there is also a ground polygon. Handle z-fighting using an offset in the projection matrix. [Angel 8.11.5]</p>
         <p>Introduce a uniform visibility variable in your fragment shader. Use this variable as a multiplication factor to draw the shadow polygons in black.</p>
         <p>In WebGPU, create two pipelines: one for the normal depth test ("less") and one for the depth test to be used for the shadow polygons ("greater"). In the render pass, set the second pipeline when drawing the shadow polygons.</p>
     </div>
-
-    <Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets} folderPath={$page.url.pathname}/>
 </div>
 
+<Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets} folderPath={$page.url.pathname}/>

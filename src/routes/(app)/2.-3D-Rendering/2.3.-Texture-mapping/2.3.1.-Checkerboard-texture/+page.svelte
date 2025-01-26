@@ -1,8 +1,10 @@
 <script>
-    import { onMount } from 'svelte';
-    import { page } from '$app/stores';
     import { WebGLUtils, fetchCodeSnippets, initShaders, convertToLatex } from '$lib/utils.svelte.js';
     import { vec2, vec4, flatten, perspective, mat4 } from '$lib/Libraries/MV.js';
+    import { textWidth } from '$lib/stores/layout.svelte.js';
+    import { page } from '$app/stores';
+    import { onMount } from 'svelte';
+
     import Result from '$lib/components/Result.svelte';
 
     let viewIndex = $state(1);
@@ -104,17 +106,20 @@
     }
 </script>
 
-<div class="flex flex-col justify-center items-start w-4/5 text-xl m-auto">
-    <div class="w-4/5 m-auto">
+<div class="flex flex-col justify-center items-start {$textWidth} text-xl m-auto gap-6">
+    <p class="text-xl font-medium m-0">Assignment</p>
+
+    <div class="flex flex-col gap-4 text-zinc-950/65 dark:text-zinc-50/65">
         <p>Create a rectangle with vertices (-4, -1, -1), (4, -1, -1), (4, -1, -21), (-4, -1, -21). Set up a perspective camera with a 90° field of view. Use the default view matrix and draw the rectangle in white on a blue background.</p>
         <p>Map a procedurally generated checkerboard texture to the rectangle using the following steps:</p>
-        <p>1) Create a texture object and bind it as the current 2D texture object. [Angel 7.5.1]</p>
-        <p>2) Generate a 64x64 resolution texture image that forms an 8x8 black-and-zinc-100 checkerboard, and set it to be used with the currently bound 2D texture. [Angel 7.5.2]</p>
-        <p>3) Create texture coordinates (-1.5, 0.0), (2.5, 0.0), (2.5, 10.0), (-1.5, 10.0) for your rectangle, such that the texture repeats four times along the width and ten times along the length of the rectangle. Set up the texture coordinates to be received as an attribute in the vertex shader. [Angel 7.5.3]</p>
-        <p>4) Set up the texture map as a uniform sampler2D in the fragment shader and link this sampler to the default texture (0). Pass the texture coordinates to the fragment shader and use them to replace the fragment color with a color from the texture map. [Angel 7.5.3]</p>
-        <p>5) Set the texture filtering parameters to use nearest point sampling. This ensures texture completeness. You should now be able to draw the texture mapped rectangle. [Angel 7.5.4]</p>
+        <ul class="list-decimal list-inside">
+            <li>Create a texture object and bind it as the current 2D texture object. [Angel 7.5.1]</li>
+            <li>Generate a 64x64 resolution texture image that forms an 8x8 black-and-zinc-100 checkerboard, and set it to be used with the currently bound 2D texture. [Angel 7.5.2]</li>
+            <li>Create texture coordinates (-1.5, 0.0), (2.5, 0.0), (2.5, 10.0), (-1.5, 10.0) for your rectangle, such that the texture repeats four times along the width and ten times along the length of the rectangle. Set up the texture coordinates to be received as an attribute in the vertex shader. [Angel 7.5.3]</li>
+            <li>Set up the texture map as a uniform sampler2D in the fragment shader and link this sampler to the default texture (0). Pass the texture coordinates to the fragment shader and use them to replace the fragment color with a color from the texture map. [Angel 7.5.3]</li>
+            <li>Set the texture filtering parameters to use nearest point sampling. This ensures texture completeness. You should now be able to draw the texture mapped rectangle. [Angel 7.5.4]</li>
+        </ul>
     </div>
-
-    <Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets} folderPath={$page.url.pathname}/>
 </div>
 
+<Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets} folderPath={$page.url.pathname}/>

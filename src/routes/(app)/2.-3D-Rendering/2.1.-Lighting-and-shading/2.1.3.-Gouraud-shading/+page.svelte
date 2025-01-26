@@ -1,12 +1,14 @@
 <script>
-    import { onMount } from 'svelte';
-    import { page } from '$app/stores';
+    import { vec3, vec4, flatten, perspective, lookAt, mat4, mult, translate, normalize, mix } from '$lib/Libraries/MV.js';
     import { WebGLUtils, fetchCodeSnippets, initShaders, convertToLatex } from '$lib/utils.svelte.js';
     import { SendToBack, BringToFront, X } from 'lucide-svelte'
-    import { vec3, vec4, flatten, perspective, lookAt, mat4, mult, translate, normalize, mix } from '$lib/Libraries/MV.js';
-    import Result from '$lib/components/Result.svelte';
+    import { textWidth } from '$lib/stores/layout.svelte.js';
+    import { page } from '$app/stores';
+    import { onMount } from 'svelte';
+
     import Counter from '$lib/components/UI/Counter.svelte';
     import Toggle from '$lib/components/UI/Toggle.svelte';
+    import Result from '$lib/components/Result.svelte';
 
     let viewIndex = $state(1);
     let isLoading = $state(true);
@@ -154,20 +156,22 @@
     });
 </script>
 
-<div class="flex flex-col justify-center items-start w-4/5 text-xl m-auto">
-    <div class="w-4/5 m-auto">
+<div class="flex flex-col justify-center items-start {$textWidth} text-xl m-auto gap-6">
+    <p class="text-xl font-medium m-0">Assignment</p>
+    
+    <div class="flex flex-col gap-4 text-zinc-950/65 dark:text-zinc-50/65">
         <p>Use Gouraud shading (with true normals) to draw a diffuse sphere lit by a distant, white, directional light with direction $(0,0,-1)$.</p>  
         <p>Obtain the surface normal in the vertex shader. [Angel 6.9]</p>
         <p>Think of the color of the sphere as its diffuse reflection coefficient $k_d$. Introduce a distant light with direction $l_e=(0,0,-1)$ and light emission $L_d=(1,1,1)$, no distance attenuation. Compute the diffusely reflected light in the vertex shader and set the vertex color to this result (note that in this case $\omega_i=\textbf l=-\textbf l_e)$. [Angel 6.3.2, 6.7.1]</p>
         <p>Let the camera orbit the sphere over time. [Angel 3.1]</p>
     </div>
-
-    <Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets} folderPath={$page.url.pathname}>
-        {#snippet controls()}
-            <div class="absolute left-0 top-0 flex flex-row justify-evenly items-center gap-4 w-full p-4 bg-zinc-900/25 rounded-{viewIndex == 1 && 'r-'}lg">    
-                <Toggle bind:selected={culling} icons={[X, SendToBack, BringToFront]}/>
-                <Counter bind:count={subdivisions} min={0} max={6} label="subdivisions"/>
-            </div>
-        {/snippet}
-    </Result>
 </div>
+
+<Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets} folderPath={$page.url.pathname}>
+    {#snippet controls()}
+        <div class="absolute left-0 top-0 flex flex-row justify-evenly items-center gap-4 w-full p-4 bg-zinc-900/25 rounded-{viewIndex == 1 && 'r-'}lg">    
+            <Toggle bind:selected={culling} icons={[X, SendToBack, BringToFront]}/>
+            <Counter bind:count={subdivisions} min={0} max={6} label="subdivisions"/>
+        </div>
+    {/snippet}
+</Result>

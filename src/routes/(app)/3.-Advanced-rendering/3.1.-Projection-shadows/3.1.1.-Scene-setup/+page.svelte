@@ -1,10 +1,12 @@
 <script>
-    import { onMount } from 'svelte';
-    import { page } from '$app/stores';
     import { WebGLUtils, fetchCodeSnippets, initShaders, convertToLatex } from '$lib/utils.svelte.js';
     import { vec2, vec4, flatten, perspective, mat4 } from '$lib/Libraries/MV.js';
-    import Result from '$lib/components/Result.svelte';
+    import { textWidth } from '$lib/stores/layout.svelte.js';
+    import { page } from '$app/stores';
+    import { onMount } from 'svelte';
+
     import Admonition from '$lib/components/UI/Admonition.svelte';
+    import Result from '$lib/components/Result.svelte';
 
     let viewIndex = $state(1);
     let isLoading = $state(true);
@@ -161,8 +163,10 @@
     }
 </script>
 
-<div class="flex flex-col justify-center items-start w-4/5 text-xl m-auto">
-    <div class="w-4/5 m-auto">
+<div class="flex flex-col justify-center items-start {$textWidth} text-xl m-auto gap-6">
+    <p class="text-xl font-medium m-0">Assignment</p>
+    
+    <div class="flex flex-col gap-4 text-zinc-950/65 dark:text-zinc-50/65">
         <p>The scene to be rendered consists of three quadrilaterals (quads). One is a large texture mapped quad in the plane $y=-1\ (x\in[-2,2], z\in[-1,-5])$, the others are smaller quads colored red. Let us refer to the large quad as the ground.</p>
         <p>One of the two smaller quads should be parallel to $y=-1$, but placed above the ground $(y=-0.5,\ x\in[0.25,0.75],\ z\in[-1.25,-1.75])$.</p>
         <p>The other should be perpendicular to $y=-1$ with two vertices intersecting the ground $(x=-1,\ y\in[-1,0],\ z\in[-2.5,-3])$.</p>
@@ -181,7 +185,7 @@
             {/snippet}
         </Admonition>
     </div>
-
-    <Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets} folderPath={$page.url.pathname}/>
 </div>
+
+<Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets} folderPath={$page.url.pathname}/>
 

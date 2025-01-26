@@ -1,8 +1,10 @@
 <script>
-    import { onMount } from 'svelte';
-    import { page } from '$app/stores';
-    import { WebGLUtils, fetchCodeSnippets, initShaders, convertToLatex } from '$lib/utils.svelte.js';
     import { vec3, vec4, flatten, perspective, mat4, normalize, mix, lookAt } from '$lib/Libraries/MV.js';
+    import { WebGLUtils, fetchCodeSnippets, initShaders, convertToLatex } from '$lib/utils.svelte.js';
+    import { textWidth } from '$lib/stores/layout.svelte.js';
+    import { page } from '$app/stores';
+    import { onMount } from 'svelte';
+    
     import Result from '$lib/components/Result.svelte';
 
     let viewIndex = $state(1);
@@ -154,18 +156,22 @@
         normals.push(c);
     }
 </script>
-
-<div class="flex flex-col justify-center items-start w-4/5 text-xl m-auto">
-    <div class="w-4/5 m-auto">
+    
+<div class="flex flex-col justify-center items-start {$textWidth} text-xl m-auto gap-6">
+    <p class="text-xl font-medium m-0">Assignment</p>
+    
+    <div class="flex flex-col gap-4 text-zinc-950/65 dark:text-zinc-50/65">
         <p>Start from a diffuse sphere illuminated by a directional light (Part 3 of Worksheet 4). We will now map a texture depicting Earth onto the sphere.</p>
         <p>To do this, we load the texture from an image file and calculate the texture coordinates in the fragment shader. Some steps to follow:</p>
-        <p>1) When initializing the texture, load the texture image from the file earth.jpg (available on CampusNet). [Angel 7.5.2]</p>
-        <p>2) The next step is to pass the normal of the sphere to the fragment shader and use it to calculate the texture coordinates. The normals define points on the unit sphere. The unit sphere is then an intermediate surface to which we can map texture coordinates. Use spherical coordinates to define the relation between a surface normal (a point on the unit sphere) and the texture coordinates (u and v). [Angel 7.4] </p>
-        <p>3) Invert the relation you found using inverse trigonometric functions. Use the resulting formula in the fragment shader to calculate texture coordinates from the surface normal. An atan2 function is needed to get the signs right. In GLSL, the atan2 function is simply to use atan(y, x) instead of atan(y/x).</p>  
-        <p>4) Use the color found by texture look-up as $k_d$ and $k_a$ of the sphere and illuminate the sphere by a directional source and an ambient source. [Angel 6.3.1, 6.3.2, 7.5.3] </p>
-        <p>5) Spin the globe. The earth texture has high resolution leading to minification issues, especially in the mountain ranges during a spin. Choose a filtering option that betters these minification issues without too much blurring of the texture. Explain your choice. [Angel 7.5.4]</p>
+        <ul class="list-decimal list-inside">
+            <li>When initializing the texture, load the texture image from the file earth.jpg (available on CampusNet). [Angel 7.5.2]</li>
+            <li>The next step is to pass the normal of the sphere to the fragment shader and use it to calculate the texture coordinates. The normals define points on the unit sphere. The unit sphere is then an intermediate surface to which we can map texture coordinates. Use spherical coordinates to define the relation between a surface normal (a point on the unit sphere) and the texture coordinates (u and v). [Angel 7.4] </li>
+            <li>Invert the relation you found using inverse trigonometric functions. Use the resulting formula in the fragment shader to calculate texture coordinates from the surface normal. An atan2 function is needed to get the signs right. In GLSL, the atan2 function is simply to use atan(y, x) instead of atan(y/x).</li>
+            <li>Use the color found by texture look-up as $k_d$ and $k_a$ of the sphere and illuminate the sphere by a directional source and an ambient source. [Angel 6.3.1, 6.3.2, 7.5.3] </li>
+            <li>Spin the globe. The earth texture has high resolution leading to minification issues, especially in the mountain ranges during a spin. Choose a filtering option that betters these minification issues without too much blurring of the texture. Explain your choice. [Angel 7.5.4]</li>
+        </ul>
     </div>
-
-    <Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets} folderPath={$page.url.pathname}/>
 </div>
+
+<Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets} folderPath={$page.url.pathname}/>
 

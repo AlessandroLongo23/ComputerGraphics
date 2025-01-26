@@ -114,11 +114,12 @@
 
 <div class="flex min-h-screen">
     {#if !isSidebarClosed}
-        <div onclick={toggleSidebar} aria-hidden="true" class="absolute inset-0 bg-zinc-950/75 z-40 transition-all duration-300 ease-in-out opacity-0 {!isSidebarClosed && 'opacity-100'} cursor-pointer"></div>
+        <div onclick={toggleSidebar} aria-hidden="true" class="fixed inset-0 bg-zinc-950/75 z-40 transition-all duration-300 ease-in-out opacity-0 {!isSidebarClosed && 'opacity-100'} cursor-pointer"></div>
     {/if}
 
     <div class="relative">
         <div class="z-50 h-screen p-6 flex flex-col justify-between bg-zinc-100 text-zinc-900 dark:text-zinc-300 dark:bg-zinc-900 transition-transform duration-300 fixed transform scroll-hidden {isSidebarClosed ? '-translate-x-full' : 'translate-x-0'} overflow-y-auto" style="width: {sidebarWidth}px">
+            
             <div class="flex flex-col items-center justify-start gap-12">
                 <div class="flex flex-row justify-between items-center w-full px-2">
                     <a href="/home" class="relative w-12 h-12 me-4">

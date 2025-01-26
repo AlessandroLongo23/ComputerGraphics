@@ -1,8 +1,10 @@
 <script>
-    import { onMount } from 'svelte';
-    import { page } from '$app/stores';
     import { WebGLUtils, fetchCodeSnippets, initShaders, convertToLatex } from '$lib/utils.svelte.js';
     import { vec2, vec4, flatten, perspective, mat4 } from '$lib/Libraries/MV.js';
+    import { textWidth } from '$lib/stores/layout.svelte.js';
+    import { page } from '$app/stores';
+    import { onMount } from 'svelte';
+    
     import Result from '$lib/components/Result.svelte';
 
     let viewIndex = $state(1);
@@ -147,38 +149,40 @@
     }
 </script>
 
-<div class="flex flex-col justify-center items-start w-4/5 text-xl m-auto">
-    <div class="w-4/5 m-auto">
+<div class="flex flex-col justify-center items-start {$textWidth} text-xl m-auto gap-6">
+    <p class="text-xl font-medium m-0">Assignment</p>
+    
+    <div class="flex flex-col gap-4 text-zinc-950/65 dark:text-zinc-50/65">
         <p>Create buttons and/or selection menus that enable you to switch between different texture wrapping modes (repeat or clamp-to-edge) and all six different texture filtering modes (nearest, linear, nearest mipmap nearest, linear mipmap nearest, nearest mipmap linear, linear mipmap linear). [Angel 3.6, 7.5.3, 7.5.4]</p>
         <p>Explain the effect of the different filtering modes and their influence on texture magnification and minification issues.</p>
     </div>
+</div>
 
-    <Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets} folderPath={$page.url.pathname}>
-        {#snippet controls()}
-            <div class="absolute left-0 top-0 flex flex-row justify-evenly items-center gap-4 w-full p-4 bg-zinc-900/25 rounded-{viewIndex == 1 && 'r-'}lg">    
-                <div class="flex flex-row justify-evenly w-full">
-                    <div class="flex flex-col w-40 bg-zinc-100 rounded-lg p-1">
-                        <label for="wrapping" class="flex text-sm h-8 items-center justify-center text-zinc-900 rounded-lg">Wrapping</label>
-                        <select name="wrapping" id="wrapping" class="flex text-sm h-8 bg-zinc-300 text-zinc-900 ps-4 rounded-lg">
-                            <option value="0">clamp to edge</option>
-                            <option value="1" selected>repeat</option>
-                        </select>
-                    </div>
-            
-                    <div class="flex flex-col w-56 bg-zinc-100 rounded-lg p-1">
-                        <label for="filtering" class="flex text-sm h-8 items-center justify-center text-zinc-900 rounded-lg">Filtering</label>
-                        <select name="filtering" id="filtering" class="flex text-sm h-8 bg-zinc-300 text-zinc-900 ps-4 rounded-lg">
-                            <option value="0" selected>nearest</option>
-                            <option value="1">linear</option>
-                            <option value="2">nearest mipmap nearest</option>
-                            <option value="3">linear mipmap nearest</option>
-                            <option value="4">nearest mipmap linear</option>
-                            <option value="5">linear mipmap linear</option>
-                        </select>
-                    </div>
+<Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets} folderPath={$page.url.pathname}>
+    {#snippet controls()}
+        <div class="absolute left-0 top-0 flex flex-row justify-evenly items-center gap-4 w-full p-4 bg-zinc-900/25 rounded-{viewIndex == 1 && 'r-'}lg">    
+            <div class="flex flex-row justify-evenly w-full">
+                <div class="flex flex-col w-40 bg-zinc-100 rounded-lg p-1">
+                    <label for="wrapping" class="flex text-sm h-8 items-center justify-center text-zinc-900 rounded-lg">Wrapping</label>
+                    <select name="wrapping" id="wrapping" class="flex text-sm h-8 bg-zinc-300 text-zinc-900 ps-4 rounded-lg">
+                        <option value="0">clamp to edge</option>
+                        <option value="1" selected>repeat</option>
+                    </select>
+                </div>
+        
+                <div class="flex flex-col w-56 bg-zinc-100 rounded-lg p-1">
+                    <label for="filtering" class="flex text-sm h-8 items-center justify-center text-zinc-900 rounded-lg">Filtering</label>
+                    <select name="filtering" id="filtering" class="flex text-sm h-8 bg-zinc-300 text-zinc-900 ps-4 rounded-lg">
+                        <option value="0" selected>nearest</option>
+                        <option value="1">linear</option>
+                        <option value="2">nearest mipmap nearest</option>
+                        <option value="3">linear mipmap nearest</option>
+                        <option value="4">nearest mipmap linear</option>
+                        <option value="5">linear mipmap linear</option>
+                    </select>
                 </div>
             </div>
-        {/snippet}
-    </Result>
-</div>
+        </div>
+    {/snippet}
+</Result>
 

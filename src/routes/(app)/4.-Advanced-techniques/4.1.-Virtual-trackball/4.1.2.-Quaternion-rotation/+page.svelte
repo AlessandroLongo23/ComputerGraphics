@@ -1,11 +1,13 @@
 <script>
-    import { onMount } from 'svelte';
-    import { page } from '$app/stores';
+    import { vec3, vec4, mat4, perspective, flatten, lookAt, normalize, mix } from '$lib/Libraries/MV.js';
     import { WebGLUtils, fetchCodeSnippets, initShaders, convertToLatex } from '$lib/utils.svelte.js';
     import { Quaternion } from '$lib/Libraries/Quaternion.js';
-    import { vec3, vec4, mat4, perspective, flatten, lookAt, normalize, mix } from '$lib/Libraries/MV.js';
-    import Result from '$lib/components/Result.svelte';
+    import { textWidth } from '$lib/stores/layout.svelte.js';
+    import { page } from '$app/stores';
+    import { onMount } from 'svelte';
+    
     import Admonition from '$lib/components/UI/Admonition.svelte';
+    import Result from '$lib/components/Result.svelte';
 
     let viewIndex = $state(1);
     let isLoading = $state(true);
@@ -236,8 +238,10 @@
     };
 </script>
 
-<div class="flex flex-col justify-center items-start w-4/5 text-xl m-auto mb-16">
-    <div class="w-4/5 m-auto">
+<div class="flex flex-col justify-center items-start {$textWidth} text-xl m-auto gap-6">
+    <p class="text-xl font-medium m-0">Assignment</p>
+    
+    <div class="flex flex-col gap-4 text-zinc-950/65 dark:text-zinc-50/65">
         <p>Switch to using quaternions for the orbit rotation instead of Euler angles. In 
             this way, you can avoid the gimbal lock.</p>
 
@@ -253,6 +257,6 @@
             {/snippet}
         </Admonition>
     </div>
-
-    <Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets} folderPath={$page.url.pathname}/>
 </div>
+
+<Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets} folderPath={$page.url.pathname}/>

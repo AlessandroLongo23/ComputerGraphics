@@ -1,9 +1,11 @@
 <script>
-    import { onMount } from 'svelte';
-    import { page } from '$app/stores';
     import { WebGLUtils, fetchCodeSnippets, initShaders, convertToLatex } from '$lib/utils.svelte.js';
     import { vec3, flatten, perspective, lookAt, mat4 } from '$lib/Libraries/MV.js';
     import { readOBJFile } from '$lib/Libraries/OBJParser.js';
+    import { textWidth } from '$lib/stores/layout.svelte.js';
+    import { page } from '$app/stores';
+    import { onMount } from 'svelte';
+
     import Result from '$lib/components/Result.svelte';
     import Admonition from '$lib/components/UI/Admonition.svelte';
 
@@ -118,8 +120,10 @@
     }
 </script>
 
-<div class="flex flex-col justify-center items-start w-4/5 text-xl m-auto">
-    <div class="w-4/5 m-auto">
+<div class="flex flex-col justify-center items-start {$textWidth} text-xl m-auto gap-6">
+    <p class="text-xl font-medium m-0">Assignment</p>
+
+    <div class="flex flex-col gap-4 text-zinc-950/65 dark:text-zinc-50/65">
         <p>Create a nice 3D object using a modeling tool such as Blender or Maya or Google SketchUp and export it as a triangle mesh in Wavefront OBJ format. The modelled object must be more interesting than a box. The Blender monkey called Suzanne is an option.</p>
         <Admonition type='warning'>
             {#snippet textContent()}
@@ -132,7 +136,7 @@
         <p>The part of the code that parses the OBJ file is in the file OBJParser.js, which we have uploaded to DTU Learn. Place OBJParser.js on the server together with the other library files and use the async and await keywords together with the function readOBJFile to load the triangle mesh from the OBJ file.</p>
         <p>Once data is available, pass it to WebGL buffers, set up the camera, and draw your 3D object as an indexed face set using a simple set of shaders.</p>
     </div>
-
-    <Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets} folderPath={$page.url.pathname}/>
 </div>
+
+<Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets} folderPath={$page.url.pathname}/>
 

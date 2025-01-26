@@ -1,9 +1,11 @@
 <script>
-    import { onMount } from 'svelte';
-    import { page } from '$app/stores';
+    import { vec3, vec4, mat4, perspective, flatten, lookAt, normalize, mix } from '$lib/Libraries/MV.js';
     import { WebGLUtils, fetchCodeSnippets, initShaders, convertToLatex } from '$lib/utils.svelte.js';
     import { Quaternion } from '$lib/Libraries/Quaternion.js';
-    import { vec3, vec4, mat4, perspective, flatten, lookAt, normalize, mix } from '$lib/Libraries/MV.js';
+    import { textWidth } from '$lib/stores/layout.svelte.js';
+    import { page } from '$app/stores';
+    import { onMount } from 'svelte';
+
     import Result from '$lib/components/Result.svelte';
 
     let viewIndex = $state(1);
@@ -315,11 +317,13 @@
     };
 </script>
 
-<div class="flex flex-col justify-center items-start w-4/5 text-xl m-auto mb-16">
-    <div class="w-4/5 m-auto">
+<div class="flex flex-col justify-center items-start {$textWidth} text-xl m-auto gap-6">
+    <p class="text-xl font-medium m-0">Assignment</p>
+    
+    <div class="flex flex-col gap-4 text-zinc-950/65 dark:text-zinc-50/65">
         <p>To do spinning, continue to update the quaternion rotation of the view using another quaternion representing the last incremental rotation recorded in the mousemove function.</p>
         <p>Stop the spinning by resetting the incremental rotation to an identity quaternion when the mouse is released at the same position as the one last recorded in the mousemove function or if more than 20 milliseconds passed since the last mouse move event.</p>
     </div>
-
-    <Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets} folderPath={$page.url.pathname}/>
 </div>
+
+<Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets} folderPath={$page.url.pathname}/>
