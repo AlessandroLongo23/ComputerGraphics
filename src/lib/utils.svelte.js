@@ -144,12 +144,12 @@ export function convertToLatex() {
         window.MathJax.typesetPromise && window.MathJax.typesetPromise();
 
         document.querySelectorAll("[class*='mjx']").forEach(function(el) {
-            el.style.fontSize = '20px';
+            el.style.fontSize = '16px';
         });
 
         document.querySelectorAll("[size='s']").forEach(function(parent) {
             parent.querySelectorAll('*').forEach(function(el) {
-                el.style.fontSize = '16px';
+                el.style.fontSize = '12px';
             });
         });
     }

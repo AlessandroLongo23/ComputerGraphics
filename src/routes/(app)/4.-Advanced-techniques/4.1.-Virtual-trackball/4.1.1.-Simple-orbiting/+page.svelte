@@ -1,6 +1,6 @@
 <script>
     import { onMount } from 'svelte';
-    import { page } from '$app/stores'
+    import { page } from '$app/stores';
     import { WebGLUtils, fetchCodeSnippets, initShaders, convertToLatex } from '$lib/utils.svelte.js';
     import { vec2, vec3, vec4, mat4, perspective, flatten, lookAt, normalize, mix } from '$lib/Libraries/MV.js';
     import Result from '$lib/components/Result.svelte';

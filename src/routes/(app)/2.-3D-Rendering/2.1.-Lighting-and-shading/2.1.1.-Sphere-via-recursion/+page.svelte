@@ -1,6 +1,6 @@
 <script>
     import { onMount } from 'svelte';
-    import { page } from '$app/stores'
+    import { page } from '$app/stores';
     import { WebGLUtils, fetchCodeSnippets, initShaders, convertToLatex } from '$lib/utils.svelte.js';
     import { vec3, vec4, flatten, perspective, lookAt, mat4, mult, translate, normalize, mix } from '$lib/Libraries/MV.js';
     import Result from '$lib/components/Result.svelte';
@@ -151,7 +151,7 @@
 
 <div class="flex flex-col justify-center items-start w-4/5 text-xl m-auto">
     <div class="w-4/5 m-auto">
-        <p class="text-black text-xl">Draw a sphere in perspective view.</p>  
+        <p class="text-zinc-900 text-xl">Draw a sphere in perspective view.</p>  
         <p>Start from Part 2 of Worksheet 3, which draws three wireframe cubes in perspective view. Simplify such that you draw just one cube in the image center and switch to drawing triangles instead of wireframe. [Angel 2.4.2, 4.6, 5.3, 5.6]</p>
         <p>Draw a unit sphere instead of a unit cube using recursive subdivision of a tetrahedron. [Angel 6.6]</p>
         <p>Insert two buttons: one which increments the subdivision level and one which decrements the subdivision level. [Angel 3.6.2]</p>
@@ -159,7 +159,7 @@
 
     <Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets} folderPath={$page.url.pathname}>
         {#snippet controls()}
-            <div class="absolute left-0 top-0 flex flex-row justify-evenly items-center gap-4 w-full p-4 bg-gray-900/25 rounded-{viewIndex == 1 && 'r-'}lg">    
+            <div class="absolute left-0 top-0 flex flex-row justify-evenly items-center gap-4 w-full p-4 bg-zinc-900/25 rounded-{viewIndex == 1 && 'r-'}lg">    
                 <Counter bind:count={subdivisions} min={0} max={6} label="subdivisions"/>
             </div>
         {/snippet}

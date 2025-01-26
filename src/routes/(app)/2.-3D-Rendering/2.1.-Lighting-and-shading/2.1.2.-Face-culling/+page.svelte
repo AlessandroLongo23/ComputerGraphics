@@ -1,6 +1,6 @@
 <script>
     import { onMount } from 'svelte';
-    import { page } from '$app/stores'
+    import { page } from '$app/stores';
     import { WebGLUtils, fetchCodeSnippets, initShaders, convertToLatex } from '$lib/utils.svelte.js';
     import { SendToBack, BringToFront, X } from 'lucide-svelte'
     import { vec3, vec4, flatten, perspective, lookAt, mat4, mult, translate, normalize, mix } from '$lib/Libraries/MV.js';
@@ -157,7 +157,7 @@
 
 <div class="flex flex-col justify-center items-start w-4/5 text-xl m-auto">
     <div class="w-4/5 m-auto">
-        <p class="text-black">Use depth buffer and back face culling to remove hidden surfaces.</p>  
+        <p class="text-zinc-900">Use depth buffer and back face culling to remove hidden surfaces.</p>  
         <p>Draw the vertex positions as colors ($\textbf c=0.5\cdot\textbf p+0.5$). [Part 3 of Worksheet 1, Angel 2.10]</p>
         <p>Use the depth buffer to ensure that you are looking at the nearest part of the surface of the sphere. [Angel 2.10.4, 5.8] </p>
         <p>Enable back face culling to improve efficiency. [Angel 5.8]</p>
@@ -165,7 +165,7 @@
 
     <Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets} folderPath={$page.url.pathname}>
         {#snippet controls()}
-            <div class="absolute left-0 top-0 flex flex-row justify-evenly items-center gap-4 w-full p-4 bg-gray-900/25 rounded-{viewIndex == 1 && 'r-'}lg">    
+            <div class="absolute left-0 top-0 flex flex-row justify-evenly items-center gap-4 w-full p-4 bg-zinc-900/25 rounded-{viewIndex == 1 && 'r-'}lg">    
                 <Toggle bind:selected={culling} icons={[X, SendToBack, BringToFront]}/>
                 <Counter bind:count={subdivisions} min={0} max={6} label="subdivisions"/>
             </div>

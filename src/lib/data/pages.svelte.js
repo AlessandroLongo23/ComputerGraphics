@@ -212,7 +212,7 @@ export const contentTree = {
                         },
                         {
                             icon: chapterIcons[2],
-                            href: '/3.-Advanced-rendering/3.2.-Shadow-mapping/3.2.2.-Black-shadow'
+                            href: '/3.-Advanced-rendering/3.2.-Shadow-mapping/3.2.2.-zinc-900-shadow'
                         },
                         {
                             icon: chapterIcons[2],

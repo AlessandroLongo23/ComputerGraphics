@@ -1,6 +1,6 @@
 <script>
     import { onMount } from 'svelte';
-    import { page } from '$app/stores'
+    import { page } from '$app/stores';
     import { WebGLUtils, fetchCodeSnippets, initShaders, convertToLatex } from '$lib/utils.svelte.js';
     import { vec3, vec4, flatten, perspective, lookAt, mat4, normalize, mix } from '$lib/Libraries/MV.js';
     import Result from '$lib/components/Result.svelte';
@@ -169,11 +169,11 @@
 
     <Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets} folderPath={$page.url.pathname}>
         {#snippet controls()}
-            <div class="absolute left-0 top-0 flex flex-col justify-evenly items-center gap-4 w-full p-4 bg-gray-900/25 rounded-{viewIndex == 1 && 'r-'}lg">    
+            <div class="absolute left-0 top-0 flex flex-col justify-evenly items-center gap-4 w-full p-4 bg-zinc-900/25 rounded-{viewIndex == 1 && 'r-'}lg">    
                 <Counter bind:count={subdivisions} min={0} max={6} label="subdivisions"/>
             </div>
 
-            <div class="absolute left-0 bottom-0 flex flex-row justify-evenly items-center gap-4 w-full p-4 bg-gray-900/25 rounded-{viewIndex == 1 && 'r-'}lg">
+            <div class="absolute left-0 bottom-0 flex flex-row justify-evenly items-center gap-4 w-full p-4 bg-zinc-900/25 rounded-{viewIndex == 1 && 'r-'}lg">
                 <div class="flex flex-col justify-evenly w-full gap-2">
                     <Slider type="compact" min={0} max={1} bind:value={k} step={0.01} id={k} label="k"/>
                     <Slider type="compact" min={0} max={1} bind:value={L} step={0.01} id={L} label="L"/>

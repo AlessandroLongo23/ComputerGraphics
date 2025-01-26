@@ -59,7 +59,7 @@
         <div class="flex flex-row justify-start overflow-x-scroll scroll-hidden">
             {#if codeSnippets.length > 1}
                 {#each codeSnippets as codeSnippet, i}
-                    <button class="flex me-2 text-sm h-8 transition-colors duration-200 items-center text-white px-4 py-4 rounded-lg w-auto" class:selected={i === currentSnippetIndex} onclick={() => selectSnippet(i)}> 
+                    <button class="flex me-2 text-sm h-8 transition-colors duration-200 items-center text-zinc-100 px-4 py-4 rounded-lg w-auto" class:selected={i === currentSnippetIndex} onclick={() => selectSnippet(i)}> 
                         {codeSnippet.name} 
                     </button>
                 {/each}
@@ -69,11 +69,11 @@
         </div>
 
         <div class="flex flex-row justify-end gap-2 ps-4">
-            <button onclick={copyToClipboard} class="flex items-center transition-colors duration-200 text-sm h-8 text-white px-4 py-2 rounded-lg w-auto {copyIcon == 'check' && 'copied'}" aria-label="Copy code to clipboard">
+            <button onclick={copyToClipboard} class="flex items-center transition-colors duration-200 text-sm h-8 text-zinc-100 px-4 py-2 rounded-lg w-auto {copyIcon == 'check' && 'copied'}" aria-label="Copy code to clipboard">
                 <i class="fa fa-{copyIcon}"></i>
             </button>
 
-            <a download href="{zipFilePath}" class="flex items-center transition-colors duration-200 text-sm h-8 text-white px-4 py-2 rounded-lg w-auto" aria-label="Download zip folder">
+            <a download href="{zipFilePath}" class="flex items-center transition-colors duration-200 text-sm h-8 text-zinc-100 px-4 py-2 rounded-lg w-auto" aria-label="Download zip folder">
                 <i class="fa-solid fa-download"></i>
             </a>
         </div>

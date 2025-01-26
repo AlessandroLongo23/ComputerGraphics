@@ -1,7 +1,15 @@
 export default {
 	content: ['./src/**/*.{html,js,svelte,ts}'],
 	plugins: [],
-	export: {
-		darkMode: 'selector',
+	darkMode: 'class',
+	safelist: ["dark"],
+	theme: {
+		extend: {
+			colors: {
+				zinc: {
+					850: '#242428'
+				}
+			}
+		}
 	}
 };

@@ -16,7 +16,7 @@
 </script>
 
 {#if ad}
-    <div class="{ad.backgroundColor} border-l-8 {ad.borderColor} text-black p-4 rounded-lg mb-4">
+    <div class="{ad.backgroundColor} border-l-8 {ad.borderColor} text-zinc-900 p-4 rounded-lg mb-4">
         <div class="flex flex-row justify-start items-center gap-4 mb-4">
             <ad.icon size={20} class={ad.iconColor}/>
             <p class="m-0 font-bold {ad.iconColor}">{title || capitalize(ad.name)}</p>

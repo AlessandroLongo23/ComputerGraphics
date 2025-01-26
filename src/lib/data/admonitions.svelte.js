@@ -11,9 +11,9 @@ export const admonitions = [
     {
         name: 'note',
         icon: ls.Notebook,
-        backgroundColor: 'bg-gray-100',
-        borderColor: 'border-gray-500',
-        iconColor: 'text-gray-700',
+        backgroundColor: 'bg-zinc-100',
+        borderColor: 'border-zinc-500',
+        iconColor: 'text-zinc-700',
     },
     {
         name: 'tip',

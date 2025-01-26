@@ -15,7 +15,7 @@ window.onload = () => {
     modelMatrixLoc = gl.getUniformLocation(program, "modelMatrix");
     projectionMatrixLoc = gl.getUniformLocation(program, "projectionMatrix");
 
-    readOBJFile(fileName = '../suzanne.obj', scale = 0.75, reverse = false)
+    readOBJFile(fileName = '../../../assets/models/suzanne.obj', scale = 0.75, reverse = false)
         .then(objInfo => {
             obj = objInfo;
 

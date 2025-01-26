@@ -1,7 +1,7 @@
 <script>
     import { onMount } from 'svelte';
-    import { page } from '$app/stores'
-    import { Code, Play } from 'lucide-svelte';
+    import { page } from '$app/stores';
+    import { Code, Play, Download } from 'lucide-svelte';
     import { WebGLUtils, fetchCodeSnippets, initShaders, convertToLatex } from '$lib/utils.svelte.js';
     import { readOBJFile } from '$lib/Libraries/OBJParser.js';
     import { vec2, vec3, vec4, mat4, perspective, flatten, lookAt, normalize, mix, mult, translate, inverse } from '$lib/Libraries/MV.js';
@@ -536,11 +536,11 @@
             metalTexture: null
         };
 
-        initTexture($page.url.pathname + "/textures/" + texturePack + "/textures/" + texturePack.slice(0, -2) + "diff_" + texturePack.slice(-2) + ".jpg", "albedoMap", 1);
-        initTexture($page.url.pathname + "/textures/" + texturePack + "/textures/" + texturePack.slice(0, -2) + "disp_" + texturePack.slice(-2) + ".jpg", "displacementTexture", 2);
-        initTexture($page.url.pathname + "/textures/" + texturePack + "/textures/" + texturePack.slice(0, -2) + "nor_gl_" + texturePack.slice(-2) + ".png", "normalTexture", 3);
-        initTexture($page.url.pathname + "/textures/" + texturePack + "/textures/" + texturePack.slice(0, -2) + "arm_" + texturePack.slice(-2) + ".jpg", "armTexture", 4);
-        initTexture($page.url.pathname + "/textures/" + texturePack + "/textures/" + texturePack.slice(0, -2) + "metal_" + texturePack.slice(-2) + ".jpg", "metalTexture", 5);
+        initTexture("/assets/textures/PBRpacks/" + texturePack + "/textures/" + texturePack.slice(0, -2) + "diff_" + texturePack.slice(-2) + ".jpg", "albedoMap", 1);
+        initTexture("/assets/textures/PBRpacks/" + texturePack + "/textures/" + texturePack.slice(0, -2) + "disp_" + texturePack.slice(-2) + ".jpg", "displacementTexture", 2);
+        initTexture("/assets/textures/PBRpacks/" + texturePack + "/textures/" + texturePack.slice(0, -2) + "nor_gl_" + texturePack.slice(-2) + ".png", "normalTexture", 3);
+        initTexture("/assets/textures/PBRpacks/" + texturePack + "/textures/" + texturePack.slice(0, -2) + "arm_" + texturePack.slice(-2) + ".jpg", "armTexture", 4);
+        initTexture("/assets/textures/PBRpacks/" + texturePack + "/textures/" + texturePack.slice(0, -2) + "metal_" + texturePack.slice(-2) + ".jpg", "metalTexture", 5);
     }
 
     const initTexture = (srcPath, textureKey, textureUnit) => {
@@ -619,7 +619,7 @@
                     break;
             }
 
-            readOBJFile($page.url.pathname + '/models/' + model + '.obj', scale, reverse)
+            readOBJFile('/assets/models/' + model + '.obj', scale, reverse)
                 .then(objInfo => {
                     obj = objInfo;
 
@@ -723,16 +723,18 @@
 
     <Result bind:canvas={canvas} bind:viewIndex={viewIndex} icons={[Code, Play]} width="700" height="700" isLoading={isLoading} codeSnippets={codeSnippets} folderPath={$page.url.pathname}>
         {#snippet controls()}
-            <div class="absolute left-0 top-0 flex flex-row justify-center items-center gap-4 w-full p-4 bg-gray-900/25 rounded-{viewIndex == 1 && 'r-'}lg">    
-                <Select label="Model" bind:value={model} options={modelOptions} width="w-40"/>
-                <Select label="Texture Pack" bind:value={texturePack} options={texturePackOptions} width="w-64"/>
-                <Select label="Cubemap" bind:value={cubemapPack} options={cubemapOptions} width="w-40"/>
-            </div>
-
-            <div class="absolute left-0 bottom-0 flex flex-row justify-center items-center gap-4 w-full p-4 bg-gray-900/25 rounded-{viewIndex == 1 && 'r-'}lg">    
-                <Slider min={0} max={.25} bind:value={displacementScale} step={0.01} id={displacementScale} label="Displacement scale"/>
-                <Counter bind:count={numRepeats} min={1} max={4} label="texture repeats"/>
-            </div>
+        <div class="absolute left-0 top-0 flex flex-row justify-center items-center gap-4 w-full p-4 bg-zinc-900/25 rounded-{viewIndex == 1 && 'r-'}lg">    
+            <Select label="Model" bind:value={model} options={modelOptions} width="w-40"/>
+            <Select label="Texture Pack" bind:value={texturePack} options={texturePackOptions} width="w-64"/>
+            <Select label="Cubemap" bind:value={cubemapPack} options={cubemapOptions} width="w-40"/>
+        </div>
+        
+        <div class="absolute left-0 bottom-0 flex flex-row justify-center items-center gap-4 w-full p-4 bg-zinc-900/25 rounded-{viewIndex == 1 && 'r-'}lg">    
+            <Slider min={0} max={.25} bind:value={displacementScale} step={0.01} id={displacementScale} label="Displacement scale"/>
+            <Counter bind:count={numRepeats} min={1} max={4} label="texture repeats"/>
+        </div>
         {/snippet}
     </Result>
+    
+    <a href="/assets/Computer_graphics_Final_project.pdf" download class="flex flex-row items-center mt-4 m-auto px-4 py-2 rounded-xl text-xl text-zinc-900 bg-zinc-300 hover:bg-zinc-400 transition-all duration-200">Full PDF<Download size=20 class="ms-4"/></a>
 </div>

@@ -1,9 +1,10 @@
 <script>
     import { onMount } from 'svelte';
-    import { page } from '$app/stores'
+    import { page } from '$app/stores';
     import { WebGLUtils, fetchCodeSnippets, initShaders, convertToLatex } from '$lib/utils.svelte.js';
     import { vec2, vec4, flatten, sizeof } from '$lib/Libraries/MV.js';
     import Result from '$lib/components/Result.svelte';
+    import { textWidth } from '$lib/stores/layout.svelte.js';
 
     let viewIndex = $state(1);
     let isLoading = $state(true);
@@ -109,39 +110,37 @@
     }
 </script>
 
-<div class="flex flex-col justify-center items-start w-4/5 text-xl m-auto">
-    <div class="w-4/5 m-auto">
-        <p>Add a second triangle to the previous part such that you have a quadrilateral (which is maybe even a square). [Angel 2.4]</p>
-        <p>Center your quad (short form of quadrilateral) and rotate it such that it has its vertices on the coordinate axes.</p>
-        <p>Add a rotation so the quad rotates around its center. Animate the rotation angle over time. Use requestAnimationFrame to continuously call your render function. [Angel 3.1]</p>
-    </div>
+<div class="flex flex-col justify-center items-start {$textWidth} text-xl m-auto">
+    <p>Add a second triangle to the previous part such that you have a quadrilateral (which is maybe even a square). [Angel 2.4]</p>
+    <p>Center your quad (short form of quadrilateral) and rotate it such that it has its vertices on the coordinate axes.</p>
+    <p>Add a rotation so the quad rotates around its center. Animate the rotation angle over time. Use requestAnimationFrame to continuously call your render function. [Angel 3.1]</p>
+</div>
 
-    <Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets} folderPath={$page.url.pathname}>
-        {#snippet controls()}
-            <div class="absolute left-0 top-0 flex flex-row justify-evenly items-center gap-4 w-full p-4 bg-gray-900/25">    
-                <button id="clear" class="flex w-32 h-8 items-center justify-center px-auto py-4 transition-colors duration-200 text-sm bg-white hover:bg-gray-300 text-black rounded-lg">
-                    Clear canvas
-                </button>
+<Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets} folderPath={$page.url.pathname}>
+    {#snippet controls()}
+        <div class="absolute left-0 top-0 flex flex-row justify-evenly items-center gap-4 w-full p-4 bg-zinc-900/25">    
+            <button id="clear" class="flex w-32 h-8 items-center justify-center px-auto py-4 transition-colors duration-200 text-sm bg-zinc-100 hover:bg-zinc-300 text-zinc-900 rounded-lg">
+                Clear canvas
+            </button>
+            
+            <div class="flex flex-row justify-between gap-4">
+                <div class="flex flex-col w-32 bg-zinc-100 rounded-lg p-1">
+                    <label for="mymenu" class="flex text-sm h-8 items-center justify-center text-zinc-900 rounded-lg">Background</label>
+                    <select id="mymenu" class="flex text-sm h-8 bg-zinc-300 text-zinc-900 ps-4 rounded-lg">
+                        <option class="bg-zinc-100" value="0" selected>Blue</option>
+                        <option class="bg-zinc-100" value="1">Green</option>
+                        <option class="bg-zinc-100" value="2">Red</option>
+                    </select>
+                </div>
                 
-                <div class="flex flex-row justify-between gap-4">
-                    <div class="flex flex-col w-32 bg-white rounded-lg p-1">
-                        <label for="mymenu" class="flex text-sm h-8 items-center justify-center text-black rounded-lg">Background</label>
-                        <select id="mymenu" class="flex text-sm h-8 bg-gray-300 text-black ps-4 rounded-lg">
-                            <option class="bg-white" value="0" selected>Blue</option>
-                            <option class="bg-white" value="1">Green</option>
-                            <option class="bg-white" value="2">Red</option>
-                        </select>
-                    </div>
-                    
-                    <div class="flex flex-col w-32 bg-white rounded-lg p-1">
-                        <label for="pointscolor" class="flex text-sm h-8 items-center justify-center text-black rounded-lg">Point color</label>
-                        <select id="pointscolor" class="flex text-sm h-8 bg-gray-300 text-black ps-4 rounded-lg">
-                            <option class="bg-white" value="0" selected>Black</option>
-                            <option class="bg-white" value="1">White</option>
-                        </select>
-                    </div>
+                <div class="flex flex-col w-32 bg-zinc-100 rounded-lg p-1">
+                    <label for="pointscolor" class="flex text-sm h-8 items-center justify-center text-zinc-900 rounded-lg">Point color</label>
+                    <select id="pointscolor" class="flex text-sm h-8 bg-zinc-300 text-zinc-900 ps-4 rounded-lg">
+                        <option class="bg-zinc-100" value="0" selected>Black</option>
+                        <option class="bg-zinc-100" value="1">White</option>
+                    </select>
                 </div>
             </div>
-        {/snippet}
-    </Result>
-</div>
+        </div>
+    {/snippet}
+</Result>

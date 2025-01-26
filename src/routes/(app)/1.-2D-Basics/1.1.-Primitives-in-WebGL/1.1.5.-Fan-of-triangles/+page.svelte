@@ -1,9 +1,12 @@
 <script>
-    import { onMount } from 'svelte';
-    import { page } from '$app/stores'
     import { WebGLUtils, fetchCodeSnippets, initShaders, convertToLatex } from '$lib/utils.svelte.js';
-    import { RotateCw } from 'lucide-svelte';
     import { add, mult, vec2, flatten } from '$lib/Libraries/MV.js';
+    import { textWidth } from '$lib/stores/layout.svelte.js';
+    import { RotateCw } from 'lucide-svelte';
+    import { page } from '$app/stores';
+    import { onMount } from 'svelte';
+
+    import Admonition from '$lib/components/UI/Admonition.svelte';
     import Result from '$lib/components/Result.svelte';
 
     let viewIndex = $state(1);
@@ -113,17 +116,26 @@
     }
 </script>
 
-<div class="flex flex-col justify-center items-start w-4/5 text-xl m-auto">
-    <div class="w-4/5 m-auto">
-        <p>Create and draw a circle using the triangle fan drawing mode. [Angel 2.4.2] [The triangle fan drawing mode is not available in WebGPU. If using WebGPU, use the triangle-strip drawing mode to draw a circle.]</p>
+<div class="flex flex-col justify-center items-start {$textWidth} text-xl m-auto gap-6">
+    <p class="text-xl font-medium m-0">Assignment</p>
+
+    <div class="flex flex-col gap-4">
+        <p>Create and draw a circle using the triangle fan drawing mode. [Angel 2.4.2]</p>
+
+        <Admonition type="warning">
+            {#snippet textContent()}
+                <p>The triangle fan drawing mode is not available in WebGPU. If using WebGPU, use the triangle-strip drawing mode to draw a circle.</p>
+            {/snippet}
+        </Admonition>
+
         <p>Make the circle bounce up and down over time.</p>
     </div>
-
-    <Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets} folderPath={$page.url.pathname}>
-        {#snippet controls()}
-            <button onclick={initBall} class="absolute left-0 top-0 m-4 p-2 bg-gray-100 rounded-lg hover:bg-gray-300 transition-colors">
-                <RotateCw size={20}/>
-            </button>
-        {/snippet}
-    </Result>
 </div>
+
+<Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets} folderPath={$page.url.pathname}>
+    {#snippet controls()}
+        <button onclick={initBall} class="absolute left-0 top-0 m-4 p-2 bg-zinc-100 rounded-lg hover:bg-zinc-300 transition-colors">
+            <RotateCw size={20}/>
+        </button>
+    {/snippet}
+</Result>

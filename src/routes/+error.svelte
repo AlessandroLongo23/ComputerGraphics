@@ -5,7 +5,7 @@
         <span class="text-8xl" style="--index: 1;">404</span>
     </div>
     <p class="text-4xl">Page not found</p>
-    <a href="/home" class="back-home bg-red-500 hover:bg-red-600 transition-colors text-white text-lg rounded-lg hover:no-underline">
+    <a href="/home" class="back-home bg-red-500 hover:bg-red-600 transition-colors text-zinc-100 text-lg rounded-lg hover:no-underline">
         Back to home
     </a>
 </div>

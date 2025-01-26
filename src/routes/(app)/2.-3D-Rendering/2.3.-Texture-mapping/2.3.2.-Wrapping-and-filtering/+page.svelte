@@ -1,6 +1,6 @@
 <script>
     import { onMount } from 'svelte';
-    import { page } from '$app/stores'
+    import { page } from '$app/stores';
     import { WebGLUtils, fetchCodeSnippets, initShaders, convertToLatex } from '$lib/utils.svelte.js';
     import { vec2, vec4, flatten, perspective, mat4 } from '$lib/Libraries/MV.js';
     import Result from '$lib/components/Result.svelte';
@@ -155,19 +155,19 @@
 
     <Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets} folderPath={$page.url.pathname}>
         {#snippet controls()}
-            <div class="absolute left-0 top-0 flex flex-row justify-evenly items-center gap-4 w-full p-4 bg-gray-900/25 rounded-{viewIndex == 1 && 'r-'}lg">    
+            <div class="absolute left-0 top-0 flex flex-row justify-evenly items-center gap-4 w-full p-4 bg-zinc-900/25 rounded-{viewIndex == 1 && 'r-'}lg">    
                 <div class="flex flex-row justify-evenly w-full">
-                    <div class="flex flex-col w-40 bg-white rounded-lg p-1">
-                        <label for="wrapping" class="flex text-sm h-8 items-center justify-center text-black rounded-lg">Wrapping</label>
-                        <select name="wrapping" id="wrapping" class="flex text-sm h-8 bg-gray-300 text-black ps-4 rounded-lg">
+                    <div class="flex flex-col w-40 bg-zinc-100 rounded-lg p-1">
+                        <label for="wrapping" class="flex text-sm h-8 items-center justify-center text-zinc-900 rounded-lg">Wrapping</label>
+                        <select name="wrapping" id="wrapping" class="flex text-sm h-8 bg-zinc-300 text-zinc-900 ps-4 rounded-lg">
                             <option value="0">clamp to edge</option>
                             <option value="1" selected>repeat</option>
                         </select>
                     </div>
             
-                    <div class="flex flex-col w-56 bg-white rounded-lg p-1">
-                        <label for="filtering" class="flex text-sm h-8 items-center justify-center text-black rounded-lg">Filtering</label>
-                        <select name="filtering" id="filtering" class="flex text-sm h-8 bg-gray-300 text-black ps-4 rounded-lg">
+                    <div class="flex flex-col w-56 bg-zinc-100 rounded-lg p-1">
+                        <label for="filtering" class="flex text-sm h-8 items-center justify-center text-zinc-900 rounded-lg">Filtering</label>
+                        <select name="filtering" id="filtering" class="flex text-sm h-8 bg-zinc-300 text-zinc-900 ps-4 rounded-lg">
                             <option value="0" selected>nearest</option>
                             <option value="1">linear</option>
                             <option value="2">nearest mipmap nearest</option>

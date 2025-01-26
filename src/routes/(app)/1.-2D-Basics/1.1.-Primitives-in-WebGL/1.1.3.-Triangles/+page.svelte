@@ -1,9 +1,11 @@
 <script>
-    import { onMount } from 'svelte';
-    import { page } from '$app/stores'
     import { WebGLUtils, fetchCodeSnippets, initShaders, convertToLatex } from '$lib/utils.svelte.js';
     import { vec2, vec4, flatten } from '$lib/Libraries/MV.js';
-    import Result from '$lib/components/Result.svelte'
+    import { textWidth } from '$lib/stores/layout.svelte.js';
+    import { page } from '$app/stores';
+    import { onMount } from 'svelte';
+ 
+    import Result from '$lib/components/Result.svelte';
 
     let isLoading = $state(true);
     let viewIndex = $state(1);
@@ -68,11 +70,13 @@
     }
 </script>
 
-<div class="flex flex-col justify-center items-start w-4/5 text-xl m-auto">
-    <div class="w-4/5 m-auto">
+<div class="flex flex-col justify-center items-start {$textWidth} text-xl m-auto gap-6">
+    <p class="text-xl font-medium m-0">Assignment</p>
+
+    <div class="flex flex-col gap-4">
         <p>Change the code in the previous example to draw triangles instead of points. [Angel 2.4.2]</p>
         <p>Extend the application to include a second buffer for vertex colors and draw the triangle with a red, a green, and a blue vertex color. [Angel 2.5.1 and 2.10]</p>
     </div>
-
-    <Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets} folderPath={$page.url.pathname}/>
 </div>
+
+<Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets} folderPath={$page.url.pathname}/>

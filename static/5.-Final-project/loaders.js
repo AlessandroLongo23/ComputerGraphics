@@ -7,12 +7,12 @@ const initCubeMap = (cubemapPack) => {
     gl.bindTexture(gl.TEXTURE_CUBE_MAP, cubeTexture);
     
     const faces = [
-        { target: gl.TEXTURE_CUBE_MAP_POSITIVE_X, url: './cubemaps/' + cubemapPack + '/posx.png' },
-        { target: gl.TEXTURE_CUBE_MAP_NEGATIVE_X, url: './cubemaps/' + cubemapPack + '/negx.png' },
-        { target: gl.TEXTURE_CUBE_MAP_POSITIVE_Y, url: './cubemaps/' + cubemapPack + '/posy.png' },
-        { target: gl.TEXTURE_CUBE_MAP_NEGATIVE_Y, url: './cubemaps/' + cubemapPack + '/negy.png' },
-        { target: gl.TEXTURE_CUBE_MAP_POSITIVE_Z, url: './cubemaps/' + cubemapPack + '/posz.png' },
-        { target: gl.TEXTURE_CUBE_MAP_NEGATIVE_Z, url: './cubemaps/' + cubemapPack + '/negz.png' }
+        { target: gl.TEXTURE_CUBE_MAP_POSITIVE_X, url: '../assets/textures/cubemaps/' + cubemapPack + '/posx.png' },
+        { target: gl.TEXTURE_CUBE_MAP_NEGATIVE_X, url: '../assets/textures/cubemaps/' + cubemapPack + '/negx.png' },
+        { target: gl.TEXTURE_CUBE_MAP_POSITIVE_Y, url: '../assets/textures/cubemaps/' + cubemapPack + '/posy.png' },
+        { target: gl.TEXTURE_CUBE_MAP_NEGATIVE_Y, url: '../assets/textures/cubemaps/' + cubemapPack + '/negy.png' },
+        { target: gl.TEXTURE_CUBE_MAP_POSITIVE_Z, url: '../assets/textures/cubemaps/' + cubemapPack + '/posz.png' },
+        { target: gl.TEXTURE_CUBE_MAP_NEGATIVE_Z, url: '../assets/textures/cubemaps/' + cubemapPack + '/negz.png' }
     ];
 
     gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
@@ -56,11 +56,11 @@ const initCubeMap = (cubemapPack) => {
 }
 
 const initTextures = (texturePack) => {
-    initTexture("./textures/" + texturePack + "/textures/" + texturePack.slice(0, -2) + "diff_" + texturePack.slice(-2) + ".jpg", "albedoMap", 1);
-    initTexture("./textures/" + texturePack + "/textures/" + texturePack.slice(0, -2) + "disp_" + texturePack.slice(-2) + ".jpg", "displacementTexture", 2);
-    initTexture("./textures/" + texturePack + "/textures/" + texturePack.slice(0, -2) + "nor_gl_" + texturePack.slice(-2) + ".png", "normalTexture", 3);
-    initTexture("./textures/" + texturePack + "/textures/" + texturePack.slice(0, -2) + "arm_" + texturePack.slice(-2) + ".jpg", "armTexture", 4);
-    initTexture("./textures/" + texturePack + "/textures/" + texturePack.slice(0, -2) + "metal_" + texturePack.slice(-2) + ".jpg", "metalTexture", 5);
+    initTexture("../assets/textures/PBRpacks/" + texturePack + "/textures/" + texturePack.slice(0, -2) + "diff_" + texturePack.slice(-2) + ".jpg", "albedoMap", 1);
+    initTexture("../assets/textures/PBRpacks/" + texturePack + "/textures/" + texturePack.slice(0, -2) + "disp_" + texturePack.slice(-2) + ".jpg", "displacementTexture", 2);
+    initTexture("../assets/textures/PBRpacks/" + texturePack + "/textures/" + texturePack.slice(0, -2) + "nor_gl_" + texturePack.slice(-2) + ".png", "normalTexture", 3);
+    initTexture("../assets/textures/PBRpacks/" + texturePack + "/textures/" + texturePack.slice(0, -2) + "arm_" + texturePack.slice(-2) + ".jpg", "armTexture", 4);
+    initTexture("../assets/textures/PBRpacks/" + texturePack + "/textures/" + texturePack.slice(0, -2) + "metal_" + texturePack.slice(-2) + ".jpg", "metalTexture", 5);
 }
 
 const initTexture = (srcPath, shader_keyword, textureUnit) => {
@@ -133,7 +133,7 @@ const initModel = (model) => {
                 break;
         }
 
-        readOBJFile(fileName = './models/' + model + '.obj', scale = scale, reverse = reverse)
+        readOBJFile(fileName = '../assets/models/' + model + '.obj', scale = scale, reverse = reverse)
             .then(objInfo => {
                 obj = objInfo;
 

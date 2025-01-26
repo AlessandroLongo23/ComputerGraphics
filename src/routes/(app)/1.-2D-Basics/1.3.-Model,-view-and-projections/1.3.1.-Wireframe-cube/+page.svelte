@@ -1,10 +1,11 @@
 <script>
     import { onMount } from 'svelte';
-    import { page } from '$app/stores'
+    import { page } from '$app/stores';
     import { WebGLUtils, fetchCodeSnippets, initShaders, convertToLatex } from '$lib/utils.svelte.js';
     import { vec3, flatten, mat4, mult, rotateX, rotateY, rotateZ } from '$lib/Libraries/MV.js';
     import Result from '$lib/components/Result.svelte';
     import Admonition from '$lib/components/UI/Admonition.svelte';
+    import { textWidth } from '$lib/stores/layout.svelte.js';
 
     let viewIndex = $state(1);
     let isLoading = $state(true);
@@ -116,21 +117,19 @@
     }
 </script>
 
-<div class="flex flex-col justify-center items-start w-4/5 text-xl m-auto">
-    <div class="w-4/5 m-auto">
-        <p>Draw a wireframe unit cube in isometric view.</p>  
-        <p>The default viewing volume uses orthographic projection. Draw a cube using orthographic projection. [Angel 2.6.1, 4.6]</p>
-        <p>Position the cube in the world coordinate system with its diagonal going from $(0,0,0)$ to $(1,1,1)$.</p>
-        <p>Draw lines instead of triangles to draw in wireframe. [Angel 2.4] </p>
-        <p>Build a model-view matrix that transforms the cube vertices so that the cube is in isometric view. [Angel 4.12, 5.1.3, 5.3]</p>
-        <Admonition type='warning'>
-            {#snippet textContent()}
-                <p class="m-0">
-                    If using WebGPU, a projection matrix is needed for this assignment because the default interval for depth coordinates is $[0,1]$ instead of $[-1,1]$.
-                </p>
-            {/snippet}
-        </Admonition>
-    </div>
-
-    <Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets} folderPath={$page.url.pathname}/>
+<div class="flex flex-col justify-center items-start {$textWidth} text-xl m-auto">
+    <p>Draw a wireframe unit cube in isometric view.</p>  
+    <p>The default viewing volume uses orthographic projection. Draw a cube using orthographic projection. [Angel 2.6.1, 4.6]</p>
+    <p>Position the cube in the world coordinate system with its diagonal going from $(0,0,0)$ to $(1,1,1)$.</p>
+    <p>Draw lines instead of triangles to draw in wireframe. [Angel 2.4] </p>
+    <p>Build a model-view matrix that transforms the cube vertices so that the cube is in isometric view. [Angel 4.12, 5.1.3, 5.3]</p>
+    <Admonition type='warning'>
+        {#snippet textContent()}
+            <p class="m-0">
+                If using WebGPU, a projection matrix is needed for this assignment because the default interval for depth coordinates is $[0,1]$ instead of $[-1,1]$.
+            </p>
+        {/snippet}
+    </Admonition>
 </div>
+
+<Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets} folderPath={$page.url.pathname}/>

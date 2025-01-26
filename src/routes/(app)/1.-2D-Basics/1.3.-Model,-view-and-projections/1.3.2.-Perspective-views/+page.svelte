@@ -1,10 +1,11 @@
 <script>
     import { onMount } from 'svelte';
-    import { page } from '$app/stores'
+    import { page } from '$app/stores';
     import { WebGLUtils, fetchCodeSnippets, initShaders, convertToLatex } from '$lib/utils.svelte.js';
     import { vec3, flatten, mat4, mult, translate, rotateX, rotateY, rotateZ, perspective } from '$lib/Libraries/MV.js';
     import Result from '$lib/components/Result.svelte';
     import { Code, Play } from 'lucide-svelte';
+    import { textWidth } from '$lib/stores/layout.svelte.js';
 
     let viewIndex = $state(1);
     let isLoading = $state(true);
@@ -126,12 +127,10 @@
     }
 </script>
 
-<div class="flex flex-col justify-center items-start w-4/5 text-xl m-auto">
-    <div class="w-4/5 m-auto">
-        <p>Draw the unit cube in different classical perspective views.</p>  
-        <p>Introduce a projection matrix that sets the camera to be a pinhole camera with a 45 degrees vertical field of view. [Angel 1.4.1, 5.5-5.7] </p>
-        <p>Draw the cube three times in the same rendering. Transform the cubes so that one is in one-point (front) perspective, one is in two-point (X) perspective, and one is in three-point perspective. [Angel 4.9-4.11, 5.1.5]</p>
-    </div>
-
-    <Result bind:canvas={canvas} bind:viewIndex={viewIndex} icons={[Code, Play]} isLoading={isLoading} codeSnippets={codeSnippets} width={1024}/>
+<div class="flex flex-col justify-center items-start {$textWidth} text-xl m-auto">
+    <p>Draw the unit cube in different classical perspective views.</p>  
+    <p>Introduce a projection matrix that sets the camera to be a pinhole camera with a 45 degrees vertical field of view. [Angel 1.4.1, 5.5-5.7] </p>
+    <p>Draw the cube three times in the same rendering. Transform the cubes so that one is in one-point (front) perspective, one is in two-point (X) perspective, and one is in three-point perspective. [Angel 4.9-4.11, 5.1.5]</p>
 </div>
+
+<Result bind:canvas={canvas} bind:viewIndex={viewIndex} icons={[Code, Play]} isLoading={isLoading} codeSnippets={codeSnippets} width={1024}/>

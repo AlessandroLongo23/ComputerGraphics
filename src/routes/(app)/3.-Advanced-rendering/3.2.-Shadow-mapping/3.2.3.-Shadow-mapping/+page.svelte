@@ -1,6 +1,6 @@
 <script>
     import { onMount } from 'svelte';
-    import { page } from '$app/stores'
+    import { page } from '$app/stores';
     import { WebGLUtils, fetchCodeSnippets, initShaders, convertToLatex } from '$lib/utils.svelte.js';
     import { vec2, vec3, vec4, mat4, perspective, mult, translate, flatten, lookAt } from '$lib/Libraries/MV.js';
     import { readOBJFile } from '$lib/Libraries/OBJParser.js';
@@ -454,7 +454,7 @@
 
     <Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets} folderPath={$page.url.pathname}>
         {#snippet controls()}
-            <div class="absolute left-0 top-0 flex flex-row justify-evenly items-center gap-4 w-full p-4 bg-gray-900/25 rounded-{viewIndex == 1 && 'r-'}lg">    
+            <div class="absolute left-0 top-0 flex flex-row justify-evenly items-center gap-4 w-full p-4 bg-zinc-900/25 rounded-{viewIndex == 1 && 'r-'}lg">    
                 <div class="flex flex-row justify-between items-center gap-2">
                     <Checkbox bind:checked={teapotMovement} label={'move teapot'}></Checkbox>
                     <Checkbox bind:checked={lightMovement} label={'move light'}></Checkbox>

@@ -1,12 +1,13 @@
 <script>
-    import { themeIndex } from "$lib/stores.svelte.js";
-    import Toggle from "$lib/components/UI/Toggle.svelte";
+    import { themeStore } from "$lib/stores/theme.svelte.js";
     import { Sun, Moon } from "lucide-svelte";
+
+    import Toggle from "$lib/components/UI/Toggle.svelte";
 </script>
 
-<div class="flex flex-col justify-center items-center h-screen {$themeIndex ? 'bg-neutral-900 text-white': 'bg-gray-100 text-neutral-900'}">
+<div class="flex flex-col justify-center items-center h-screen">
     <div class="absolute top-14 right-28">
-        <Toggle bind:selected={$themeIndex} icons={[Sun, Moon]}/>
+        <Toggle bind:selected={$themeStore} icons={[Sun, Moon]}/>
     </div>
 
     <div class="flex flex-col justify-center items-center mb-16">
@@ -14,12 +15,12 @@
 
         <div class="flex flex-row justify-center items-center gap-4 me-9">
             <p class="text-8xl">Computer</p> 
-            <img src="/assets/images/favicon-{ $themeIndex == 0 ? 'light' : 'dark' }.png" alt="icon" class="size-16 mb-4">
+            <img src="/assets/images/favicon-{ $themeStore == 0 ? 'light' : 'dark' }.png" alt="icon" class="size-16">
             <p class="text-8xl">Graphics</p>
         </div>
     </div>
 
-    <a href='/home' class="bg-red-500 hover:bg-red-600 transition-colors text-white text-lg px-4 py-2 rounded-lg hover:no-underline">
+    <a href='/home' class="bg-red-500 hover:bg-red-600 transition-colors text-zinc-100 text-lg px-4 py-2 rounded-lg hover:no-underline">
         Start learning!
     </a>
 

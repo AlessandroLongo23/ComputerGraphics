@@ -1,8 +1,11 @@
 <script>
-    import { onMount } from 'svelte';
-    import { page } from '$app/stores'
     import { WebGLUtils, fetchCodeSnippets, initShaders, convertToLatex } from '$lib/utils.svelte.js';
+    import { textWidth } from '$lib/stores/layout.svelte.js';
     import { vec2, flatten} from '$lib/Libraries/MV.js';
+    import { page } from '$app/stores';
+    import { onMount } from 'svelte';
+    
+    import Admonition from '$lib/components/UI/Admonition.svelte';
     import Result from '$lib/components/Result.svelte';
 
     let viewIndex = $state(1);
@@ -51,11 +54,19 @@
     }
 </script>
 
-<div class="flex flex-col justify-center items-start w-4/5 text-xl m-auto">
-    <div class="w-4/5 m-auto">
+<div class="flex flex-col justify-center items-start {$textWidth} text-xl m-auto gap-6">
+    <p class="text-xl font-medium m-0">Assignment</p>
+    
+    <div class="flex flex-col gap-4">
         <p>Load and compile a shader program. Write a basic vertex shader and a constant color fragment shader. [Angel 2.8.3 to 2.8.8]</p>
-        <p>Setup a vertex buffer with the corresponding attribute pointer. Add the coordinates and draw three points of size 20 pixels, like in the figure. [Angel 2.4, 2.8, and 2.5.3] [If using WebGPU, note that points can only be of size 1. These points then need to be drawn as two triangles forming a square.] Shaders and buffers.</p>
-    </div>
+        <p>Setup a vertex buffer with the corresponding attribute pointer. Add the coordinates and draw three points of size 20 pixels, like in the figure. [Angel 2.4, 2.8, and 2.5.3]</p>
 
-    <Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets} folderPath={$page.url.pathname}/>
+        <Admonition type="warning">
+            {#snippet textContent()}
+                <p>If using WebGPU, note that points can only be of size 1. These points then need to be drawn as two triangles forming a square.</p>
+            {/snippet}
+        </Admonition>
+    </div>
 </div>
+
+<Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets} folderPath={$page.url.pathname}/>

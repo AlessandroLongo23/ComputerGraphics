@@ -1,8 +1,10 @@
 <script>
-    import { onMount } from 'svelte';
-    import { page } from '$app/stores'
     import { WebGLUtils, fetchCodeSnippets, initShaders, convertToLatex } from '$lib/utils.svelte.js';
+    import { textWidth } from '$lib/stores/layout.svelte.js';
     import { vec2, flatten } from '$lib/Libraries/MV.js';
+    import { page } from '$app/stores';
+    import { onMount } from 'svelte';
+    
     import Result from '$lib/components/Result.svelte';
 
     let viewIndex = $state(1);
@@ -71,12 +73,14 @@
     }
 </script>
 
-<div class="flex flex-col justify-center items-start w-4/5 text-xl m-auto">
-    <div class="w-4/5 m-auto">
+<div class="flex flex-col justify-center items-start {$textWidth} text-xl m-auto gap-6">
+    <p class="text-xl font-medium m-0">Assignment</p>
+    
+    <div class="flex flex-col gap-4">
         <p>Add a second triangle to the previous part such that you have a quadrilateral (which is maybe even a square). [Angel 2.4]</p>
         <p>Center your quad (short form of quadrilateral) and rotate it such that it has its vertices on the coordinate axes.</p>
         <p>Add a rotation so the quad rotates around its center. Animate the rotation angle over time. Use requestAnimationFrame to continuously call your render function. [Angel 3.1]</p>
     </div>
-
-    <Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets} folderPath={$page.url.pathname}/>
 </div>
+
+<Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets} folderPath={$page.url.pathname}/>
