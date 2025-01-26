@@ -287,7 +287,7 @@
     <div class="w-4/5 m-auto">
         <p>Set up interaction modes (using either webpage buttons or mouse buttons) for orbiting, dollying, and panning.</p>
         <p>Store distance to the eye point from the look-at point and the $xy$ displacement of the look-at point together with the quaternions used for orbiting.</p>
-        <ul>
+        <ul class="list-disc list-inside">
             <li>In dolly mode, the difference in the $y$ coordinate of the mouse position is used to update the distance to the eye from the look-at point.</li>
             <li>In panning mode, the differences in $x$ and $y$ coordinates of the mouse position are used for displacement of both look-at and eye points along the world space basis vectors of the image plane.</li>
         </ul>

@@ -1,11 +1,12 @@
 <script>
-    import { onMount } from 'svelte';
-    import { page } from '$app/stores';
     import { WebGLUtils, fetchCodeSnippets, initShaders, convertToLatex } from '$lib/utils.svelte.js';
     import { vec2, flatten, sizeof } from '$lib/Libraries/MV.js';
-    import Result from '$lib/components/Result.svelte';
     import { textWidth } from '$lib/stores/layout.svelte.js';
-
+    import { page } from '$app/stores';
+    import { onMount } from 'svelte';
+    
+    import Result from '$lib/components/Result.svelte';
+    
     let viewIndex = $state(1);
     let isLoading = $state(true);
     let canvas = $state();
@@ -73,10 +74,14 @@
     }
 </script>
 
-<div class="flex flex-col justify-center items-start {$textWidth} text-xl m-auto">
-    <p>Start from your solution to Part 2 of Worksheet 1: A web application that clears the canvas and then draws three points. [Angel 2.8]</p>
-    <p>Attach an event handler to the mouse click event and draw points on the canvas where the mouse was clicked. [Angel 3.7]</p>
-    <p>Points are offset from the tip of the mouse cursor. This is not as desired. Get the bounding rectangle of the canvas in the client area using event.target.getBoundingClientRect() and correct the mouse position using the left and top coordinates of this rectangle.</p>
+<div class="flex flex-col justify-center items-start {$textWidth} text-xl m-auto gap-6">
+    <p class="text-xl font-medium m-0">Assignment</p>
+
+    <div class="flex flex-col gap-4 text-zinc-950/65 dark:text-zinc-50/65">
+        <p>Start from your solution to Part 2 of Worksheet 1: A web application that clears the canvas and then draws three points. [Angel 2.8]</p>
+        <p>Attach an event handler to the mouse click event and draw points on the canvas where the mouse was clicked. [Angel 3.7]</p>
+        <p>Points are offset from the tip of the mouse cursor. This is not as desired. Get the bounding rectangle of the canvas in the client area using event.target.getBoundingClientRect() and correct the mouse position using the left and top coordinates of this rectangle.</p>
+    </div>
 </div>
 
 <Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets} zipFolderPath={$page.url.pathname}/>

@@ -241,7 +241,7 @@
         <p>Switch to using quaternions for the orbit rotation instead of Euler angles. In 
             this way, you can avoid the gimbal lock.</p>
 
-        <ul>
+        <ul class="list-disc list-inside">
             <li>Get $x$ and $y$ coordinates for your mouse position that are in $[-1,1]$</li>
             <li>Project these coordinates to a spherical surface of radius $2$</li>
             <li>Normalize the resulting vector and build a quaternion that rotates from the previous to the current of these vectors to find the rotation corresponding to the mouse movement.</li> 

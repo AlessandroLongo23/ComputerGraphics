@@ -1,12 +1,13 @@
 <script>
-    import { onMount } from 'svelte';
-    import { page } from '$app/stores';
-    import { WebGLUtils, fetchCodeSnippets, initShaders, convertToLatex } from '$lib/utils.svelte.js';
     import { vec3, flatten, mat4, mult, translate, rotateX, rotateY, rotateZ, perspective } from '$lib/Libraries/MV.js';
-    import Result from '$lib/components/Result.svelte';
-    import { Code, Play } from 'lucide-svelte';
+    import { WebGLUtils, fetchCodeSnippets, initShaders, convertToLatex } from '$lib/utils.svelte.js';
     import { textWidth } from '$lib/stores/layout.svelte.js';
-
+    import { Code, Play } from 'lucide-svelte';
+    import { page } from '$app/stores';
+    import { onMount } from 'svelte';
+    
+    import Result from '$lib/components/Result.svelte';
+    
     let viewIndex = $state(1);
     let isLoading = $state(true);
     let canvas = $state();
@@ -127,10 +128,14 @@
     }
 </script>
 
-<div class="flex flex-col justify-center items-start {$textWidth} text-xl m-auto">
-    <p>Draw the unit cube in different classical perspective views.</p>  
-    <p>Introduce a projection matrix that sets the camera to be a pinhole camera with a 45 degrees vertical field of view. [Angel 1.4.1, 5.5-5.7] </p>
-    <p>Draw the cube three times in the same rendering. Transform the cubes so that one is in one-point (front) perspective, one is in two-point (X) perspective, and one is in three-point perspective. [Angel 4.9-4.11, 5.1.5]</p>
+<div class="flex flex-col justify-center items-start {$textWidth} text-xl m-auto gap-6">
+    <p class="text-xl font-medium m-0">Assignment</p>
+    
+    <div class="flex flex-col gap-4 text-zinc-950/65 dark:text-zinc-50/65">
+        <p>Draw the unit cube in different classical perspective views.</p>  
+        <p>Introduce a projection matrix that sets the camera to be a pinhole camera with a 45 degrees vertical field of view. [Angel 1.4.1, 5.5-5.7] </p>
+        <p>Draw the cube three times in the same rendering. Transform the cubes so that one is in one-point (front) perspective, one is in two-point (X) perspective, and one is in three-point perspective. [Angel 4.9-4.11, 5.1.5]</p>
+    </div>
 </div>
 
 <Result bind:canvas={canvas} bind:viewIndex={viewIndex} icons={[Code, Play]} isLoading={isLoading} codeSnippets={codeSnippets} width={1024}/>

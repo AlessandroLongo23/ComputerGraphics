@@ -37,7 +37,7 @@
 <div class="flex flex-col justify-center items-start {$textWidth} text-xl m-auto gap-6">
     <p class="text-xl font-medium m-0">Assignment</p>
     
-    <div class="flex flex-col gap-4">
+    <div class="flex flex-col gap-4 text-zinc-950/65 dark:text-zinc-50/65">
         <p>Create a HTML document with a 512x512 canvas element and write a script to create a WebGL context. [Angel 2.8]</p>
         <p>Setup a viewport and clear the canvas with the color cornflower blue (0.3921, 0.5843, 0.9294, 1.0). [Angel 2.5.1]</p>
         <p>If not already done, move the script to a separate JavaScript file and include it in the HTML document.</p>

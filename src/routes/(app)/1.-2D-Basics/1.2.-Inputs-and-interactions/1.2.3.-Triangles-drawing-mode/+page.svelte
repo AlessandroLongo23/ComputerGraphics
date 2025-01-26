@@ -1,13 +1,14 @@
 <script>
-    import { onMount } from 'svelte';
-    import { page } from '$app/stores';
     import { WebGLUtils, fetchCodeSnippets, initShaders, convertToLatex } from '$lib/utils.svelte.js';
     import { vec2, vec4, flatten, sizeof } from '$lib/Libraries/MV.js';
-    import Result from '$lib/components/Result.svelte';
-    import Toggle from '$lib/components/UI/Toggle.svelte';
-    import Admonition from '$lib/components/UI/Admonition.svelte';
-    import { Dot, Triangle } from 'lucide-svelte'
     import { textWidth } from '$lib/stores/layout.svelte.js';
+    import { Dot, Triangle } from 'lucide-svelte'
+    import { page } from '$app/stores';
+    import { onMount } from 'svelte';
+
+    import Admonition from '$lib/components/UI/Admonition.svelte';
+    import Toggle from '$lib/components/UI/Toggle.svelte';
+    import Result from '$lib/components/Result.svelte';
 
     let viewIndex = $state(1);
     let isLoading = $state(true);
@@ -193,16 +194,22 @@
     }
 </script>
 
-<div class="flex flex-col justify-center items-start {$textWidth} text-xl m-auto">
-    <p>We would now like to have two different drawing modes. One where we draw points and one where we interactively build a triangle by placing three points. Add a button for each drawing mode. [Angel 3.6.2]</p>
-    <Admonition type='tip'>
-        {#snippet textContent()}
-            <p class="m-0">
-                What we do has some relation to the textbook CAD example [Angel 3.10], where a polygon is built interactively.
-            </p>
-        {/snippet}
-    </Admonition>
-    <p>Let us draw all our shapes as triangles (using gl.TRIANGLES). When a point is drawn, add vertices (positions and colors) for two triangles representing this point to the vertex buffers. In the triangle drawing mode, keep a record (array) of the former points that were clicked and their colors. When the third point is clicked, replace the two points and their colors (four triangles) with the one triangle to be drawn and clear the record.</p>
+<div class="flex flex-col justify-center items-start {$textWidth} text-xl m-auto gap-6">
+    <p class="text-xl font-medium m-0">Assignment</p>
+
+    <div class="flex flex-col gap-4 text-zinc-950/65 dark:text-zinc-50/65">
+        <p>We would now like to have two different drawing modes. One where we draw points and one where we interactively build a triangle by placing three points. Add a button for each drawing mode. [Angel 3.6.2]</p>
+        
+        <Admonition type='tip'>
+            {#snippet textContent()}
+                <p class="m-0">
+                    What we do has some relation to the textbook CAD example [Angel 3.10], where a polygon is built interactively.
+                </p>
+            {/snippet}
+        </Admonition>
+        
+        <p>Let us draw all our shapes as triangles (using gl.TRIANGLES). When a point is drawn, add vertices (positions and colors) for two triangles representing this point to the vertex buffers. In the triangle drawing mode, keep a record (array) of the former points that were clicked and their colors. When the third point is clicked, replace the two points and their colors (four triangles) with the one triangle to be drawn and clear the record.</p>
+    </div>
 </div>
 
 <Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets} folderPath={$page.url.pathname}>

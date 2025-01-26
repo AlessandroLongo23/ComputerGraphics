@@ -1,12 +1,13 @@
 <script>
-    import { onMount } from 'svelte';
-    import { page } from '$app/stores';
     import { WebGLUtils, fetchCodeSnippets, initShaders, convertToLatex } from '$lib/utils.svelte.js';
     import { vec2, vec4, flatten, sizeof } from '$lib/Libraries/MV.js';
-    import Result from '$lib/components/Result.svelte';
-    import Toggle from '$lib/components/UI/Toggle.svelte';
-    import { Dot, Triangle, Circle } from 'lucide-svelte'
     import { textWidth } from '$lib/stores/layout.svelte.js';
+    import { Dot, Triangle, Circle } from 'lucide-svelte';
+    import { page } from '$app/stores';
+    import { onMount } from 'svelte';
+
+    import Toggle from '$lib/components/UI/Toggle.svelte';
+    import Result from '$lib/components/Result.svelte';
 
     let viewIndex = $state(1);
     let isLoading = $state(true);
@@ -256,10 +257,14 @@
     }
 </script>
 
-<div class="flex flex-col justify-center items-start {$textWidth} text-xl m-auto">
-    <p>Add a button for a circle drawing mode. [Angel 3.6.2]</p>
-    <p>When drawing in circle mode, add a point on the first click and keep a record of the point that was clicked. On the second click, use the position of the point on record and that of the second click to find the circle center and radius and replace the point with vertices (positions and colors) for the circle (refer to Part 5 of Worksheet 1).</p>
-    <p>If needed, modify your circle drawing routine so that the circle can be drawn as triangles (using gl.TRIANGLES).</p>
+<div class="flex flex-col justify-center items-start {$textWidth} text-xl m-auto gap-6">
+    <p class="text-xl font-medium m-0">Assignment</p>
+  
+    <div class="flex flex-col gap-4 text-zinc-950/65 dark:text-zinc-50/65">
+        <p>Add a button for a circle drawing mode. [Angel 3.6.2]</p>
+        <p>When drawing in circle mode, add a point on the first click and keep a record of the point that was clicked. On the second click, use the position of the point on record and that of the second click to find the circle center and radius and replace the point with vertices (positions and colors) for the circle (refer to Part 5 of Worksheet 1).</p>
+        <p>If needed, modify your circle drawing routine so that the circle can be drawn as triangles (using gl.TRIANGLES).</p>
+    </div>  
 </div>
 
 <Result bind:canvas={canvas} bind:viewIndex={viewIndex} isLoading={isLoading} codeSnippets={codeSnippets} folderPath={$page.url.pathname}>

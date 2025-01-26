@@ -194,7 +194,7 @@
     <div class="w-4/5 m-auto">
         <p>A light source position is needed to cast shadows. Introduce an animated point light that circles the scene with circle center $(0,2,-2)$ and radius $2$.</p>
         <p>Implement projection shadows using the following steps:</p>
-        <ul>
+        <ul class="list-disc list-inside">
             <li>Create a projection matrix $M_p$ that projects geometry onto the ground plane $y=-1$. Projection to a plane different from $y=0$ is done by subtracting the $y$-coordinate of the plane from the $y$-coordinate of the light source in $M_p$. [Angel 5.10]</li>
             <li>Construct a shadow model matrix $M_s$ by concatenating $M_p$ with model and translation matrices so that shadow polygons are projected from the current position of the point light onto the ground plane. [Angel 5.10]</li>
             <li>Use the shadow model matrix to draw the smaller quads again but as shadow polygons.</li>

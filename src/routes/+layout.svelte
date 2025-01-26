@@ -6,7 +6,7 @@
     let { children } = $props();
 </script>
 
-<div class="bg-zinc-200 text-zinc-850 dark:bg-zinc-850 dark:text-zinc-200">
+<div class="bg-zinc-100 text-zinc-850 dark:bg-zinc-900 dark:text-zinc-200">
     <ThemeProvider>
         {@render children?.()}
     </ThemeProvider>

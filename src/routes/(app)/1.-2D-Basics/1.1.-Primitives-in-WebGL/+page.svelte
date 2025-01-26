@@ -7,7 +7,7 @@
     <div class="flex flex-col gap-6 items-start w-1/2 m-auto">
         <p class="text-xl font-medium m-0">Introduction</p>
 
-        <div class="flex flex-col gap-4">
+        <div class="flex flex-col gap-4 text-zinc-950/65 dark:text-zinc-50/65">
             <p>The purpose of this set of exercises is to get started with WebGL (if you prefer, you can use WebGPU instead of WebGL).</p>
             <p>You will setup a WebGL application from scratch, create a canvas and a WebGL context, compile and use simplistic shader programs, setup the needed buffers for drawing, and draw and animate simple shapes.</p>
             

@@ -19,7 +19,7 @@
         <div class="flex flex-col gap-4">
             {#each chapters as chapter}
                 <div class="relative">
-                    <a class="text-zinc-950 dark:text-zinc-100 opacity-50 hover:opacity-100 relative after:absolute after:bg-zinc-850 after:dark:bg-zinc-200 after:-bottom-[3px] after:left-0 after:h-[1px] after:w-0 hover:after:w-full transition-opacity duration-300 after:transition-all after:duration-300" href={chapter.href}>{chapter.title}</a>
+                    <a class="text-zinc-950 dark:text-zinc-50 opacity-65 hover:opacity-100 relative after:absolute after:bg-zinc-850 after:dark:bg-zinc-200 after:-bottom-[3px] after:left-0 after:h-[1px] after:w-0 hover:after:w-full transition-opacity duration-300 after:transition-all after:duration-300" href={chapter.href}>{chapter.title}</a>
                 </div>
             {/each}
         </div>

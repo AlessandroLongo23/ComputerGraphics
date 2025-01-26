@@ -57,7 +57,7 @@
 <div class="flex flex-col justify-center items-start {$textWidth} text-xl m-auto gap-6">
     <p class="text-xl font-medium m-0">Assignment</p>
     
-    <div class="flex flex-col gap-4">
+    <div class="flex flex-col gap-4 text-zinc-950/65 dark:text-zinc-50/65">
         <p>Load and compile a shader program. Write a basic vertex shader and a constant color fragment shader. [Angel 2.8.3 to 2.8.8]</p>
         <p>Setup a vertex buffer with the corresponding attribute pointer. Add the coordinates and draw three points of size 20 pixels, like in the figure. [Angel 2.4, 2.8, and 2.5.3]</p>
 

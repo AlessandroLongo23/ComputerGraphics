@@ -5,7 +5,7 @@
 <div class="flex flex-col gap-1 items-start w-1/2 m-auto">
     <p>In this worksheet, we return to user interaction. Our goal is to implement interactive orbiting, dollying, and panning of the camera.</p>
         
-    <ul>
+    <ul class="list-disc list-inside">
         <li>Orbiting is moving spherically around the scene center</li>        
         <li>Dollying is moving radially to have the camera closer to the center or further away from it</li>        
         <li>Panning is moving the camera in a plane parallel to the image plane</li>        

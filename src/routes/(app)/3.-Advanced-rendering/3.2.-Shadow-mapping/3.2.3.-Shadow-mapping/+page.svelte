@@ -446,7 +446,7 @@
         </Admonition>
         
         <p>There are two kinds of coordinate spaces used in this assignment: camera relative and light relative. The following figure illustrates these coordinate spaces and the transformations between them. The basic steps are:</p> 
-        <ul>
+        <ul class="list-disc list-inside">
             <li>Render the scene from the point of view of the light source. Use a shader that draws fragment depth and use a framebuffer object (fbo) to render directly into a texture. The viewport might need adjustment when using the fbo. Bind the depth texture when drawing the ground plane to inspect the result and use this inspection to set proper light view and light projection matrices. [Angel 5.11, 7.12] </li>
             <li>Use the rendered depth texture in the other shaders to determine whether a fragment is in shadow or fully lit. Multi-texturing is needed for the ground plane to combine shadow and texture mapping. [Angel 5.11, 7.5.6]  Make the shadows dark but not pitch black. This can be done by adjusting the visibility factor in the fragment shader.</li>
         </ul>

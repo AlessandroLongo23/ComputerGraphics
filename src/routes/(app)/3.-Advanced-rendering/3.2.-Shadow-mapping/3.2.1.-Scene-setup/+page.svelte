@@ -277,7 +277,7 @@
 
         <p>The main difficulties are that the ground plane and the loaded object use different shaders and that we need to position the teapot in the scene.</p>
             
-        <ul>
+        <ul class="list-disc list-inside">
             <li>Use your code from Part 3 of Worksheet 5 to load and render the teapot model, which is available on DTU Learn. Scale the teapot to a quarter of its original size and construct a model matrix for it that translates it by the vector $(0,-1,-3)$.</li>
             <li>Insert shaders and the part that initializes and draws the textured ground quad from Part 3 of Worksheet 8. The ground quad and the teapot use different shaders.
                 <Admonition type='warning'>

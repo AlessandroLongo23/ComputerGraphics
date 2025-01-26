@@ -73,7 +73,7 @@
 <div class="flex flex-col justify-center items-start {$textWidth} text-xl m-auto gap-6">
     <p class="text-xl font-medium m-0">Assignment</p>
 
-    <div class="flex flex-col gap-4">
+    <div class="flex flex-col gap-4 text-zinc-950/65 dark:text-zinc-50/65">
         <p>Change the code in the previous example to draw triangles instead of points. [Angel 2.4.2]</p>
         <p>Extend the application to include a second buffer for vertex colors and draw the triangle with a red, a green, and a blue vertex color. [Angel 2.5.1 and 2.10]</p>
     </div>

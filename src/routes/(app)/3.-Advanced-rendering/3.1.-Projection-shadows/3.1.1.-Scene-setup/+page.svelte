@@ -167,7 +167,7 @@
         <p>One of the two smaller quads should be parallel to $y=-1$, but placed above the ground $(y=-0.5,\ x\in[0.25,0.75],\ z\in[-1.25,-1.75])$.</p>
         <p>The other should be perpendicular to $y=-1$ with two vertices intersecting the ground $(x=-1,\ y\in[-1,0],\ z\in[-2.5,-3])$.</p>
         <p>Create a WebGL program that draws this scene. Here are some steps:</p> 
-        <ul>
+        <ul class="list-disc list-inside">
             <li>Start from Part 1 of Worksheet 6. Use the coordinates given above to set the vertex coordinates of the ground. Adjust the texture coordinates of the ground so that the texture fills out the square without being repeated.</li>
             <li>Replace the checkerboard texture by the texture image in xamp23.png (available on DTU Learn).</li>
             <li>In initialization, switch to gl.TEXTURE1 using gl.activeTexture and create a new texture of $1\times1$ resolution, where you store just a single red color: Uint8Array([255, 0, 0]). [Angel 7.5.6]</li>

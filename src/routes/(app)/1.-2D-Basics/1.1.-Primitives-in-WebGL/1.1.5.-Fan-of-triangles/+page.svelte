@@ -119,7 +119,7 @@
 <div class="flex flex-col justify-center items-start {$textWidth} text-xl m-auto gap-6">
     <p class="text-xl font-medium m-0">Assignment</p>
 
-    <div class="flex flex-col gap-4">
+    <div class="flex flex-col gap-4 text-zinc-950/65 dark:text-zinc-50/65">
         <p>Create and draw a circle using the triangle fan drawing mode. [Angel 2.4.2]</p>
 
         <Admonition type="warning">
